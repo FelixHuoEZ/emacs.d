@@ -1,0 +1,219 @@
+[[https://travis-ci.org/remyhonig/org-query][https://travis-ci.org/remyhonig/org-query.svg?branch=master]]
+
+* Problem
+
+I wanted to use the /Getting Things Done/ productivity method for
+managing my projects and tasks and the only way I knew how to do this
+was by copying the relevant functions from [[http://doc.norang.ca/org-mode.html#Projects][Bernt Hansen]] but when I
+wanted to customize the views I discovered this was error-prone and
+not very convenient. So I decided to write my own helper functions
+which I turned into =org-query=. 
+
+* Solution
+
+** Features
+
+*** Selection DSL
+
+To include entries in the agenda blocks you can use queries like this.
+
+#+BEGIN_SRC emacs-lisp
+  ;; Skip the whole tree if the condition is not met
+  (org-query-select "tree"
+
+   ;; All criteria must be satisfied
+   (and
+
+    ;; Don't match trees under the Someday / Maybe headline
+    (not (org-query-parent (org-query-stringmatch "^Someday / Maybe")))
+
+    ;; The headline should have at least one child with a todo state
+    (org-query-child (org-query-todo))
+
+    ;; The headline itself should have the NEXT todo state
+    (org-query-todo '("NEXT"))))
+#+END_SRC
+
+This in contrast to the [[https://www.gnu.org/software/emacs/manual/html_node/org/Special-agenda-views.html][standard skip functions]] included in =orgmode=
+by default. The problem with those functions is that they cannot be
+combined very easily or intuitively.
+
+*** GTD style skipping functions
+
+This package includes a selection of functions that help to implement
+GTD-style project management. See the example for their usage.
+
+** Example
+
+*** Orgmode Tree
+
+#+BEGIN_SRC text
+ * Inbox
+ ** TODO do something
+ * Areas of Focus
+ ** Finances
+ *** NEXT implement budget
+ **** NEXT map current expenditures
+ **** TODO map current income
+ **** TODO set budgets
+ **** TODO setup automatic transactions 
+ *** WAITING change bank
+ **** DONE transfer all funds to new bank account
+ **** DONE close previous bank account
+ **** WAITING verify funds are in new bank account
+ ** Programming
+ *** TODO create org-query v2
+ **** NEXT make coffee
+ **** TODO checkout repo from github
+ **** WAITING pull request to other project
+ **** Someday / Maybe 
+ ***** TODO caching
+ ** Family
+ *** NEXT go to the movies
+ **** DONE choose movie
+ **** TODO buy tickets
+ **** TODO pickup tickets 
+ #+END_SRC
+
+*** Agenda View
+
+#+BEGIN_SRC text
+============================================================
+Task to refile
+  test:       TODO do something
+
+============================================================
+Tasks waiting for something
+  test:       WAITING verify funds are in new bank account
+  test:       WAITING pull request to other project
+
+============================================================
+Next tasks in active projects
+  test:       NEXT map current expenditures
+
+============================================================
+Active projects with a next task
+  test:       NEXT implement budget
+
+============================================================
+Active projects without next task
+  test:       NEXT go to the movies
+
+============================================================
+Waiting projects
+  test:       WAITING change bank
+
+============================================================
+Backlog of active projects
+  test:       TODO map current income
+  test:       TODO set budgets
+  test:       TODO setup automatic transactions
+  test:       TODO buy tickets
+  test:       TODO pickup tickets
+#+END_SRC
+
+** Usage
+
+#+name: org-config
+#+BEGIN_SRC emacs-lisp
+  (defun rmh/agendablock-tasks-waiting ()
+    `(tags-todo "/+WAITING|+DEFERRED"
+                ((org-agenda-overriding-header "Tasks waiting for something")
+                 (org-tags-match-list-sublevels nil)
+                 (org-agenda-skip-function (org-query-select "headline" (not (org-query-gtd-project))))
+                 (org-agenda-todo-ignore-scheduled t)
+                 (org-agenda-todo-ignore-deadlines t)
+                 )))
+
+  (defun rmh/agendablock-next-in-active ()
+    `(tags-todo "/+NEXT"
+                ((org-agenda-overriding-header "Next tasks in active projects")
+                 (org-agenda-skip-function (org-query-select "headline" (org-query-gtd-active-project-next-task)))
+                 (org-tags-match-list-sublevels t)
+                 (org-agenda-todo-ignore-scheduled 't)
+                 (org-agenda-todo-ignore-deadlines 't)
+                 (org-agenda-todo-ignore-with-date 't)
+                 (org-agenda-sorting-strategy
+                  '(todo-state-down effort-up category-keep)))))
+
+  (defun rmh/agendablock-backlog-of-active ()
+    `(tags-todo "/+TODO"
+                ((org-agenda-overriding-header "Backlog of active projects")
+                 (org-agenda-skip-function (org-query-select "headline" (org-query-gtd-backlog-task)))
+                 (org-agenda-todo-ignore-scheduled 't)
+                 (org-agenda-todo-ignore-deadlines 't)
+                 (org-agenda-todo-ignore-with-date 't)
+                 (org-agenda-sorting-strategy
+                  '(category-keep)))))
+
+  (defun rmh/agendablock-active-projects-without-next ()
+    `(tags-todo "/+NEXT"
+                ((org-agenda-overriding-header "Active projects without next task")
+                 (org-agenda-skip-function (org-query-select "tree" (org-query-gtd-active-project-stuck)))
+                 (org-tags-match-list-sublevels 't)
+                 (org-agenda-sorting-strategy
+                  '(category-keep)))))
+
+  (defun rmh/agendablock-active-projects-with-next ()
+    `(tags-todo "/+NEXT"
+                ((org-agenda-overriding-header "Active projects with a next task")
+                 (org-agenda-skip-function (org-query-select "tree" (org-query-gtd-active-project-armed)))
+                 (org-tags-match-list-sublevels 't)
+                 (org-agenda-sorting-strategy
+                  '(category-keep)))))
+
+  (defun rmh/agendablock-waiting-projects ()
+    `(tags-todo "/+WAITING"
+                ((org-agenda-overriding-header "Waiting projects")
+                 (org-agenda-skip-function (org-query-select "tree" (org-query-gtd-project)))
+                 (org-tags-match-list-sublevels 't)
+                 (org-agenda-sorting-strategy
+                  '(category-keep)))))
+
+  (defun rmh/agendablock-loose-tasks ()
+    `(tags-todo "/+TODO"
+                ((org-agenda-overriding-header "Tasks not belonging to a project")
+                 (org-agenda-skip-function
+                  (org-query-select "headline" (and (org-query-gtd-loose-task) (not (org-is-habit-p)))))
+                 (org-agenda-todo-ignore-scheduled 't)
+                 (org-agenda-todo-ignore-deadlines 't)
+                 (org-agenda-todo-ignore-with-date 't)
+                 (org-agenda-sorting-strategy
+                  '(category-keep)))))
+
+  (defun rmh/agendablock-checklists ()
+    `(tags "CHECKLIST"
+           ((org-agenda-overriding-header "Checklists")
+            (org-tags-match-list-sublevels nil))))
+
+  (defun rmh/agendablock-inbox ()
+    `(tags-todo "LEVEL=2"
+                ((org-agenda-overriding-header "Tasks to refile")
+                 (org-agenda-skip-function (org-query-select "tree" (org-query-gtd-refile)))
+                 (org-tags-match-list-sublevels nil))))
+
+
+  (setq org-agenda-custom-commands
+        `(" " "Agenda"
+          ((agenda "" ((org-agenda-ndays 1)))
+           ,(rmh/agendablock-inbox)
+           ,(rmh/agendablock-tasks-waiting)
+           ,(rmh/agendablock-next-in-active)
+           ,(rmh/agendablock-active-projects-with-next)
+           ,(rmh/agendablock-active-projects-without-next)
+           ,(rmh/agendablock-waiting-projects)
+           ,(rmh/agendablock-backlog-of-active)
+           ,(rmh/agendablock-checklists))
+          nil)
+        ("r" "Review Agenda"
+         ((agenda "" ((org-agenda-ndays 1)))
+          ,(rmh/agendablock-inbox)
+          ,(rmh/agendablock-loose-tasks)
+          ,(rmh/agendablock-tasks-waiting)
+          ,(rmh/agendablock-next-in-active)
+          ,(rmh/agendablock-active-projects-with-next)
+          ,(rmh/agendablock-active-projects-without-next)
+          ,(rmh/agendablock-backlog-of-active)
+          ,(rmh/agendablock-checklists))
+         nil))
+#+END_SRC

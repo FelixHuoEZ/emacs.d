@@ -1,0 +1,8 @@
+* text eol=lf
+*.flf binary
+*.css -text
+*.js -text
+*.setup -text
+*.png binary
+*.pyim -text
+*.exe binary

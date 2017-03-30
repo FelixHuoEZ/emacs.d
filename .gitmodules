@@ -1,0 +1,10 @@
+[submodule "export-themes"]
+	path = export-themes
+	url = https://github.com/private-github-user/export-themes.git
+[submodule "snippets"]
+	path = snippets
+	url = https://github.com/private-github-user/my-snippets.git
+[submodule "pyim-dicts"]
+	path = pyim/dicts
+	url = https://github.com/private-github-user/pyim-dicts.git
+
