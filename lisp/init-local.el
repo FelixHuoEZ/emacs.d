@@ -17,10 +17,6 @@
 ;;Turn on abbrev mode
 (load (expand-file-name "lisp/emacs_abbrev.el" user-emacs-directory))
 ;;(load "~/.emacs.d/my_emacs_abbrev")
-(global-set-key (kbd "<f2>") 'open-my-init-file)
-(defun open-my-init-file ()
-  (interactive)
-  (find-file "~/.emacs.d/init.el"))
 (global-set-key (kbd "C-h C-f") 'find-function)
 (setq desktop-restore-frames t)
 (desktop-save-mode nil)
@@ -1417,6 +1413,15 @@ the actual manpage using the function `man'."
 (use-package helm-zhihu-daily
   :ensure t)
 
+
+
+;;; neotree
+(use-package neotree
+  :config
+  ;; (use-package all-the-icons)
+  ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  :bind (("<f8>" . neotree-toggle)))
+
 
 (use-package verify-url
   :ensure t)
@@ -1581,6 +1586,14 @@ _~_: modified
   (interactive)
   (find-file "~/.emacs.d/lisp/init-org.el"))
 
+(defun my-customize-local ()
+  (interactive)
+  (find-file "~/.emacs.d/lisp/init-local.el"))
+
+(defun open-my-init-file ()
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
+
 (defun restart-tabbar-mode ()
   (interactive)
   (tabbar-mode nil)
@@ -1590,8 +1603,10 @@ _~_: modified
 ;; (pyim-restart-1 t)
 
 (global-set-key (kbd "C-c v") 'view-mode)
+(global-set-key (kbd "C-c g i") 'open-my-init-file)
 (global-set-key (kbd "C-c g g") 'gtd)
 (global-set-key (kbd "C-c g o") 'my-customize-org)
+(global-set-key (kbd "<f2>") 'my-customize-local)
 ;; (define-key matlab-mode-map (kbd "M-j") nil)
 
 
