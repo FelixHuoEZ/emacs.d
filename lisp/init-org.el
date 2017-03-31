@@ -139,7 +139,7 @@
                (file-exists-p org-ditaa-jar-path))
     (let ((jar-name "ditaa0_9.jar")
           (url "http://jaist.dl.sourceforge.net/project/ditaa/ditaa/0.9/ditaa0_9.zip"))
-      (setq org-ditaa-jar-path (expand-file-name jar-name (file-name-directory user-init-file)))
+      (setq org-ditaa-jar-path (expand-file-name jar-name user-emacs-directory))
       (unless (file-exists-p org-ditaa-jar-path)
         (sanityinc/grab-ditaa url jar-name)))))
 

@@ -26,39 +26,16 @@
 
 
 ;;; Standard package repositories
-
 (when (< emacs-major-version 24)
   ;; Mainly for ruby-mode
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t))
+  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/")))
 
 ;; We include the org repository for completeness, but don't normally
 ;; use it.
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
 
 (when (< emacs-major-version 24)
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t))
-
-
-;; (when (< emacs-major-version 24)
-;;   ;; Mainly for ruby-mode
-;;   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/")))
-
-;; ;; We include the org repository for completeness, but don't normally
-;; ;; use it.
-;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-
-;; (when (< emacs-major-version 24)
-;;   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-
-;; ;;; Also use Melpa for most packages
-;; (add-to-list 'package-archives '("melpa" . ,(if (< emacs-major-version 24)
-;;                                                 "http://melpa.org/packages/"
-;;                                               "https://melpa.org/packages/")))
-
-
-;; (add-to-list 'package-archives '("THU" . "https://mirror.tuna.tsinghua.edu.cn/elpa/"))
-;; (add-to-list 'package-archives '("emacs-china" . "http://elpa.emacs-china.org/"))
-;; (add-to-list 'package-archives '("emacs-china" . "http://elpa.zilongshanren.com/melpa/"))
+  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 
 (defconst sanityinc/no-ssl (or (< emacs-major-version 24)
                                (and (memq system-type '(windows-nt ms-dos))
@@ -72,6 +49,27 @@
 
 ;; NOTE: In case of MELPA problems, the official mirror URL is
 ;; https://www.mirrorservice.org/sites/stable.melpa.org/packages/
+
+
+;; (when (< emacs-major-version 24)
+;;   ;; Mainly for ruby-mode
+;;   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t))
+
+;; ;; We include the org repository for completeness, but don't normally
+;; ;; use it.
+;; (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+
+;; (when (< emacs-major-version 24)
+;;   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/") t))
+
+;; ;;; Also use Melpa for most packages
+;; (add-to-list 'package-archives '("melpa" . ,(if (< emacs-major-version 24)
+;;                                                 "http://melpa.org/packages/"
+;;                                               "https://melpa.org/packages/")))
+
+;; (add-to-list 'package-archives '("THU" . "https://mirror.tuna.tsinghua.edu.cn/elpa/"))
+;; (add-to-list 'package-archives '("emacs-china" . "http://elpa.emacs-china.org/"))
+;; (add-to-list 'package-archives '("emacs-china" . "http://elpa.zilongshanren.com/melpa/"))
 
 
 
