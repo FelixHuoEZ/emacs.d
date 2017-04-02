@@ -1097,7 +1097,8 @@ the actual manpage using the function `man'."
 
 
 (use-package ox-latex-chinese
-  :ensure t
+  ;; :ensure t
+  ;; :load-path "elpa-24.5/ox-latex-chinese/"
   ;; :disabled t
   :config
   ;; (setq org-latex-create-formula-image-program 'dvipng)    ;速度很快，但 *默认* 不支持中文
@@ -1218,9 +1219,16 @@ the actual manpage using the function `man'."
         (remove '("T1" "fontenc" t) org-latex-default-packages-alist))
 ;; (setf org-latex-default-packages-alist
 ;;       (remove '("normalem" "ulem" t) org-latex-default-packages-alist))
+  (setf org-latex-default-packages-alist
+        (remove '("" "textcomp" t) org-latex-default-packages-alist))
 
 
 ;; modify hyperref options in default packages alist
+  (setf oxlc/org-latex-default-packages-alist
+        (remove '("" "textcomp" t) oxlc/org-latex-default-packages-alist))
+  (setf oxlc/org-latex-default-packages-alist
+        (remove '("T1" "fontenc" t) oxlc/org-latex-default-packages-alist))
+
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "hyperref" nil) oxlc/org-latex-default-packages-alist))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
@@ -1236,8 +1244,12 @@ the actual manpage using the function `man'."
            ("" "xltxtra" t)
            ("" "fontspec" nil)
            ("" "xunicode" nil)
-         ;; ("" "graphicx" nil)
-         ;; ("top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm" "geometry" nil)
+           ("" "newtxmath" t)
+           ("" "newtxtext" t)
+           ;; ("" "esint" nil)
+           ;; ("" "mathpazo" nil) ; required by siunitx, but actually no matter
+           ;; ("" "graphicx" nil)
+           ;; ("top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm" "geometry" nil)
            ("" "caption" nil)
            ("" "multicol" nil)
            ("" "multirow" nil)
@@ -1247,24 +1259,23 @@ the actual manpage using the function `man'."
            ("" "colortbl" nil)
            ("" "csquotes" nil)
            ("" "helvet" nil)
-           ;; ("" "mathpazo" nil) ; required by siunitx, but actually no matter
            ("" "pgfplots" nil)
            ("" "xcolor" nil)
            ("" "siunitx" nil)
-           ("" "upgreek" nil)
+           ;; ("" "upgreek" nil)
            ("" "physics" nil)
            ("" "bm" nil)
-           ("" "esint" nil)
            ("" "lscape" nil)
            ("" "fancyhdr" nil)
-         ;; ("" "titlesec" nil)  titlesec conflict with titling for the command thetitle
-         ;; ("" "cite" nil)
+           ;; ("" "titlesec" nil)  titlesec conflict with titling for the command thetitle
+           ;; ("" "cite" nil)
            ("numbers,square,super,sort&compress" "natbib" nil)
            ("" "listings" nil)
+           ("" "zhspacing" nil)
            "
 \\newcommand{\\circlenum}[1]{\\ding{\\numexpr171+#1}}
-\\DeclareSymbolFont{matha}{OML}{txmi}{m}{it}% txfonts
-\\DeclareMathSymbol{\\varv}{\\mathord}{matha}{118}
+% \\DeclareSymbolFont{matha}{OML}{txmi}{m}{it}% txfonts
+% \\DeclareMathSymbol{\\varv}{\\mathord}{matha}{118}
 \\makeatletter
 \\newcommand*{\\fullcite}[2][]{%
 \\begingroup
