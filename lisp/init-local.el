@@ -582,28 +582,42 @@ same directory as the org-buffer and insert a link to this file."
 
 
 ;; screenshot
-;; 使用 irfanview 的命令行截图，并保存到指定文件夹
-;; 再使用 picpick 或 faststone 修改
-(defun cut ()
+;; 使用 irfanview 的命令行截图，并保存到指定文件夹，再使用 picpick 或 faststone 修改
+;; 若使用全局参数 C-u 截图之后会调用 picpick 编辑图片
+;; TODO: 截图之前交互式地选择一个 buffer 来作为 current org file，那样就不限于在 org 文件的当前 buffer 截图了
+;; TODO: 带参数来决定 irfanview 的 option，可以使用带参数的C-u 来实现，但是与已实现的带参数来调用 picpick 的功能冲突
+(defun org-img-capture (arg)
   "Take a screenshot into a unique-named file in the current buffer file
    directory and insert a link to this file.
 [[http://www.jianshu.com/p/77841e0aba46][emacs的工作环境设置 - 简书]]
 [[https://emacs-china.org/t/org-mode-windows-7/2161/9][Org-mode截图与显示图片（Windows 7） - Org-mode - Emacs China]]
 "
-  (interactive)
-  (setq filename
-        (concat (make-temp-name "img-") ".png"))
-  ;; (shell-command (format "boxcutter f:/cy/home/thinkT420/Notiz/img/\"%s\"" filename))
-  (shell-command (concat "i_view64 /capture=4 /convert=" "\"g:\\testimg" (format "\\%s\"" filename)))
-  (insert (concat "[[./img/" filename "]]"))
-  (shell-command (format "picpick f:/cy/home/thinkT420/Notiz/img/\"%s\"" filename))
-  )
+  (interactive "P")
+  (let ((file-directory (file-name-directory buffer-file-name)))
+    (make-directory (concat file-directory "img/") t)
+    (let* ((file-fullname
+            (concat file-directory "img/img_" (format-time-string "%Y%m%d_%H%M%S") ".png"))             ;;  (concat file-directory (make-temp-name (concat file-directory "img/img-")) ".png")
+           (file-name (file-name-nondirectory file-fullname)))
+      ;; irfanview cature options
+      ;; 0 = whole screen
+      ;; 1 = current monitor, where mouse is located
+      ;; 2 = foreground window
+      ;; 3 = foreground window - client area
+      ;; 4 = rectangle selection
+      ;; 5 = object selected with the mouse
+      ;; 6 = start in capture mode (can't be combined with other commandline options)
+      ;; 7 = fixed rectangle (using capture dialog values or direct input)
+      (shell-command (concat "i_view64 /capture=4 /convert=" (format "\"%s\"" file-fullname)))
+      (insert (concat "[[./img/" file-name "]]"))
+      (if arg (shell-command (format "picpick \"%s\"" file-fullname))))))
 
-(define-key org-mode-map (kbd "C-c r") 'cut)
+(define-key org-mode-map (kbd "C-c r") 'org-img-capture)
+
 
 ;; merriam-webster dictionary
 ;; 使用 eww 直接打开网页，不够人性化
 ;; 希望可以做成有道那样，不知道 wesbter 有没有提供 API
+;; todo
 (defvar webster-url "http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=")
 
 (defun merriam (word)
@@ -657,12 +671,16 @@ same directory as the org-buffer and insert a link to this file."
 
 
 ;;; chinese-pyim
-
-;; (require 'chinese-pyim)
 (use-package chinese-pyim
-  :ensure t
-  :demand t
+  ;; :ensure t
+  ;; :load-path "elpa-24.5/chinese-pyim"
+  ;; :defer nil
+  ;; :demand t                             ; if set demand, pyim will not automatically switched sometimes especially in org-mode,
+                                        ; if not set, when first use pyim, there will be a delay to load the package
   ;; :disabled t
+  ;; :init
+  ;; (add-hook 'after-init-hook
+  ;;           #'(lambda () (pyim-restart-1 t)))
   :config
   ;; 基本快捷键列表
   ;; C-n/M-n/+ 向下翻页， C-p/M-p/- 向上翻页， C-f 选择下一个备选词，C-b 选择上一个备选词
@@ -689,7 +707,7 @@ same directory as the org-buffer and insert a link to this file."
                   pyim-probe-punctuation-after-punctuation))
 
   (use-package chinese-pyim-basedict
-    :ensure t
+    ;; :ensure t
     ;; :disabled t
     :config
     (chinese-pyim-basedict-enable))
@@ -719,22 +737,23 @@ same directory as the org-buffer and insert a link to this file."
   ;; (setq pyim-page-tooltip 'pos-tip)
   ;; (setq pyim-page-tooltip 'popup)
   ;; (print pyim-dicts)
-  (add-hook 'emacs-startup-hook
-            #'(lambda () (pyim-restart-1 t)))
+  ;; (add-hook 'emacs-startup-hook
+  ;;           #'(lambda () (pyim-restart-1 t)))
   ;; (pyim-restart-1 t)
+  ;; (pyim-restart-1)
 
   ;; 词库导出，后续更新版本需要注释掉
-  (defun pyim-personal-dcache-export ()
-    "将 pyim-dcache-icode2word 导出为 pyim 词库文件。"
-    (interactive)
-    (let ((file (read-file-name "将个人缓存中的词条导出到文件：")))
-      (with-temp-buffer
-        (insert ";;; -*- coding: utf-8-unix -*-\n")
-        (maphash
-         #'(lambda (key value)
-             (insert (concat key " " (mapconcat #'identity value " ") "\n")))
-         pyim-dcache-icode2word)
-        (write-file file))))
+  ;; (defun pyim-personal-dcache-export ()
+  ;;   "将 pyim-dcache-icode2word 导出为 pyim 词库文件。"
+  ;;   (interactive)
+  ;;   (let ((file (read-file-name "将个人缓存中的词条导出到文件：")))
+  ;;     (with-temp-buffer
+  ;;       (insert ";;; -*- coding: utf-8-unix -*-\n")
+  ;;       (maphash
+  ;;        #'(lambda (key value)
+  ;;            (insert (concat key " " (mapconcat #'identity value " ") "\n")))
+  ;;        pyim-dcache-icode2word)
+  ;;       (write-file file))))
 
   (use-package chinese-pyim-company
     :disabled t
@@ -1612,6 +1631,7 @@ _~_: modified
 
 (restart-tabbar-mode)
 ;; (pyim-restart-1 t)
+;; (pyim-restart-1)
 
 (global-set-key (kbd "C-c v") 'view-mode)
 (global-set-key (kbd "C-c g i") 'open-my-init-file)
