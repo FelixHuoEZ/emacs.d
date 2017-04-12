@@ -464,6 +464,7 @@ typical word processor."
      (sql . nil)
      (sqlite . t))))
 
+
 
 ;;; Private User Misc Settings
 
@@ -477,15 +478,59 @@ typical word processor."
 
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
+;; org-edit-latex
+(use-package org-edit-latex)
 
+
+;;; increasingly renumber the equation in fragment
+(defun org-renumber-environment (orig-func &rest args)
+  (let ((results '())
+        (counter -1)
+        (numberp))
+
+    (setq results (loop for (begin .  env) in
+                        (org-element-map (org-element-parse-buffer) 'latex-environment
+                          (lambda (env)
+                            (cons
+                             (org-element-property :begin env)
+                             (org-element-property :value env))))
+                        collect
+                        (cond
+                         ((and (string-match "\\\\begin{equation}" env)
+                               (not (string-match "\\\\tag{" env)))
+                          (incf counter)
+                          (cons begin counter))
+                         ((string-match "\\\\begin{align}" env)
+                          (prog2
+                              (incf counter)
+                              (cons begin counter)
+                            (with-temp-buffer
+                              (insert env)
+                              (goto-char (point-min))
+                              ;; \\ is used for a new line. Each one leads to a number
+                              (incf counter (count-matches "\\\\$"))
+                              ;; unless there are nonumbers.
+                              (goto-char (point-min))
+                              (decf counter (count-matches "\\nonumber")))))
+                         (t
+                          (cons begin nil)))))
+
+    (when (setq numberp (cdr (assoc (point) results)))
+      (setf (car args)
+            (concat
+             (format "\\setcounter{equation}{%s}\n" numberp)
+             (car args)))))
+
+  (apply orig-func args))
+
+(advice-add 'org-create-formula-image :around #'org-renumber-environment)
+;; (advice-remove 'org-create-formula-image #'org-renumber-environment)
 
 ;;; org-ref and bibtex
 
 (use-package org-ref
-  :ensure t
   :config
-  (use-package ivy-bibtex
-    :ensure t)
+  (use-package ivy-bibtex)
   (require 'doi-utils)
   ;; doi-utils-add-bibtex-entry-from-doi and doi-utils-add-entry-from-crossref-query
   (require 'org-ref-wos)
@@ -497,7 +542,10 @@ typical word processor."
   (require 'x2bib)
 
   (setq org-ref-completion-library 'org-ref-ivy-cite)
-  (setq reftex-default-bibliography '("E:/Zotero/autobib/zoteroexport.bib"))
+  ;; on Linux or macOS, just use ln command to make a symbol link or hard link
+  ;; on Windows, you should make a symbol link from your zotero export bib file to ~/.emacs.d/zoterobib.bib
+  ;; mklink "<path-to-home>/.emacs.d/zoterobib.bib" "<path-and-filename-to-zotero-export-bib>"
+  (setq reftex-default-bibliography '(expand-file-name "zoterobib.bib" user-emacs-directory))
   (setq bibtex-completion-pdf-symbol "⌘")
   (setq bibtex-completion-notes-symbol "✎")
 

@@ -75,6 +75,8 @@ site-lisp/package/
 /.smex-items
 /server/emacs-server-file
 /.bookmarks.el
+/tldr/
+zoterobib.bib
 
 # cache
 /pyim/cache/

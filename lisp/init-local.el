@@ -1173,6 +1173,9 @@ the actual manpage using the function `man'."
 \\setmainfont{Times New Roman}    % 英文衬线字体
 \\setmonofont{Consolas}           % 英文等宽字体
 \\setsansfont{Arial}              % 英文无衬线字体
+[DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]
 "
 ;;; 下面这部分是上面字体设置部分的注释
 ;;; 最好使用文件名设置字体，而不是字体族名
@@ -1230,36 +1233,37 @@ the actual manpage using the function `man'."
           ))
 
 
-;; org不建议自定义org-latex-default-package-alist变量，但"inputenc" and "fontenc"两个宏包似乎和xelatex有冲突，调整默认值！
-;; 如果直接设置该变量，可以直接去除这三个 cell，不需要下面这三段代码
-;; (setf org-latex-default-packages-alist
-;;       (remove '("AUTO" "inputenc" t) org-latex-default-packages-alist))
-  (setf org-latex-default-packages-alist
-        (remove '("T1" "fontenc" t) org-latex-default-packages-alist))
-;; (setf org-latex-default-packages-alist
-;;       (remove '("normalem" "ulem" t) org-latex-default-packages-alist))
-  (setf org-latex-default-packages-alist
-        (remove '("" "textcomp" t) org-latex-default-packages-alist))
+  ;; org不建议自定义org-latex-default-package-alist变量，但"inputenc" and "fontenc"两个宏包似乎和xelatex有冲突，调整默认值！
+  ;; 如果直接设置该变量，可以直接去除这三个 cell，不需要下面这三段代码
+  ;; (setf org-latex-default-packages-alist
+  ;;       (remove '("AUTO" "inputenc" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;;       (remove '("T1" "fontenc" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;;       (remove '("normalem" "ulem" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;;       (remove '("" "textcomp" t) org-latex-default-packages-alist))
 
 
-;; modify hyperref options in default packages alist
+;; customize default packages alist
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "textcomp" t) oxlc/org-latex-default-packages-alist))
   (setf oxlc/org-latex-default-packages-alist
         (remove '("T1" "fontenc" t) oxlc/org-latex-default-packages-alist))
-
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "hyperref" nil) oxlc/org-latex-default-packages-alist))
-  (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
-
-  (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
+  (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" t))
+  ;; (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titletoc" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titling" nil))
 
   (setq  oxlc/org-latex-packages-alist
          '(("" "tikz" nil)
-           ("" "CJKulem" nil)
-           ("" "pifont" nil)
+           ;; ctex will automatically load xeCJKfntef, which will load CJKulem
+           ;; ("" "CJKulem" nil)
+           ;; use pifont only if use ding
+           ;; ("" "pifont" nil)
+           ;; xltxtra loads fontspec, metalogo, realscripts. Many features are incorporated into fontspec
            ("" "xltxtra" t)
            ("" "fontspec" nil)
            ("" "xunicode" nil)
@@ -1279,11 +1283,11 @@ the actual manpage using the function `man'."
            ("" "csquotes" nil)
            ("" "helvet" nil)
            ("" "pgfplots" nil)
-           ("" "xcolor" nil)
-           ("" "siunitx" nil)
+           ("" "xcolor" t)
+           ("" "siunitx" t)
            ;; ("" "upgreek" nil)
            ("" "physics" nil)
-           ("" "bm" nil)
+           ("" "bm" t)
            ("" "lscape" nil)
            ("" "fancyhdr" nil)
            ;; ("" "titlesec" nil)  titlesec conflict with titling for the command thetitle
@@ -1292,7 +1296,8 @@ the actual manpage using the function `man'."
            ("" "listings" nil)
            ("" "zhspacing" nil)
            "
-\\newcommand{\\circlenum}[1]{\\ding{\\numexpr171+#1}}
+% early generated document maybe need the following sentences
+% \\newcommand{\\circlenum}[1]{\\ding{\\numexpr171+#1}}
 % \\DeclareSymbolFont{matha}{OML}{txmi}{m}{it}% txfonts
 % \\DeclareMathSymbol{\\varv}{\\mathord}{matha}{118}
 \\makeatletter
@@ -1311,6 +1316,7 @@ the actual manpage using the function `man'."
 "))
 
   (setq org-latex-packages-alist 'oxlc/org-latex-packages-alist)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.3))
 
   (setq org-pretty-entities nil))
 
@@ -1586,6 +1592,16 @@ _~_: modified
     (global-set-key (kbd "C-x b") #'persp-switch-to-buffer)
     (global-set-key (kbd "C-x k") #'persp-kill-buffer))
   )
+
+
+
+;; symbol-overlay
+(use-package symbol-overlay
+  :disabled t
+  :bind
+  (("M-i" . symbol-overlay-put)
+   ("M-u" . symbol-overlay-switch-backward)
+   ("M-o" . symbol-overlay-switch-forward)))
 
 
 (require 'init-window-settings)

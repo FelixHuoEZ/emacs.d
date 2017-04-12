@@ -46,9 +46,15 @@
 (setq org-html-validation-link nil)
 
 
-
+;; refer to the page [[http://docs.mathjax.org/en/latest/tex.html#][MathJax TeX and LaTeX Support — MathJax 2.7 documentation]]
 (setq org-html-mathjax-template
-      "<script type=\"text/javascript\" src=\"%PATH\"></script>")
+      "<script type=\"text/javascript\" src=\"%PATH\"></script>
+<script type=\"text/x-mathjax-config\">
+MathJax.Hub.Config({
+  TeX: { equationNumbers: { autoNumber: \"AMS\" } }
+});
+</script>
+")
 ;; (setq org-html-mathjax-template "")
 
 (setq org-html-mathjax-options
