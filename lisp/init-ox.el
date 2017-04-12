@@ -51,10 +51,10 @@
       "<script type=\"text/javascript\" src=\"%PATH\"></script>
 <script type=\"text/x-mathjax-config\">
 MathJax.Hub.Config({
-  extensions: [\"tex2jax.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/physics/physics.js\"],
+  extensions: [\"tex2jax.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/physics/physics.js\", \"[Contrib]/sqrtspacing.js\"],
   TeX: {
     equationNumbers: { autoNumber: \"AMS\" },
-    extensions: [\"autoload-all.js\", \"AMSmath.js\", \"AMSsymbols.js\", \"color.js\", \"sinuitx.js\", \"physics.js\", \"cancel.js\", \"begingroup.js\"]
+    extensions: [\"autoload-all.js\", \"AMSmath.js\", \"AMSsymbols.js\", \"color.js\", \"sinuitx.js\", \"physics.js\", \"cancel.js\", \"begingroup.js\", \"sqrtspacing.js\"]
 }
 });
 </script>
