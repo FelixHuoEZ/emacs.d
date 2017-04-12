@@ -51,7 +51,11 @@
       "<script type=\"text/javascript\" src=\"%PATH\"></script>
 <script type=\"text/x-mathjax-config\">
 MathJax.Hub.Config({
-  TeX: { equationNumbers: { autoNumber: \"AMS\" } }
+  extensions: [\"tex2jax.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/physics/physics.js\"],
+  TeX: {
+    equationNumbers: { autoNumber: \"AMS\" },
+    extensions: [\"autoload-all.js\", \"AMSmath.js\", \"AMSsymbols.js\", \"color.js\", \"sinuitx.js\", \"physics.js\", \"cancel.js\", \"begingroup.js\"]
+}
 });
 </script>
 ")
