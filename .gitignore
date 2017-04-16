@@ -45,6 +45,7 @@ site-lisp/package/
 /projectile-bookmarks.eld
 /anaconda-mode/
 /.historian
+/.uptimes.el
 
 ## my files
 # misc
