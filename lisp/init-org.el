@@ -179,13 +179,16 @@ typical word processor."
 (global-set-key (kbd "C-c c") 'org-capture)
 
 (setq org-capture-templates
-      `(("t" "todo" entry (file "~/orgfile/GTD/newgtd.org")  ; "newgtd.org" => org-default-gtd-file
+      `(("t" "todo" entry (file "~/orgfile/GTD/newgtd.org") ; "newgtd.org" => org-default-gtd-file
          "* NEXT %?\n%U\n" :clock-resume t)
         ("n" "note" entry (file "~/orgfile/GTD/journal.org") ; "journal.org" => org-default-note-file
+         "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
+        ("a" "academic" entry (file "~/orgfile/GTD/academic.org") ; "academic.org" => academic-note-file
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
         ))
 (setq org-agenda-files (quote ("~/orgfile/GTD/newgtd.org"
                                "~/orgfile/GTD/journal.org"
+                               "~/orgfile/GTD/academic.org"
                                "~/orgfile/GTD/someday.org"
                                "~/orgfile/GTD/birthday.org")))
 
@@ -539,6 +542,7 @@ typical word processor."
   (require 'org-ref-sci-id)
   (require 'x2bib)
 
+  (setq org-latex-prefer-user-labels t)
   (setq org-ref-completion-library 'org-ref-ivy-cite)
   ;; on Linux or macOS, just use ln command to make a symbol link or hard link
   ;; on Windows, you should make a symbol link from your zotero export bib file to ~/.emacs.d/zoterobib.bib

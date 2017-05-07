@@ -731,7 +731,7 @@ same directory as the org-buffer and insert a link to this file."
   ;; Enable searching with pinyin
   (setq pyim-isearch-enable-pinyin-search t)
   ;; (setq pyim-guidance-format-function 'pyim-guidance-format-function-one-line)
-  (setq pyim-page-length 5)
+  (setq pyim-page-length 9)
   ;; (setq pyim-page-style 'one-line)
   (setq pyim-page-tooltip nil)
   ;; (setq pyim-page-tooltip 'pos-tip)
@@ -1131,9 +1131,12 @@ the actual manpage using the function `man'."
   ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -g -pdf %f"))
   ;; 升级 texlive 的 latexmk 之后， -xelatex 改变导致下面这一行命令不能用了
   ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg -pdf %b.tex"))
+  (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %f"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %b.tex"))
   ;; %O 会被自动转义，现在也没办法，先去掉吧
   ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %O %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
-  (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
 
   ;; latex
   ;; (setq org-latex-coding-system 'utf-8) ; I do not know what the sentence do
@@ -1166,6 +1169,8 @@ the actual manpage using the function `man'."
   (setq oxlc/org-latex-classes
         '(("ctexart"
            "\\documentclass[fontset=windowsnew,UTF8,a4paper,zihao=-4]{ctexart}
+[DEFAULT-PACKAGES]
+[PACKAGES]
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}
 \\setCJKmainfont[BoldFont={SimHei}]{SimSun}
 \\setCJKsansfont[BoldFont={SimHei}]{Kaiti}
@@ -1173,8 +1178,6 @@ the actual manpage using the function `man'."
 \\setmainfont{Times New Roman}    % 英文衬线字体
 \\setmonofont{Consolas}           % 英文等宽字体
 \\setsansfont{Arial}              % 英文无衬线字体
-[DEFAULT-PACKAGES]
-[PACKAGES]
 [EXTRA]
 "
 ;;; 下面这部分是上面字体设置部分的注释
@@ -1248,12 +1251,13 @@ the actual manpage using the function `man'."
 ;; customize default packages alist
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "textcomp" t) oxlc/org-latex-default-packages-alist))
-  (setf oxlc/org-latex-default-packages-alist
-        (remove '("T1" "fontenc" t) oxlc/org-latex-default-packages-alist))
+  ;; (setf oxlc/org-latex-default-packages-alist
+  ;;       (remove '("T1" "fontenc" t ("pdflatex")) oxlc/org-latex-default-packages-alist))
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "hyperref" nil) oxlc/org-latex-default-packages-alist))
-  (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" t))
-  ;; (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
+  (add-to-list 'oxlc/org-latex-default-packages-alist '("normalem" "ulem" t))
+  (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
+  (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titletoc" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titling" nil))
 
@@ -1267,8 +1271,8 @@ the actual manpage using the function `man'."
            ("" "xltxtra" t)
            ("" "fontspec" nil)
            ("" "xunicode" nil)
-           ("" "newtxmath" t)
-           ("" "newtxtext" t)
+           ;; ("" "newtxmath" t)
+           ;; ("" "newtxtext" nil)
            ;; ("" "esint" nil)
            ;; ("" "mathpazo" nil) ; required by siunitx, but actually no matter
            ;; ("" "graphicx" nil)
@@ -1295,6 +1299,8 @@ the actual manpage using the function `man'."
            ("numbers,square,super,sort&compress" "natbib" nil)
            ("" "listings" nil)
            ("" "zhspacing" nil)
+           ("" "tabularx" nil)
+           ("" "pdflscape" nil)
            "
 % early generated document maybe need the following sentences
 % \\newcommand{\\circlenum}[1]{\\ding{\\numexpr171+#1}}
