@@ -1,0 +1,18 @@
+# Words that extend the spell checker. See ignore.txt for words that should be
+# completely ignored (i.e. not used to create suggestions).
+# © 2015-2017 Marco A.G.Pinto
+# Licensed under LGPL
+#
+afear
+baseball
+basketball
+database
+databases
+device
+devices
+DNA
+laptop
+laptops
+management
+premio
+#New York

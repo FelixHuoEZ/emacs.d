@@ -1115,6 +1115,16 @@ the actual manpage using the function `man'."
   )
 
 
+;; ox-latex-subfigure
+(use-package ox-latex-subfigure
+  :ensure nil
+  :disabled t
+  :load-path "~/.emacs.d/site-lisp/ox-latex-subfigure/"
+  :config
+  (require 'ox-latex-subfigure)
+  (setq org-latex-caption-above nil
+        org-latex-prefer-user-labels t))
+
 (use-package ox-latex-chinese
   ;; :ensure t
   ;; :load-path "elpa-24.5/ox-latex-chinese/"
@@ -1226,14 +1236,13 @@ the actual manpage using the function `man'."
            ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
            )
           ("article"
-           "\\documentclass{arcitle}
+           "\\documentclass{article}
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}"
            ("\\section{%s}" . "\\section*{%s}")
            ("\\subsection{%s}" . "\\subsection*{%s}")
            ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
            ("\\paragraph{%s}" . "\\paragraph*{%s}")
-           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-          ))
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 
   ;; org不建议自定义org-latex-default-package-alist变量，但"inputenc" and "fontenc"两个宏包似乎和xelatex有冲突，调整默认值！
@@ -1255,6 +1264,8 @@ the actual manpage using the function `man'."
   ;;       (remove '("T1" "fontenc" t ("pdflatex")) oxlc/org-latex-default-packages-alist))
   (setf oxlc/org-latex-default-packages-alist
         (remove '("" "hyperref" nil) oxlc/org-latex-default-packages-alist))
+  (setf oxlc/org-latex-default-packages-alist
+        (remove '("" "capt-of" nil) oxlc/org-latex-default-packages-alist))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("normalem" "ulem" t))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
@@ -1608,6 +1619,22 @@ _~_: modified
   (("M-i" . symbol-overlay-put)
    ("M-u" . symbol-overlay-switch-backward)
    ("M-o" . symbol-overlay-switch-forward)))
+
+
+
+;; langtool
+(use-package langtool
+  :config
+  (setq langtool-language-tool-jar (expand-file-name "win-apps/langtool/languagetool-commandline.jar" user-emacs-directory))
+  (setq langtool-default-language "en-US")
+  ;; (setq langtool-mother-tongue "en")
+  :bind
+  (("C-x 4 w" . langtool-check)
+   ("C-x 4 W" . langtool-check-done)
+   ("C-x 4 l" . langtool-switch-default-language)
+   ("C-x 4 4" . langtool-show-message-at-point)
+   ("C-x 4 c" . langtool-correct-buffer)
+   ))
 
 
 (require 'init-window-settings)

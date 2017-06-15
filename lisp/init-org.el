@@ -475,7 +475,8 @@ typical word processor."
    (not (string= lang "latex"))         ;don't ask for latex
    (not (string= lang "emacs-lisp"))    ;don't ask for elisp
    (not (string= lang "sh"))            ;don't ask for shell
-   (not (string= lang "python"))))      ;don't ask for python
+   (not (string= lang "python"))
+   (not (string= lang "dot"))))                                   ;don't ask for python
 
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
