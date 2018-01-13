@@ -44,12 +44,37 @@
 
 ;; (require-package 'chinese-fonts-setup)
 ;; (require 'chinese-fonts-setup)
-(use-package chinese-fonts-setup
-  :ensure t
-  :demand t
-  :init
-  (setq cfs-verbose nil)
+;;(use-package chinese-fonts-setup
+;;  :ensure t
+;;  :demand t
+;;  :init
+;;  (setq cfs-verbose nil)
+;;
+;;  :config
+;;  ;; (cl-prettyprint (font-family-list))
+;;  ;; (print (font-family-list))
+;;
+;;  ;; (cl-remove-if #'(lambda (font)
+;;  ;;                   (not (string-match-p "\\cc" font)))
+;;  ;;               (font-family-list))
+;;
+;;  (setq cfs-personal-fontnames
+;;        '(
+;;          ()
+;;          ("方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
+;;          ()
+;;          ))
+;;
+;;  (setq cfs-profiles
+;;        '("program" "org-mode" "read-book"))
+;;  (chinese-fonts-setup-enable)
+;;  :bind
+;;  (("C--" . cfs-decrease-fontsize)
+;;   ("C-=" . cfs-increase-fontsize)
+;;   ("C-+" . cfs-next-profile)))
 
+(use-package cnfonts
+  :demand t
   :config
   ;; (cl-prettyprint (font-family-list))
   ;; (print (font-family-list))
@@ -58,21 +83,26 @@
   ;;                   (not (string-match-p "\\cc" font)))
   ;;               (font-family-list))
 
-  (setq cfs-personal-fontnames
+  (setq cnfonts-use-system-type t)
+  (setq cnfonts-personal-fontnames
         '(
           ()
           ("方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
           ()
           ))
 
-  (setq cfs-profiles
+  (setq cnfonts-profiles
         '("program" "org-mode" "read-book"))
-  (chinese-fonts-setup-enable)
-  :bind
-  (("C--" . cfs-decrease-fontsize)
-   ("C-=" . cfs-increase-fontsize)
-   ("C-+" . cfs-next-profile)))
+  (cnfonts-enable)
 
+  ;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
+
+  :bind
+  (("C--" . cnfonts-decrease-fontsize)
+   ("C-=" . cnfonts-increase-fontsize)
+   ("C-+" . cnfonts-next-profile))
+
+  )
 
 ;;; fix youdao-dictionary invalid date error
 
@@ -135,7 +165,7 @@
   (lispy-define-key lispy-mode-map "U" 'lispy-split)
   ;; (lispy-define-key lispy-mode-map ";" 'lispy-comment)
 
-;;;; change keybindings
+  ;;;; change keybindings
   ;; (eval-after-load "lispy"
   ;;   `(progn
   ;;      ;; replace a global binding with own function
@@ -294,7 +324,7 @@ same directory as the org-buffer and insert a link to this file."
   (use-package counsel-projectile
     :ensure t
     :config
-    (counsel-projectile-on))
+    (counsel-projectile-mode))
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
 
@@ -1048,8 +1078,6 @@ the actual manpage using the function `man'."
 (use-package helm-google
   :ensure t
   :config
-  ;; (setq browse-url-browser-function 'eww-browse-url)
-  ;; (setq browse-url-browser-function 'browse-url-default-browser)
   :bind
   (("C-h j" . helm-google)))
 
@@ -1141,12 +1169,18 @@ the actual manpage using the function `man'."
   ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -g -pdf %f"))
   ;; 升级 texlive 的 latexmk 之后， -xelatex 改变导致下面这一行命令不能用了
   ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg -pdf %b.tex"))
-  (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %f"))
+  (setq oxlc/org-latex-commands '("latexmk -xelatex -g %f"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %f"))
   ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %b.tex"))
   ;; %O 会被自动转义，现在也没办法，先去掉吧
   ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %O %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
   ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
   ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+
+  (defun oxlc/org-export-to-pdf-quick ()
+    (interactive)
+    (let ((oxlc/org-latex-commands '("latexmk -xelatex -g -pdf %f")))
+      (org-latex-export-to-pdf)))
 
   ;; latex
   ;; (setq org-latex-coding-system 'utf-8) ; I do not know what the sentence do
@@ -1183,7 +1217,7 @@ the actual manpage using the function `man'."
 [PACKAGES]
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}
 \\setCJKmainfont[BoldFont={SimHei}]{SimSun}
-\\setCJKsansfont[BoldFont={SimHei}]{Kaiti}
+\\setCJKsansfont[BoldFont={SimHei}]{KaiTi}
 \\setCJKmonofont{SimHei}
 \\setmainfont{Times New Roman}    % 英文衬线字体
 \\setmonofont{Consolas}           % 英文等宽字体
@@ -1271,6 +1305,7 @@ the actual manpage using the function `man'."
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "float" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titletoc" nil))
   (add-to-list 'oxlc/org-latex-default-packages-alist '("" "titling" nil))
+  (add-to-list 'oxlc/org-latex-default-packages-alist '("" "array" nil))
 
   (setq  oxlc/org-latex-packages-alist
          '(("" "tikz" nil)
@@ -1636,6 +1671,11 @@ _~_: modified
    ("C-x 4 c" . langtool-correct-buffer)
    ))
 
+
+
+;; helpful
+(use-package helpful)
+
 
 (require 'init-window-settings)
 
@@ -1691,6 +1731,53 @@ _~_: modified
 
 
 
+;; broswe-url
+
+;; [[https://emacs.stackexchange.com/questions/7328/how-to-make-eww-default-browser-in-emacs][org mode - How to make eww default browser in Emacs? - Emacs Stack Exchange]]
+;; [[http://ergoemacs.org/emacs/elisp_browse_url.html][Emacs Lisp: View URL in Web Browser: browse-url]]
+;; [[http://ergoemacs.org/emacs/emacs_set_default_browser.html][Emacs: Set Default Browser]]
+(defun hsk/browse-url-with-chrome (url &optional _new-window)
+  (interactive (browse-url-interactive-arg "URL: "))
+  (setq url (browse-url-encode-url url))
+  (cond
+   ((string-equal system-type "windows-nt") ; Windows
+    (shell-command (concat "chrome " url)))
+   ((string-equal system-type "gnu/linux")
+    (shell-command (concat "chrome " url)))
+   ((string-equal system-type "darwin") ; Mac
+    (shell-command (concat "open -a Chrome.app " url)))))
+
+;; set env var named “path” by appending a new path
+(setenv "PATH"
+        (concat
+         "C:/Program Files (x86)/Google/Chrome/Application/"
+         ";"
+         (getenv "PATH")))
+
+;; (setq browse-url-browser-function 'hsk/browse-url-with-chrome)
+;; (setq browse-url-browser-function 'eww-browse-url)
+(setq browse-url-browser-function 'browse-url-default-browser)
+;; (setq browse-url-browser-function 'browse-url-chromium)
+;; (setq browse-url-browser-function 'browse-url-generic
+;;       browse-url-generic-program "chrome")
+
+;; (defun hsk/browse-url-of-buffer-with-firefox ()
+;;   "Same as `browse-url-of-buffer' but using Firefox.
+;; You need Firefox's path in the path environment variable within emacs.
+;; e.g.
+;;  (setenv \"PATH\" (concat \"C:/Program Files (x86)/Mozilla Firefox/\" \";\" (getenv \"PATH\") ) )
+;; On Mac OS X, you don't need to. This command makes this shell call:
+;;  「open -a Firefox.app http://example.com/」"
+;;   (interactive)
+;;   (cond
+;;    ((string-equal system-type "windows-nt") ; Windows
+;;     (shell-command (concat "firefox file://" buffer-file-name)))
+;;    ((string-equal system-type "gnu/linux")
+;;     (shell-command (concat "firefox file://" buffer-file-name)))
+;;    ((string-equal system-type "darwin") ; Mac
+;;     (shell-command (concat "open -a Firefox.app file://" buffer-file-name)))))
+
+
 ;; Wiznote Customization
 (defun wiznote-format-timestamp ()
   (interactive)
@@ -1708,6 +1795,22 @@ _~_: modified
 ;; (let ((wiznote-formated-timestamp (replace-regexp-in-string "\/" "-" (w32-get-clipboard-data))))
 ;;   (if wiznote-formated-timestamp
 ;;       (insert wiznote-formated-timestamp)))
+
+
+;; geeknote
+(use-package geeknote
+  :init
+  ;; (setq geeknote-command "geeknote")
+  ;; :config
+  :bind (
+         ("C-c n c" . geeknote-create)
+         ("C-c n e" . geeknote-edit)
+         ("C-c n f" . geeknote-find)
+         ("C-c n s" . geeknote-show)
+         ("C-c n r" . geeknote-remove)
+         ("C-c n m" . geeknote-move)
+         )
+  )
 
 
 ;; remove the prompt for killing emacsclient buffers 需要放在最后加载
