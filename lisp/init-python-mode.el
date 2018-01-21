@@ -3,17 +3,14 @@
 		("SConscript\\'" . python-mode))
               auto-mode-alist))
 
-(use-package pip-requirements
-  :ensure t)
+(use-package pip-requirements)
 
 (use-package py-autopep8
-  :ensure t
   :config
   (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
   )
 
 (use-package elpy
-  :ensure t
   :config
   (setq elpy-rpc-python-command "python")
   ;; (setq elpy-rpc-python-command "pythonw")
@@ -24,12 +21,10 @@
   (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-current-statement)
   )
 
-(use-package jedi
-  :ensure t)
+(use-package jedi)
 
 
 (use-package flycheck
-  :ensure t
   :config
   (when (require 'flycheck nil t)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
@@ -38,7 +33,6 @@
 
 
 (use-package ein
-  :ensure t
   :config
   ;; (if (eq system-type 'windows-nt)
   ;;     (elpy-use-ipython))

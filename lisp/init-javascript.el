@@ -51,12 +51,14 @@
 
 ;; Javascript nests {} and () a lot, so I find this helpful
 
-(when (and (executable-find "ag")
-           (maybe-require-package 'xref-js2))
-  (after-load 'js2-mode
-    (define-key js2-mode-map (kbd "M-.") nil)
-    (add-hook 'js2-mode-hook
-              (lambda () (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))))
+(unless (version<= emacs-version "25.1")
+  (when (and (executable-find "ag")
+             (maybe-require-package 'xref-js2))
+    (after-load 'js2-mode
+      (define-key js2-mode-map (kbd "M-.") nil)
+      (add-hook 'js2-mode-hook
+                (lambda () (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t))))))
+
 
 
 

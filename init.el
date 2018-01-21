@@ -53,7 +53,8 @@
 (require-package 'use-package)
 (eval-when-compile
   (require 'use-package))
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure nil)
+(setq use-package-always-defer nil)
 ;; (require 'diminish)                ;; if you use :diminish
 (require-package 'bind-key)
 (require 'bind-key)

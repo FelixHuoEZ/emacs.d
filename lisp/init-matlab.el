@@ -1,5 +1,4 @@
 (use-package matlab-mode
-  :ensure t
   :mode "\\.m$"
   ;; :init
   ;; (add-to-list

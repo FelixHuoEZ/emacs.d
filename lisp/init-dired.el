@@ -22,6 +22,18 @@
   (after-load 'dired
     (add-hook 'dired-mode-hook 'diff-hl-dired-mode)))
 
+;; (add-hook 'dired-mode-hook
+;;           (lambda ()
+;;             (highlight-lines-matching-regexp "\.\(org\)\|\(tex\)$" 'hi-yellow)))
+
+(add-hook 'dired-mode-hook
+          (lambda ()
+            (highlight-lines-matching-regexp "\.org$" 'hi-yellow)))
+
+(add-hook 'dired-mode-hook
+          (lambda ()
+            (highlight-lines-matching-regexp "\.tex$" 'hi-green)))
+
 
 ;;; 以下为子龙山人的部分配置
 ;; 删除目录的时候， 取消 Emacs 询问是否递归删除或拷贝

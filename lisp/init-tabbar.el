@@ -7,7 +7,6 @@
 ;;(require 'tabbar)
 
 (use-package tabbar
-  :ensure t
   :config
   (tabbar-mode t)
   ;;Speed up by not using images

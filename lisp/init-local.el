@@ -45,7 +45,6 @@
 ;; (require-package 'chinese-fonts-setup)
 ;; (require 'chinese-fonts-setup)
 ;;(use-package chinese-fonts-setup
-;;  :ensure t
 ;;  :demand t
 ;;  :init
 ;;  (setq cfs-verbose nil)
@@ -75,6 +74,8 @@
 
 (use-package cnfonts
   :demand t
+  :init
+  (setq cnfonts-verbose nil)
   :config
   ;; (cl-prettyprint (font-family-list))
   ;; (print (font-family-list))
@@ -92,7 +93,7 @@
           ))
 
   (setq cnfonts-profiles
-        '("program" "org-mode" "read-book"))
+        '("default" "program" "org-mode" "read-book"))
   (cnfonts-enable)
 
   ;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
@@ -142,7 +143,6 @@
 
 ;; smartparens-mode
 (use-package smartparens
-  :ensure t
   :config
   (smartparens-global-mode t)
   )
@@ -152,7 +152,7 @@
 ;; lispy 的 comment 在第一次加载时不起作用，其他命令正常
 ;; lispy 的 M-j 与 chinese-pyim 的函数冲突，已经将 lispy 的 lispy-split 命令绑定为 U
 (use-package lispy
-  :ensure t
+  :commands (lispy-comment)
   :config
   (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
   ;; enbale lispy-mode in minibuffer
@@ -165,7 +165,7 @@
   (lispy-define-key lispy-mode-map "U" 'lispy-split)
   ;; (lispy-define-key lispy-mode-map ";" 'lispy-comment)
 
-  ;;;; change keybindings
+;;;; change keybindings
   ;; (eval-after-load "lispy"
   ;;   `(progn
   ;;      ;; replace a global binding with own function
@@ -182,7 +182,6 @@
 
 ;;; org-download(abo-abo)
 (use-package org-download
-  :ensure t
   :config
   ;; (setq org-download-backend 'wget)
   (setq org-download-backend "wget")
@@ -234,7 +233,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; ace-link(abo-abo)
 (use-package ace-link
-  :ensure t
   :config
   (ace-link-setup-default)
   (define-key org-mode-map (kbd "M-o") 'ace-link-org)
@@ -245,7 +243,6 @@ same directory as the org-buffer and insert a link to this file."
 
 
 (use-package habitica
-  :ensure t
   :config
   (setq habitica-uid "REDACTED-HABITICA-UID")
   (setq habitica-token "REDACTED-HABITICA-TOKEN")
@@ -257,14 +254,12 @@ same directory as the org-buffer and insert a link to this file."
 
 
 ;; (use-package ox-anki
-;;   :ensure t
 ;;   :config
 ;;   )
 
 
 ;;; tiny(abo-abo)
 (use-package tiny
-  :ensure t
   :config
   (tiny-setup-default))
 
@@ -272,7 +267,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; popwin
 
 (use-package popwin
-  :ensure t
   :config
   (popwin-mode t)
   )
@@ -282,7 +276,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; ag
 
 (use-package ag
-  :ensure t
   :config
   (setq-default grep-highlight-matches t
                 grep-scroll-output t)
@@ -301,7 +294,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; hungry-delete
 
 (use-package hungry-delete
-  :ensure t
   :config
   (global-hungry-delete-mode)
   )
@@ -316,13 +308,10 @@ same directory as the org-buffer and insert a link to this file."
 ;;; swiper
 
 (use-package swiper
-  :ensure t
   ;; :disabled t
   :config
-  (use-package counsel
-    :ensure t)
+  (use-package counsel)
   (use-package counsel-projectile
-    :ensure t
     :config
     (counsel-projectile-mode))
   (ivy-mode 1)
@@ -330,8 +319,7 @@ same directory as the org-buffer and insert a link to this file."
 
   ;; 让`ivy-read'支持拼音
   ;; [[https://emacs-china.org/t/ivy-read/2432][使ivy-read支持拼音搜索 - Emacs-general - Emacs China]]
-  (use-package pinyinlib
-    :ensure t)
+  (use-package pinyinlib)
 
   (defun re-builder-pinyin (str)
     (or (pinyin-to-utf8 str)
@@ -389,7 +377,6 @@ same directory as the org-buffer and insert a link to this file."
 
 
 (use-package helm
-  :ensure t
   :bind ("M-y" . helm-show-kill-ring))
 
 
@@ -401,8 +388,7 @@ same directory as the org-buffer and insert a link to this file."
 ;;; server mode(Allow access from emacsclient)
 
 ;; (use-package server
-;;   :ensure t
-;;   :config
+;; ;;   :config
 ;;   (unless (server-running-p)
 ;;     ;; (setq server-auth-dir "d:\\emacs\\.emacs.d\\server\\")
 ;;     (cond
@@ -417,7 +403,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; edit-server: start edit server for chromebrowser(port:9292)
 
 (use-package edit-server
-  :ensure t
   :config
   (setq edit-server-new-frame nil)
   (edit-server-start)
@@ -450,7 +435,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; flx-ido
 (use-package flx-ido
-  :ensure t
   :config
   (ido-mode 1)
   (ido-everywhere 1)
@@ -464,7 +448,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;(require 'init-tabbar)
 (use-package tabbar
-  :ensure t
   :config
   (tabbar-mode t)
   ;;Speed up by not using images
@@ -479,7 +462,6 @@ same directory as the org-buffer and insert a link to this file."
    ("C-M-k" . tabbar-forward-group)))
 
 (use-package tabbar-ruler
-  :ensure t
   :disabled t
   :config
   (setq tabbar-ruler-global-tabbar t)   ; If you want tabbar
@@ -570,7 +552,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; Window numbering(Numbered window shortcuts for Emacs)
 (use-package window-numbering
-  :ensure t
   :config
   (window-numbering-mode t)
   ;; (setq window-numbering-assign-func
@@ -581,7 +562,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; expand-region
 (use-package expand-region
-  :ensure t
   :config
   ;; Don't use expand-region fast keys
   (setq expand-region-fast-keys-enabled nil)
@@ -601,7 +581,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; magit
 (use-package magit
-  :ensure t
   :config
   (setenv "SSH_ASKPASS" "git-gui--askpass")
   ;; (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
@@ -671,7 +650,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; define-word (E2E dictionary, abo-abo)
 (use-package define-word
   ;; :disabled t
-  :ensure t
   :bind (
          ;; ("C-c C-y" . define-word-at-point)
          ("C-c C-y" . define-word))
@@ -680,7 +658,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; youdao-dictionary
 (use-package youdao-dictionary
-  :ensure t
   :config
   ;; Enable Cache
   (setq url-automatic-caching t)
@@ -702,7 +679,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; chinese-pyim
 (use-package chinese-pyim
-  ;; :ensure t
   ;; :load-path "elpa-24.5/chinese-pyim"
   ;; :defer nil
   ;; :demand t                             ; if set demand, pyim will not automatically switched sometimes especially in org-mode,
@@ -737,7 +713,6 @@ same directory as the org-buffer and insert a link to this file."
                   pyim-probe-punctuation-after-punctuation))
 
   (use-package chinese-pyim-basedict
-    ;; :ensure t
     ;; :disabled t
     :config
     (chinese-pyim-basedict-enable))
@@ -804,22 +779,18 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;;pinyin-search
 (use-package pinyin-search
-  :ensure t
   :bind
   (("C-r" . pinyin-search)))
 
 
 ;; (use-package easy-lentic
-;;   :ensure t
-;;   :config
-;;   (use-package ox-gfm
-;;     :ensure t)
+;; ;;   :config
+;;   (use-package ox-gfm)
 ;;   (easy-lentic-mode-setup) ; Enable `easy-lentic-mode' for `emacs-lisp-mode' and `org-mode'
 ;;   )
 
 
-(use-package find-by-pinyin-dired
-  :ensure t)
+(use-package find-by-pinyin-dired)
 
 
 ;;; Don't delete *scratch* buffer
@@ -839,7 +810,6 @@ same directory as the org-buffer and insert a link to this file."
 
 (use-package eshell
   :bind (("C-x c" . eshell))
-  :ensure t
   :config
 
   (use-package em-term
@@ -867,8 +837,7 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;;ahk-mode
 
-(use-package ahk-mode
-  :ensure t)
+(use-package ahk-mode)
 
 
 
@@ -908,7 +877,6 @@ same directory as the org-buffer and insert a link to this file."
 ;;; avy
 
 (use-package avy
-  :ensure t
   ;; :disabled t
   :config
   (avy-setup-default)
@@ -923,7 +891,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;; (require-package 'ace-pinyin)
 (use-package ace-pinyin
-  :ensure t
   :config
   ;; (setq ace-pinyin-use-avy nil) ;; uncomment if you want to use `ace-jump-mode'
   (ace-pinyin-global-mode +1))
@@ -931,7 +898,6 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; multiple-cursors
 (use-package multiple-cursors
-  :ensure t
   :bind (
          ("C-M-," . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
@@ -992,7 +958,6 @@ the actual manpage using the function `man'."
 
 ;; tldr.el
 (use-package tldr
-  :ensure t
   :config
   ;; (tldr-update-docs)
   )
@@ -1000,7 +965,6 @@ the actual manpage using the function `man'."
 
 ;; kaomoji 颜文字
 (use-package kaomoji
-  :ensure t
   :config
   ;; (setq kaomoji-table
   ;;       (append '((("angry" "furious") . "(／‵Д′)／~ ╧╧ ")
@@ -1012,7 +976,6 @@ the actual manpage using the function `man'."
 
 ;; hexo.el
 (use-package hexo
-  :ensure t
   :config
   (defun hexo-hsk-blog ()
     (interactive)
@@ -1020,7 +983,6 @@ the actual manpage using the function `man'."
 
 ;;; blog-admin
 (use-package blog-admin
-  :ensure t
   :config
   (setq blog-admin-backend-path "~/blog")
   (setq blog-admin-backend-type 'hexo)
@@ -1035,7 +997,6 @@ the actual manpage using the function `man'."
 
 ;;; org2issue
 (use-package org2issue
-  :ensure t
   :config
   ;;(require-package 'ox-gfm)
   ;;(require 'ox-gfm)
@@ -1050,13 +1011,11 @@ the actual manpage using the function `man'."
 
 ;;; esup
 ;;; startup time statistics
-(use-package esup
-  :ensure t)
+(use-package esup)
 
 ;;; helm-github-stars
 ;;; go to github starred project
 (use-package helm-github-stars
-  :ensure t
   :config
   (setq helm-github-stars-username "private-github-user")
   ;; (setq helm-github-stars-cache-file "/cache/path")
@@ -1069,14 +1028,12 @@ the actual manpage using the function `man'."
 
 ;;; helm-chrome
 (use-package helm-chrome
-  :ensure t
   :config
   ;; (setq helm-chrome-use-urls t)
   ;; (helm-chrome-reload-bookmarks)
   )
 
 (use-package helm-google
-  :ensure t
   :config
   :bind
   (("C-h j" . helm-google)))
@@ -1085,7 +1042,6 @@ the actual manpage using the function `man'."
 ;;; vim-empty-mode
 ;;; add tilde at the empty line below the end of file
 (use-package vim-empty-lines-mode
-  :ensure t
   :disabled t
   :config
   (global-vim-empty-lines-mode -1)
@@ -1097,7 +1053,6 @@ the actual manpage using the function `man'."
 ;;; org-zotxt-mode
 ;;; zotero connection
 (use-package zotxt
-  :ensure t
   :config
   (require 'org-zotxt)
   ;; Activate org-zotxt-mode in org-mode buffers
@@ -1116,7 +1071,6 @@ the actual manpage using the function `man'."
 
 
 (use-package zotelo
-  :ensure t
   :config
   (add-hook 'TeX-mode-hook 'zotelo-minor-mode)
   (add-hook 'org-mode-hook 'zotelo-minor-mode))
@@ -1125,7 +1079,6 @@ the actual manpage using the function `man'."
 ;;; yasnippet
 ;;; yet another snippet
 (use-package yasnippet
-  :ensure t
   :config
   (yas-global-mode 1)
   ;; Develop in ~/emacs.d/mysnippets, but also
@@ -1154,7 +1107,6 @@ the actual manpage using the function `man'."
         org-latex-prefer-user-labels t))
 
 (use-package ox-latex-chinese
-  ;; :ensure t
   ;; :load-path "elpa-24.5/ox-latex-chinese/"
   ;; :disabled t
   :config
@@ -1373,14 +1325,12 @@ the actual manpage using the function `man'."
   (setq org-pretty-entities nil))
 
 
-(use-package evil-tutor
-  :ensure t)
+(use-package evil-tutor)
 
 
 ;;; cheatsheet
 
 (use-package cheatsheet
-  :ensure t
   :config
   (cheatsheet-add :group 'Common
                   :key "C-x C-c"
@@ -1389,12 +1339,10 @@ the actual manpage using the function `man'."
 
 
 (use-package helm-descbinds
-  :ensure t
   :config
   (helm-descbinds-mode))
 
 (use-package which-key
-  :ensure t
   :config
   (which-key-mode)
   (which-key-setup-side-window-right-bottom)
@@ -1404,7 +1352,6 @@ the actual manpage using the function `man'."
 ;;; uimage - darksun - lujun9972
 
 (use-package uimage
-  :ensure t
   :config
   ;; (push `(,(concat "\\(`\\|\\[\\[\\|<\\)?"
   ;;                  "\\(\\(file:http://\\)" uimage-mode-image-filename-regex "\\)"
@@ -1416,7 +1363,6 @@ the actual manpage using the function `man'."
 
 ;;; mode-icons
 (use-package mode-icons
-  :ensure t
   :disabled t
   :config
   (mode-icons-mode)
@@ -1427,7 +1373,6 @@ the actual manpage using the function `man'."
 ;;; vdiff
 
 (use-package vdiff
-  :ensure t
   :disabled t
   :config
   (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
@@ -1436,7 +1381,6 @@ the actual manpage using the function `man'."
 
 ;;; symon
 (use-package symon
-  :ensure t
   :config
   ;; (symon-mode)
   )
@@ -1444,7 +1388,6 @@ the actual manpage using the function `man'."
 
 ;;; figlet
 (use-package figlet
-  :ensure t
   :config
   ;; (setq figlet-font-directory "c:/emacs/.emacs.d/win-apps/figlet/fonts")
   (setq figlet-font-directory (expand-file-name "~/.emacs.d/win-apps/figlet/fonts") )
@@ -1455,13 +1398,11 @@ the actual manpage using the function `man'."
 ;;; hyperbole
 
 (use-package hyperbole
-  :ensure t
   :disabled t
   )
 
 ;;; sublimity, a substitute of minimap
 (use-package sublimity
-  :ensure t
   :disabled t
   :config
   (require 'sublimity-scroll)
@@ -1484,22 +1425,19 @@ the actual manpage using the function `man'."
 
 ;;; beacon-mode
 (use-package beacon
-  :ensure t
   :config
   (beacon-mode 1))
 
 
 ;;; command-log-mode
 (use-package command-log-mode
-  :ensure t
   :config
   (add-hook 'LaTeX-mode-hook 'command-log-mode)
   (add-hook 'emacs-lisp-mode-hook 'command-log-mode)
   )
 
 ;;; zhihu-daily
-(use-package helm-zhihu-daily
-  :ensure t)
+(use-package helm-zhihu-daily)
 
 
 
@@ -1511,8 +1449,7 @@ the actual manpage using the function `man'."
   :bind (("<f8>" . neotree-toggle)))
 
 
-(use-package verify-url
-  :ensure t)
+(use-package verify-url)
 
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 ;; (use-package semantic-tag-folding
@@ -1523,7 +1460,6 @@ the actual manpage using the function `man'."
 
 
 (use-package hydra
-  :ensure t
   :disabled t
   :config
   (defhydra hydra-buffer-menu (:color pink
@@ -1632,7 +1568,6 @@ _~_: modified
 
 ;;;persp-mode
 (use-package persp-mode
-  ;; :ensure t
   :disabled t
   :config
   (with-eval-after-load "persp-mode-autoloads"

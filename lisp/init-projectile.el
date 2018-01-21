@@ -15,7 +15,6 @@
          (format " Pr[%s]" (projectile-project-name)))))))
 
 ;; (use-package projectile
-;;   :ensure t
 ;;   :disabled t
 ;;   :config
 ;;   (projectile-global-mode)
