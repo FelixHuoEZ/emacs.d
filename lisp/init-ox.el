@@ -62,7 +62,7 @@ MathJax.Hub.Config({
 ;; (setq org-html-mathjax-template "")
 
 (setq org-html-mathjax-options
-      '((path "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML")
+      '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML")
         (scale "100")
         (align "center")
         (indent "2em")

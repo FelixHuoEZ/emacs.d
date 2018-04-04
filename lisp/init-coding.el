@@ -14,7 +14,6 @@
 (cond
  ((eq system-type 'windows-nt)
   (set-file-name-coding-system 'chinese-gbk))
-
  ((eq system-type 'gnu/linux)
   (set-file-name-coding-system 'utf-8-unix)))
 

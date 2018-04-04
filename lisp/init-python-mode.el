@@ -18,7 +18,7 @@
   (elpy-enable)
   ;; (setq python-shell-unbuffered nil)
   ;; (setq python-shell-prompt-detect-failure-warning nil)
-  (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-current-statement)
+  (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-statement-and-step)
   )
 
 (use-package jedi)

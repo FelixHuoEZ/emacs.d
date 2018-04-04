@@ -79,6 +79,12 @@
 (add-hook 'inferior-ess-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
+;; (use-package org-fancy-priorities
+;;   :config
+;;   (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
+;;   (add-hook 'org-mode-hook 'org-fancy-priorities-mode))
+
+
 ;; ;;How do I make Org-mode open PDF files
 ;; (eval-after-load "org"
 ;;   '(progn
@@ -180,7 +186,7 @@ typical word processor."
 
 (setq org-capture-templates
       `(("t" "todo" entry (file "~/orgfile/GTD/newgtd.org") ; "newgtd.org" => org-default-gtd-file
-         "* NEXT %?\n%U\n" :clock-resume t)
+         "* TODO %?\n%U\n" :clock-resume t)
         ("n" "note" entry (file "~/orgfile/GTD/journal.org") ; "journal.org" => org-default-note-file
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
         ("a" "academic" entry (file "~/orgfile/GTD/academic.org") ; "academic.org" => academic-note-file
@@ -188,6 +194,7 @@ typical word processor."
         ))
 (setq org-agenda-files (quote ("~/orgfile/GTD/newgtd.org"
                                "~/orgfile/GTD/journal.org"
+                               "~/orgfile/GTD/refile-beorg.org"
                                "~/orgfile/GTD/academic.org"
                                "~/orgfile/GTD/someday.org"
                                "~/orgfile/GTD/birthday.org")))

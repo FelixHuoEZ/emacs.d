@@ -98,12 +98,77 @@
 
   ;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
 
+  (defun my-set-symbol-fonts (fontsizes-list)
+    (let* ((fontname "Noto Emoji")
+           (fontsize (nth 0 fontsizes-list))
+           (fontspec (font-spec :name fontname
+                                :size fontsize
+                                :weight 'normal
+                                :slant 'normal)))
+      (if (cnfonts--fontspec-valid-p fontspec)
+          (set-fontset-font "fontset-default" 'symbol fontspec nil 'append)
+        (message "字体 %S 不存在！" fontname))))
+
+
+  (defun my-set-exta-fonts (fontsizes-list)
+    (let* ((fontname "Microsoft YaHei UI")
+           (fontsize (nth 1 fontsizes-list))
+           (fontspec (font-spec :name fontname
+                                :size fontsize
+                                :weight 'normal
+                                :slant 'normal)))
+      (if (cnfonts--fontspec-valid-p fontspec)
+          (set-fontset-font "fontset-default" '(#x3400 . #x4DFF) fontspec nil 'append)
+        (message "字体 %S 不存在！" fontname))))
+
+  (add-hook 'cnfonts-set-font-finish-hook 'my-set-symbol-fonts)
+  (add-hook 'cnfonts-set-font-finish-hook 'my-set-exta-fonts)
+  
+  
+  (defvar my-line-spacing-alist
+    '((9 . 0.1) (10 . 0.9) (11.5 . 0.2)
+      (12.5 . 0.2) (14 . 0.2) (16 . 0.2)
+      (18 . 0.2) (20 . 1.0) (22 . 0.2)
+      (24 . 0.2) (26 . 0.2) (28 . 0.2)
+      (30 . 0.2) (32 . 0.2)))
+
+  (defun my-line-spacing-setup (fontsizes-list)
+    (let ((fontsize (car fontsizes-list))
+          (line-spacing-alist (copy-list my-line-spacing-alist)))
+      (dolist (list line-spacing-alist)
+        (when (= fontsize (car list))
+          (setq line-spacing-alist nil)
+          (setq-default line-spacing (cdr list))))))
+
+  (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
+
   :bind
   (("C--" . cnfonts-decrease-fontsize)
    ("C-=" . cnfonts-increase-fontsize)
    ("C-+" . cnfonts-next-profile))
-
   )
+
+
+(use-package web-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+  (defun my-web-mode-hook ()
+    "Hooks for Web mode."
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    )
+  (add-hook 'web-mode-hook  'my-web-mode-hook)
+  )
+
 
 ;;; fix youdao-dictionary invalid date error
 
@@ -898,6 +963,19 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; multiple-cursors
 (use-package multiple-cursors
+  :config
+  ;; ;; [[https://www.zhihu.com/question/27478438/answer/59796810][Emacs 有什么奇技淫巧? - 知乎]]
+  ;; Multiple cursors does not do well when you invoke its commands with M-x. It needs to be bound to keys to work properly. Pull request to fix this is welcome.
+  ;; (defun cua-or-multicursor ()
+  ;;   (interactive)
+  ;;   (if (use-region-p)
+  ;;       (mc/edit-lines)
+  ;;     (cua-rectangle-mark-mode)))
+  ;; ;; http://emacs.stackexchange.com/a/9916/514
+  ;; (eval-after-load "multiple-cursors-core"
+  ;;   (lambda ()
+  ;;     (add-to-list 'mc--default-cmds-to-run-once 'cua-or-multicursor)))
+
   :bind (
          ("C-M-," . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
@@ -1494,76 +1572,6 @@ _~_: modified
 
   (define-key Buffer-menu-mode-map "." 'hydra-buffer-menu/body)
   )
-
-;;; erc
-;;; emacs irc
-
-;; (defconst irc-channels
-;;   '(("freenode.net" "#ubuntu-cn" "#archlinux-cn" "#emacs.tw"
-;;      ;; "#geekhack"
-;;      )
-;;     ("oftc.net" "#arch-cn" "#njulug" "#wormux-cn" "#emacs-cn")
-;;     ("esper.net" "#minecraft-cn")))
-;; (ignore-errors (setq erc-autojoin-channels-alist irc-channels))
-
-;; (defun erc-start ()
-;;   (interactive)
-;;   (erc :server "irc.freenode.net" :port 6667 :nick irc-nick
-;;        :password irc-password :full-name irc-full-name)
-;;   (erc-tls :server "irc.oftc.net" :port 6697 :nick irc-nick
-;;            :password irc-password :full-name irc-full-name)
-;;   (erc-tls :server "irc.esper.net" :port 6697 :nick irc-nick
-;;            :password irc-password :full-name irc-full-name))
-
-
-;; (setq erc-quit-reason-various-alist
-;;       '(("dinner" "Having dinner...")
-;;         ("z" "Zzz...")
-;;         ("^$" yow)))
-;; (setq erc-quit-reason 'erc-quit-reason-various)
-
-;; (defun erc-cmd-THINK (&rest line)
-;;   (let ((text
-;;          (concat ".oO{ "
-;;                  (erc-trim-string (mapconcat 'identity line " "))
-;;                  " }")))
-;;     (erc-send-action (erc-default-target) text)))
-
-;; (defun erc-cmd-SLAP (&rest nick)
-;;   (if (not (equal '() nick))
-;;       (erc-send-action
-;;        (erc-default-target)
-;;        (concat "slaps " (car nick)
-;;                " with Peskin's Introduction to QFT."))))
-
-;; (defun erc-cmd-SHOWOFF (&rest ignore)
-;;   "Show off implementation"
-;;   (let* ((chnl (erc-buffer-list))
-;;          (srvl (erc-buffer-list 'erc-server-buffer-p))
-;;          (memb (apply '+ (mapcar (lambda (chn)
-;;                                    (with-current-buffer chn
-;;                                      (1- (length (erc-get-channel-user-list)))))
-;;                                  chnl)))
-;;          (show (format "is connected to %i networks and talks in %i chans to %i ppl overall :>"
-;;                        (length srvl)
-;;                        (- (length chnl) (length srvl))
-;;                        memb)))
-;;     (erc-send-action (erc-default-target) show)))
-
-;; ;; Say hi to everyone, use with CAUTION!!
-;; (defun erc-cmd-HI ()
-;;   (defun hi-to-nicks (nick-list)
-;;     (if (eq nick-list '())
-;;         nil
-;;       (erc-send-message (concat "Hi, " (car nick-list)))
-;;       (sleep-for 1)
-;;       (hi-to-nicks (cdr nick-list))))
-
-;;   (let ((nicks (erc-get-channel-nickname-list)))
-;;     (hi-to-nicks nicks)))
-
-;; [[https://www.zhihu.com/question/27478438/answer/59796810][Emacs 有什么奇技淫巧? - 地铁风的回答 - 知乎]]
-;; [[https://www.zhihu.com/question/27478438][Emacs 有什么奇技淫巧? - 知乎]]
 
 
 ;;;persp-mode
@@ -1606,6 +1614,14 @@ _~_: modified
    ("C-x 4 c" . langtool-correct-buffer)
    ))
 
+
+;; centered-window-mode
+;; works not well
+(use-package centered-window-mode
+  :disabled t
+  :config
+  (centered-window-mode t)
+  )
 
 
 ;; helpful
