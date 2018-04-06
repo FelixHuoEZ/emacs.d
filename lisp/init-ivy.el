@@ -9,8 +9,7 @@
                   ivy-magic-tilde nil
                   ivy-dynamic-exhibit-delay-ms 150
                   ivy-initial-inputs-alist
-                  '((counsel-M-x . "^")
-                    (man . "^")
+                  '((man . "^")
                     (woman . "^")))
 
     ;; IDO-style directory navigation
