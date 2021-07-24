@@ -70,6 +70,9 @@ emacs_backtrace.txt
 site-lisp/package/
 
 # only local
+/smex-items
+/transient
+init.el.bak
 /var
 /url/cookies
 /request/

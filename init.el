@@ -4,10 +4,10 @@
 ;;; a number of other files.
 
 (let ((minver "24.3"))
-  (when (version< emacs-version minver)
-    (error "Your Emacs is too old -- this config requires v%s or higher" minver)))
+(when (version< emacs-version minver)
+(error "Your Emacs is too old -- this config requires v%s or higher" minver)))
 (when (version< emacs-version "24.5")
-  (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
+(message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
 
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 (require 'init-benchmarking) ;; Measure startup time
@@ -20,10 +20,10 @@
 ;; Adjust garbage collection thresholds during startup, and thereafter
 ;;----------------------------------------------------------------------------
 (let ((normal-gc-cons-threshold (* 20 1024 1024))
-      (init-gc-cons-threshold (* 128 1024 1024)))
-  (setq gc-cons-threshold init-gc-cons-threshold)
-  (add-hook 'after-init-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
+(init-gc-cons-threshold (* 128 1024 1024)))
+(setq gc-cons-threshold init-gc-cons-threshold)
+(add-hook 'after-init-hook
+(lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
 
 ;;----------------------------------------------------------------------------
 ;; Bootstrap config
@@ -32,7 +32,7 @@
 (require 'init-utils)
 (require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
 ;; Calls (package-initialize)
-(require 'init-elpa)      ;; Machinery for installing required packages
+(require 'init-elpa) ;; Machinery for installing required packages
 (require 'init-exec-path) ;; Set up $PATH
 
 ;;----------------------------------------------------------------------------
@@ -45,7 +45,7 @@
 ;;----------------------------------------------------------------------------
 
 (require-package 'wgrep)
-(require-package 'project-local-variables)
+;; (require-package 'project-local-variables)
 (require-package 'diminish)
 (require-package 'scratch)
 (require-package 'command-log-mode)
@@ -53,10 +53,10 @@
 ;; init use-package
 (require-package 'use-package)
 (eval-when-compile
-  (require 'use-package))
+(require 'use-package))
 (setq use-package-always-ensure nil)
 (setq use-package-always-defer nil)
-;; (require 'diminish)                ;; if you use :diminish
+;; (require 'diminish) ;; if you use :diminish
 (require-package 'bind-key)
 (require 'bind-key)
 
@@ -64,7 +64,7 @@
 (require 'init-themes)
 ;; (require 'init-osx-keys)
 (require 'init-gui-frames)
-(require 'init-dired)
+;; (require 'init-dired)
 (require 'init-isearch)
 ;; (require 'init-grep)
 (require 'init-uniquify)
@@ -106,13 +106,13 @@
 ;;(require 'init-ox-beamer)
 (require 'init-org-query)
 ;; (require 'init-nxml)
-(require 'init-html)
+;; (require 'init-html)
 (require 'init-css)
 ;;(require 'init-haml)
 (require 'init-http)
 (require 'init-python-mode)
-(unless (version<= emacs-version "24.3")
-  (require 'init-haskell))
+;; (unless (version<= emacs-version "24.3")
+;; (require 'init-haskell))
 ;; (require 'init-elm)
 ;; (require 'init-purescript)
 ;; (require 'init-ruby-mode)
@@ -130,7 +130,7 @@
 (require 'init-common-lisp)
 
 (when *spell-check-support-enabled*
-  (require 'init-spelling))
+(require 'init-spelling))
 
 (require 'init-misc)
 
@@ -144,7 +144,7 @@
 (require-package 'htmlize)
 (require-package 'dsvn)
 (when *is-a-mac*
-  (require-package 'osx-location))
+(require-package 'osx-location))
 (maybe-require-package 'regex-tool)
 (maybe-require-package 'dotenv-mode)
 
@@ -153,16 +153,16 @@
 ;;----------------------------------------------------------------------------
 (require 'server)
 (unless (server-running-p)
-  (setq server-auth-dir "~/.emacs.d/server/")
-  (setq server-name "emacs-server-file")
-  (server-start))
-
+(setq server-auth-dir "~/.emacs.d/server/")
+(setq server-name "emacs-server-file")
+(server-start))
+;; use "setsid emacsclient --socket-name emacs-server-file xxx.txt" to start emacsclient
 
 ;;----------------------------------------------------------------------------
 ;; Variables configured via the interactive 'customize' interface
 ;;----------------------------------------------------------------------------
 (when (file-exists-p custom-file)
-  (load custom-file))
+(load custom-file))
 
 
 ;;----------------------------------------------------------------------------
@@ -178,7 +178,7 @@
 
 
 (when (maybe-require-package 'uptimes)
-  (add-hook 'after-init-hook (lambda () (require 'uptimes))))
+(add-hook 'after-init-hook (lambda () (require 'uptimes))))
 
 
 (provide 'init)

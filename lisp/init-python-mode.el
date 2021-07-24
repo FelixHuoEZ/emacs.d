@@ -14,12 +14,20 @@
   :config
   (setq elpy-rpc-python-command "python")
   ;; (setq elpy-rpc-python-command "pythonw")
-  ;; (elpy-use-ipython)
+  ;; use jupyter
+  (setq python-shell-interpreter "jupyter"
+        python-shell-interpreter-args "console --simple-prompt"
+        python-shell-prompt-detect-failure-warning nil)
+  ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
+  ;;              "jupyter")
+  ;; use ipython
+  ;; (if (eq system-type 'windows-nt)
+  ;;     (setq python-shell-interpreter "ipython"
+  ;; python-shell-interpreter-args "-i --simple-prompt"))
   (elpy-enable)
   ;; (setq python-shell-unbuffered nil)
   ;; (setq python-shell-prompt-detect-failure-warning nil)
-  (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-statement-and-step)
-  )
+  (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-statement-and-step))
 
 (use-package jedi)
 

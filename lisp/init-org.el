@@ -548,6 +548,7 @@ typical word processor."
 ;;; org-ref and bibtex
 
 (use-package org-ref
+  :disabled t
   :config
   (use-package ivy-bibtex)
   (require 'doi-utils)

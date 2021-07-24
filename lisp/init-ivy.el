@@ -77,5 +77,5 @@ instead."
 (when (maybe-require-package 'ivy-xref)
   (setq xref-show-xrefs-function 'ivy-xref-show-xrefs))
 
-
+(global-set-key (kbd "C-x b") 'ivy-switch-buffer)
 (provide 'init-ivy)
