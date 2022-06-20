@@ -53,8 +53,9 @@
 ;; init use-package
 (require-package 'use-package)
 (eval-when-compile
-(require 'use-package))
-(setq use-package-always-ensure nil)
+  (require 'use-package))
+;; first time install all packages, change nil to t, after install all, then change t to nil
+(setq use-package-always-ensure t)
 (setq use-package-always-defer nil)
 ;; (require 'diminish) ;; if you use :diminish
 (require-package 'bind-key)

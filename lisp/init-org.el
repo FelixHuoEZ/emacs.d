@@ -1,4 +1,4 @@
-(maybe-require-package 'org-fstree)
+;; (maybe-require-package 'org-fstree)
 (when *is-a-mac*
   (maybe-require-package 'grab-mac-link))
 
@@ -471,7 +471,7 @@ typical word processor."
      (gnuplot . t)
      (haskell . nil)
      (latex . t)
-     (ledger . t)
+     ;; (ledger . t)
      (ocaml . nil)
      (octave . t)
      (plantuml . t)
@@ -498,7 +498,8 @@ typical word processor."
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
 ;; org-edit-latex
-(use-package org-edit-latex)
+(use-package org-edit-latex
+  :ensure nil)
 
 
 ;;; increasingly renumber the equation in fragment
