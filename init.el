@@ -3,9 +3,10 @@
 ;;; This file bootstraps the configuration, which is divided into
 ;;; a number of other files.
 
+(setq debug-on-error t)
 (let ((minver "24.3"))
-(when (version< emacs-version minver)
-(error "Your Emacs is too old -- this config requires v%s or higher" minver)))
+  (when (version< emacs-version minver)
+    (error "Your Emacs is too old -- this config requires v%s or higher" minver)))
 (when (version< emacs-version "24.5")
 (message "Your Emacs is old, and some functionality in this config will be disabled. Please upgrade if possible."))
 
@@ -55,8 +56,14 @@
 (eval-when-compile
   (require 'use-package))
 ;; first time install all packages, change nil to t, after install all, then change t to nil
+(require 'use-package-ensure)
 (setq use-package-always-ensure t)
 (setq use-package-always-defer nil)
+;; (use-package auto-package-update
+;;   :config
+;;   (setq auto-package-update-delete-old-versions t)
+;;   (setq auto-package-update-hide-results t)
+;;   (auto-package-update-maybe))
 ;; (require 'diminish) ;; if you use :diminish
 (require-package 'bind-key)
 (require 'bind-key)

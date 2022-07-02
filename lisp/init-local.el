@@ -737,115 +737,120 @@ directory and insert a link to this file.
 ;; (setq youdao-dictionary-use-chinese-word-segmentation t)
 
 :bind (
-;; Example Key binding
-("C-c y" . youdao-dictionary-search-at-point))
+       ;; Example Key binding
+       ("C-c y" . youdao-dictionary-search-at-point))
 )
+
 
 
 ;;; chinese-pyim
 (use-package pyim
-;; :load-path "elpa-24.5/chinese-pyim"
-;; :defer nil
-;; :demand t ; if set demand, pyim will not automatically switched sometimes especially in org-mode,
-; if not set, when first use pyim, there will be a delay to load the package
-;; :disabled t
-;; :init
-;; (add-hook 'after-init-hook
-;; #'(lambda () (pyim-restart-1 t)))
-:config
-;; 基本快捷键列表
-;; C-n/M-n/+ 向下翻页， C-p/M-p/- 向上翻页， C-f 选择下一个备选词，C-b 选择上一个备选词
-;; SPC 确定输入，RET/C-m 字母上屏， C-c 取消输入， C-g 取消输入并保留已输入的中文， TAB 模糊音调整
-(setq default-input-method "pyim")
-;; (setq default-input-method nil)
-(setq pyim-default-scheme 'quanpin)
-(global-set-key (kbd "C-\\") 'toggle-input-method)
+  ;; :load-path "elpa-24.5/chinese-pyim"
+  ;; :defer nil
+  ;; :demand t ; if set demand, pyim will not automatically switched sometimes especially in org-mode,
+                                        ; if not set, when first use pyim, there will be a delay to load the package
+  ;; :disabled t
+  ;; :init
+  ;; (add-hook 'after-init-hook
+  ;; #'(lambda () (pyim-restart-1 t)))
+  :config
+  ;; 基本快捷键列表
+  ;; C-n/M-n/+ 向下翻页， C-p/M-p/- 向上翻页， C-f 选择下一个备选词，C-b 选择上一个备选词
+  ;; SPC 确定输入，RET/C-m 字母上屏， C-c 取消输入， C-g 取消输入并保留已输入的中文， TAB 模糊音调整
+  (setq default-input-method "pyim")
+  ;; (setq default-input-method nil)
+  (setq pyim-default-scheme 'quanpin)
+  (global-set-key (kbd "C-\\") 'toggle-input-method)
 
-;; (setq pyim-enable-words-predict '(dabbrev pinyin-similar pinyin-znabc))
-;; (setq pyim-enable-words-predict nil)
-(setq pyim-backends '(dcache-personal dcache-common pinyin-chars pinyin-shortcode pinyin-znabc))
-;; (setq pyim-backends '(dcache-personal dcache-common pinyin-chars))
-;; (setq pyim-backends '(dcache-common))
+  ;; (setq pyim-enable-words-predict '(dabbrev pinyin-similar pinyin-znabc))
+  ;; (setq pyim-enable-words-predict nil)
+  (require 'pyim-dregcache)
+  (require 'pyim-cregexp-utils)
+  (require 'pyim-cstring-utils)
+  
+  (setq pyim-backends '(dcache-personal dcache-common pinyin-chars pinyin-shortcode pinyin-znabc))
+  ;; (setq pyim-backends '(dcache-personal dcache-common pinyin-chars))
+  ;; (setq pyim-backends '(dcache-common))
 
-(setq-default pyim-english-input-switch-functions
-'(pyim-probe-dynamic-english
-pyim-probe-isearch-mode
-pyim-probe-program-mode
-pyim-probe-org-structure-template))
+  (setq-default pyim-english-input-switch-functions
+                '(pyim-probe-dynamic-english
+                  pyim-probe-isearch-mode
+                  pyim-probe-program-mode
+                  pyim-probe-org-structure-template))
 
-(setq-default pyim-punctuation-half-width-functions
-'(pyim-probe-punctuation-line-beginning
-pyim-probe-punctuation-after-punctuation))
+  (setq-default pyim-punctuation-half-width-functions
+                '(pyim-probe-punctuation-line-beginning
+                  pyim-probe-punctuation-after-punctuation))
 
-(use-package pyim-basedict
-;; :disabled t
-:config
-(pyim-basedict-enable))
+  (use-package pyim-basedict
+    ;; :disabled t
+    :config
+    (pyim-basedict-enable))
 
-(setq pyim-dicts
-'(
-;; (:name "bigdict" :file "~/.emacs.d/pyim/dicts/pyim-bigdict.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-;; (:name "guessdict" :file "~/.emacs.d/pyim/dicts/pyim-guessdict.gpyim" :coding utf-8-unix :dict-type guess-dict)
-;; (:name "sogou-dic-utf8" :file "~/.emacs.d/pyim/dicts/sogou-dic-utf8.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-;; (:name "sogoucell" :file "~/.emacs.d/pyim/dicts/SogouCellWordLib.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-;; (:name "millions" :file "~/.emacs.d/pyim/dicts/millions.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+  (setq pyim-dicts
+        '(
+          ;; (:name "bigdict" :file "~/.emacs.d/pyim/dicts/pyim-bigdict.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          ;; (:name "guessdict" :file "~/.emacs.d/pyim/dicts/pyim-guessdict.gpyim" :coding utf-8-unix :dict-type guess-dict)
+          ;; (:name "sogou-dic-utf8" :file "~/.emacs.d/pyim/dicts/sogou-dic-utf8.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          ;; (:name "sogoucell" :file "~/.emacs.d/pyim/dicts/SogouCellWordLib.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          ;; (:name "millions" :file "~/.emacs.d/pyim/dicts/millions.pyim" :coding utf-8-unix :dict-type pinyin-dict)
 
-(:name "Useful" :file "~/.emacs.d/pyim/dicts/Useful.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-(:name "words" :file "~/.emacs.d/pyim/dicts/words.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-(:name "Daily" :file "~/.emacs.d/pyim/dicts/Daily.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-(:name "Electronics" :file "~/.emacs.d/pyim/dicts/Electronics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-(:name "CS" :file "~/.emacs.d/pyim/dicts/CS.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-(:name "Math-Physics" :file "~/.emacs.d/pyim/dicts/Math-Physics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-))
+          (:name "Useful" :file "~/.emacs.d/pyim/dicts/Useful.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          (:name "words" :file "~/.emacs.d/pyim/dicts/words.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          (:name "Daily" :file "~/.emacs.d/pyim/dicts/Daily.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          (:name "Electronics" :file "~/.emacs.d/pyim/dicts/Electronics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          (:name "CS" :file "~/.emacs.d/pyim/dicts/CS.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          (:name "Math-Physics" :file "~/.emacs.d/pyim/dicts/Math-Physics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
+          ))
 
-;; Enable searching with pinyin
-(setq pyim-isearch-enable-pinyin-search t)
-;; (setq pyim-guidance-format-function 'pyim-guidance-format-function-one-line)
-(setq pyim-page-length 9)
-;; (setq pyim-page-style 'one-line)
-(setq pyim-page-tooltip nil)
-;; (setq pyim-page-tooltip 'pos-tip)
-;; (setq pyim-page-tooltip 'popup)
-;; (print pyim-dicts)
-;; (add-hook 'emacs-startup-hook
-;; #'(lambda () (pyim-restart-1 t)))
-;; (pyim-restart-1 t)
-;; (pyim-restart-1)
+  ;; Enable searching with pinyin
+  (setq pyim-isearch-enable-pinyin-search t)
+  ;; (setq pyim-guidance-format-function 'pyim-guidance-format-function-one-line)
+  (setq pyim-page-length 9)
+  ;; (setq pyim-page-style 'one-line)
+  (setq pyim-page-tooltip nil)
+  ;; (setq pyim-page-tooltip 'pos-tip)
+  ;; (setq pyim-page-tooltip 'popup)
+  ;; (print pyim-dicts)
+  ;; (add-hook 'emacs-startup-hook
+  ;; #'(lambda () (pyim-restart-1 t)))
+  ;; (pyim-restart-1 t)
+  ;; (pyim-restart-1)
 
-;; 词库导出，后续更新版本需要注释掉
-;; (defun pyim-personal-dcache-export ()
-;; "将 pyim-dcache-icode2word 导出为 pyim 词库文件。"
-;; (interactive)
-;; (let ((file (read-file-name "将个人缓存中的词条导出到文件：")))
-;; (with-temp-buffer
-;; (insert ";;; -*- coding: utf-8-unix -*-\n")
-;; (maphash
-;; #'(lambda (key value)
-;; (insert (concat key " " (mapconcat #'identity value " ") "\n")))
-;; pyim-dcache-icode2word)
-;; (write-file file))))
+  ;; 词库导出，后续更新版本需要注释掉
+  ;; (defun pyim-personal-dcache-export ()
+  ;; "将 pyim-dcache-icode2word 导出为 pyim 词库文件。"
+  ;; (interactive)
+  ;; (let ((file (read-file-name "将个人缓存中的词条导出到文件：")))
+  ;; (with-temp-buffer
+  ;; (insert ";;; -*- coding: utf-8-unix -*-\n")
+  ;; (maphash
+  ;; #'(lambda (key value)
+  ;; (insert (concat key " " (mapconcat #'identity value " ") "\n")))
+  ;; pyim-dcache-icode2word)
+  ;; (write-file file))))
 
-(use-package pyim-company
-:disabled t
-:ensure nil
-:config
-(setq pyim-company-max-length 6))
+  (use-package pyim-company
+    :disabled t
+    :ensure nil
+    :config
+    (setq pyim-company-max-length 6))
 
-:bind
-(("C-\\" . toggle-input-method)
-("M-j" . pyim-convert-code-at-point)
-;; ("C-;" . pyim-delete-word-from-personal-buffer)
-("C-c h" . pyim-punctuation-translate-at-point)
-("C-c C-h" . pyim-punctuation-toggle)
-("M-f" . pyim-forward-word)
-("M-b" . pyim-backward-word)
-))
+  :bind
+  (("C-\\" . toggle-input-method)
+   ("M-j" . pyim-convert-string-at-point)
+   ;; ("C-;" . pyim-delete-word-from-personal-buffer)
+   ("C-c h" . pyim-punctuation-translate-at-point)
+   ("C-c C-h" . pyim-punctuation-toggle)
+   ("M-f" . pyim-forward-word)
+   ("M-b" . pyim-backward-word)
+   ))
 
 
 ;;;pinyin-search
 (use-package pinyin-search
-:bind
-(("C-r" . pinyin-search)))
+  :bind
+  (("C-r" . pinyin-search)))
 
 
 ;; (use-package easy-lentic
