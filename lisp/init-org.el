@@ -498,8 +498,7 @@ typical word processor."
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
 ;; org-edit-latex
-(use-package org-edit-latex
-  :ensure nil)
+(use-package org-edit-latex)
 
 
 ;;; increasingly renumber the equation in fragment
