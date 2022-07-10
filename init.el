@@ -34,6 +34,7 @@
 (require 'init-site-lisp) ;; Must come before elpa, as it may provide package.el
 ;; Calls (package-initialize)
 (require 'init-elpa) ;; Machinery for installing required packages
+;; (require 'init-package)
 (require 'init-exec-path) ;; Set up $PATH
 
 ;;----------------------------------------------------------------------------
@@ -72,7 +73,7 @@
 
 ;; (require 'init-osx-keys)
 (require 'init-gui-frames)
-;; (require 'init-dired)
+(require 'init-dired)
 (require 'init-isearch)
 ;; (require 'init-grep)
 (require 'init-uniquify)

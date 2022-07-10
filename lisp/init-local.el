@@ -33,9 +33,11 @@
 ;; 每一次当 Emacs 需要与你确认某个命令时需要输入 (yes or no) 比较麻烦，所有我们可以使用下面的代码，设置一个别名将其简化为只输入 (y or n)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setf org-file-apps
-(remove '("\\.pdf\\'" . default) org-file-apps))
-(add-to-list 'org-file-apps '("\\.pdf\\'" . "sumatrapdf %s"))
-(add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "sumatrapdf -page %1 %s"))
+      (remove '("\\.pdf\\'" . default) org-file-apps))
+(add-to-list 'org-file-apps '("\\.pdf\\'" . "xdg-open \"%s\""))
+(add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "xdg-open \"-page %1 %s\""))
+;; (add-to-list 'org-file-apps '("\\.pdf\\'" . "sumatrapdf %s"))
+;; (add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "sumatrapdf -page %1 %s"))
 
 ;;; Chinese fonts setup
 
@@ -73,80 +75,80 @@
 ;; ("C-+" . cfs-next-profile)))
 
 (use-package cnfonts
-:demand t
-:init
-(setq cnfonts-verbose nil)
-:config
-;; (cl-prettyprint (font-family-list))
-;; (print (font-family-list))
+  :demand t
+  :init
+  (setq cnfonts-verbose nil)
+  :config
+  ;; (cl-prettyprint (font-family-list))
+  ;; (print (font-family-list))
 
-;; (cl-remove-if #'(lambda (font)
-;; (not (string-match-p "\\cc" font)))
-;; (font-family-list))
+  ;; (cl-remove-if #'(lambda (font)
+  ;; (not (string-match-p "\\cc" font)))
+  ;; (font-family-list))
 
-(setq cnfonts-use-system-type t)
-(setq cnfonts-personal-fontnames
-'(
-()
-("方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
-()
-))
+  (setq cnfonts-use-system-type t)
+  (setq cnfonts-personal-fontnames
+        '(
+          ()
+          ("方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
+          ()
+          ))
 
-(setq cnfonts-profiles
-'("default" "program" "org-mode" "read-book"))
-(cnfonts-enable)
+  (setq cnfonts-profiles
+        '("default" "program" "org-mode" "read-book"))
+  (cnfonts-enable)
 
-;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
+  ;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
 
-(defun my-set-symbol-fonts (fontsizes-list)
-(let* ((fontname "NotoColorEmoji")
-(fontsize (nth 0 fontsizes-list))
-(fontspec (font-spec :name fontname
-:size fontsize
-:weight 'normal
-:slant 'normal)))
-(if (cnfonts--fontspec-valid-p fontspec)
-(set-fontset-font "fontset-default" 'symbol fontspec nil 'append)
-(message "字体 %S 不存在！" fontname))))
-
-
-(defun my-set-exta-fonts (fontsizes-list)
-(let* ((fontname "Microsoft YaHei UI")
-(fontsize (nth 1 fontsizes-list))
-(fontspec (font-spec :name fontname
-:size fontsize
-:weight 'normal
-:slant 'normal)))
-(if (cnfonts--fontspec-valid-p fontspec)
-(set-fontset-font "fontset-default" '(#x3400 . #x4DFF) fontspec nil 'append)
-(message "字体 %S 不存在！" fontname))))
-
-(add-hook 'cnfonts-set-font-finish-hook 'my-set-symbol-fonts)
-(add-hook 'cnfonts-set-font-finish-hook 'my-set-exta-fonts)
+  (defun my-set-symbol-fonts (fontsizes-list)
+    (let* ((fontname "NotoColorEmoji")
+           (fontsize (nth 0 fontsizes-list))
+           (fontspec (font-spec :name fontname
+                                :size fontsize
+                                :weight 'normal
+                                :slant 'normal)))
+      (if (cnfonts--fontspec-valid-p fontspec)
+          (set-fontset-font "fontset-default" 'symbol fontspec nil 'append)
+        (message "字体 %S 不存在！" fontname))))
 
 
-(defvar my-line-spacing-alist
-'((9 . 0.1) (10 . 0.9) (11.5 . 0.2)
-(12.5 . 0.2) (14 . 0.2) (16 . 0.2)
-(18 . 0.2) (20 . 1.0) (22 . 0.2)
-(24 . 0.2) (26 . 0.2) (28 . 0.2)
-(30 . 0.2) (32 . 0.2)))
+  (defun my-set-exta-fonts (fontsizes-list)
+    (let* ((fontname "Microsoft YaHei UI")
+           (fontsize (nth 1 fontsizes-list))
+           (fontspec (font-spec :name fontname
+                                :size fontsize
+                                :weight 'normal
+                                :slant 'normal)))
+      (if (cnfonts--fontspec-valid-p fontspec)
+          (set-fontset-font "fontset-default" '(#x3400 . #x4DFF) fontspec nil 'append)
+        (message "字体 %S 不存在！" fontname))))
 
-(defun my-line-spacing-setup (fontsizes-list)
-(let ((fontsize (car fontsizes-list))
-(line-spacing-alist (copy-list my-line-spacing-alist)))
-(dolist (list line-spacing-alist)
-(when (= fontsize (car list))
-(setq line-spacing-alist nil)
-(setq-default line-spacing (cdr list))))))
+  (add-hook 'cnfonts-set-font-finish-hook 'my-set-symbol-fonts)
+  (add-hook 'cnfonts-set-font-finish-hook 'my-set-exta-fonts)
 
-(add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
 
-:bind
-(("C--" . cnfonts-decrease-fontsize)
-("C-=" . cnfonts-increase-fontsize)
-("C-+" . cnfonts-next-profile))
-)
+  (defvar my-line-spacing-alist
+    '((9 . 0.1) (10 . 0.9) (11.5 . 0.2)
+      (12.5 . 0.2) (14 . 0.2) (16 . 0.2)
+      (18 . 0.2) (20 . 1.0) (22 . 0.2)
+      (24 . 0.2) (26 . 0.2) (28 . 0.2)
+      (30 . 0.2) (32 . 0.2)))
+
+  (defun my-line-spacing-setup (fontsizes-list)
+    (let ((fontsize (car fontsizes-list))
+          (line-spacing-alist (copy-list my-line-spacing-alist)))
+      (dolist (list line-spacing-alist)
+        (when (= fontsize (car list))
+          (setq line-spacing-alist nil)
+          (setq-default line-spacing (cdr list))))))
+
+  (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
+
+  :bind
+  (("C--" . cnfonts-decrease-fontsize)
+   ("C-=" . cnfonts-increase-fontsize)
+   ("C-+" . cnfonts-next-profile))
+  )
 
 
 (use-package web-mode
@@ -217,41 +219,63 @@
 ;; lispy 的 comment 在第一次加载时不起作用，其他命令正常
 ;; lispy 的 M-j 与 chinese-pyim 的函数冲突，已经将 lispy 的 lispy-split 命令绑定为 U
 (use-package lispy
-:commands (lispy-comment)
-:config
-(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
-;; enbale lispy-mode in minibuffer
-(defun conditionally-enable-lispy ()
-(when (eq this-command 'eval-expression)
-(lispy-mode 1)
-(local-set-key "β" 'helm-lisp-completion-at-point)))
-(add-hook 'minibuffer-setup-hook 'conditionally-enable-lispy)
-(define-key lispy-mode-map (kbd "M-j") nil)
-(lispy-define-key lispy-mode-map "U" 'lispy-split)
-;; (lispy-define-key lispy-mode-map ";" 'lispy-comment)
+  :commands (lispy-comment)
+  :config
+  ;; (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
+  ;; enbale lispy-mode in minibuffer
+  (defun conditionally-enable-lispy ()
+    (when (eq this-command 'eval-expression)
+      (lispy-mode 1)
+      (local-set-key "β" 'helm-lisp-completion-at-point)))
+  (add-hook 'minibuffer-setup-hook 'conditionally-enable-lispy)
+  (define-key lispy-mode-map (kbd "M-j") nil)
+  (lispy-define-key lispy-mode-map "U" 'lispy-split)
+  ;; (lispy-define-key lispy-mode-map ";" 'lispy-comment)
 
 ;;;; change keybindings
-;; (eval-after-load "lispy"
-;; `(progn
-;; ;; replace a global binding with own function
-;; (define-key lispy-mode-map (kbd "C-e") 'my-custom-eol)
-;; ;; replace a global binding with major-mode's default
-;; (define-key lispy-mode-map (kbd "C-j") nil)
-;; ;; replace a local binding
-;; (lispy-define-key lispy-mode-map "s" 'lispy-down)))
+  ;; (eval-after-load "lispy"
+  ;; `(progn
+  ;; ;; replace a global binding with own function
+  ;; (define-key lispy-mode-map (kbd "C-e") 'my-custom-eol)
+  ;; ;; replace a global binding with major-mode's default
+  ;; (define-key lispy-mode-map (kbd "C-j") nil)
+  ;; ;; replace a local binding
+  ;; (lispy-define-key lispy-mode-map "s" 'lispy-down)))
 
-;; http://oremacs.com/lispy/
-;; https://github.com/abo-abo/lispy
-)
-
+  ;; http://oremacs.com/lispy/
+  ;; https://github.com/abo-abo/lispy
+  )
+(add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
 ;;; org-download(abo-abo)
 (use-package org-download
-:config
-;; (setq org-download-backend 'wget)
-(setq org-download-backend "wget")
-(setq org-download-annotate-function 'ignore)
-)
+  :bind ("C-c y" . yank-image-from-win-clipboard-through-powershell)
+  :config
+  ;; (setq org-download-backend 'wget)
+  (setq org-download-backend "wget")
+  (setq org-download-annotate-function 'ignore)
+  ;; Drag-and-drop to `dired`
+  (add-hook 'dired-mode-hook 'org-download-enable)
+  ;;image cut settings
+  (defun yank-image-from-win-clipboard-through-powershell()
+    "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy"
+    (interactive)
+    (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
+           (file-dir "./images/")
+           (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
+           ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
+           (file-path-wsl (concat file-dir file-name))
+           )
+      (unless (file-exists-p file-dir)
+        (make-directory file-dir))
+      ;; (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/\\$env:USERNAME/" file-name "\\\")\""))
+      (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/Public/Pictures/" file-name "\\\")\""))
+      (rename-file (concat "/mnt/c/Users/Public/Pictures/" file-name) file-path-wsl)
+      (insert (concat "#+ATTR_LATEX: :width 0.5\\textwidth\n"))
+      (org-indent-line)
+      (insert (concat "[[file:" file-path-wsl "]] "))
+      ))
+  )
 
 
 (use-package org-attach-screenshot
@@ -266,32 +290,32 @@
 
 
 (defun my-org-screenshot ()
-"Take a screenshot into a time stamped unique-named file in the
+  "Take a screenshot into a time stamped unique-named file in the
 same directory as the org-buffer and insert a link to this file."
-(interactive)
-(org-display-inline-images)
-(setq filename
-(concat
-(make-temp-name
-(concat (file-name-nondirectory (buffer-file-name))
-"_imgs/"
-(format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
-(unless (file-exists-p (file-name-directory filename))
-(make-directory (file-name-directory filename)))
-; take screenshot
-(if (eq system-type 'darwin)
-(progn
-(call-process-shell-command "screencapture" nil nil nil nil " -s " (concat
-"\"" filename "\"" ))
-(call-process-shell-command "convert" nil nil nil nil (concat "\"" filename "\" -resize \"50%\"" ) (concat "\"" filename "\"" ))
-))
-(if (eq system-type 'gnu/linux)
-(call-process "import" nil nil nil filename))
-; insert into file if correctly taken
-(if (file-exists-p filename)
-(insert (concat "[[file:" filename "]]")))
-(org-display-inline-images)
-)
+  (interactive)
+  (org-display-inline-images)
+  (setq filename
+        (concat
+         (make-temp-name
+          (concat (file-name-nondirectory (buffer-file-name))
+                  "_imgs/"
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (unless (file-exists-p (file-name-directory filename))
+    (make-directory (file-name-directory filename)))
+                                        ; take screenshot
+  (if (eq system-type 'darwin)
+      (progn
+        (call-process-shell-command "screencapture" nil nil nil nil " -s " (concat
+                                                                            "\"" filename "\"" ))
+        (call-process-shell-command "convert" nil nil nil nil (concat "\"" filename "\" -resize \"50%\"" ) (concat "\"" filename "\"" ))
+        ))
+  (if (eq system-type 'gnu/linux)
+      (call-process "import" nil nil nil filename))
+                                        ; insert into file if correctly taken
+  (if (file-exists-p filename)
+      (insert (concat "[[file:" filename "]]")))
+  (org-display-inline-images)
+  )
 
 (global-set-key (kbd "C-c s c") 'my-org-screenshot)
 
@@ -363,7 +387,7 @@ grep-scroll-output t)
 (global-hungry-delete-mode)
 )
 
- 
+
 
 ;;Set nodejs-repl
 (require-package 'nodejs-repl)
@@ -442,7 +466,7 @@ nil))
 
 
 (use-package helm
-:bind ("M-y" . helm-show-kill-ring))
+  :bind ("M-y" . helm-show-kill-ring))
 
 
 ;; (setq url-proxy-services '(("http" . "localhost:1080")
@@ -551,7 +575,7 @@ nil))
 ;; (require 'init-fontsset)
 ;; (require 'unicad)
 
- 
+
 
 
 ;;------------------------------------------------
@@ -738,7 +762,7 @@ directory and insert a link to this file.
 
 :bind (
        ;; Example Key binding
-       ("C-c y" . youdao-dictionary-search-at-point))
+       ("C-c u" . youdao-dictionary-search-at-point))
 )
 
 
@@ -767,7 +791,7 @@ directory and insert a link to this file.
   (require 'pyim-dregcache)
   (require 'pyim-cregexp-utils)
   (require 'pyim-cstring-utils)
-  
+
   (setq pyim-backends '(dcache-personal dcache-common pinyin-chars pinyin-shortcode pinyin-znabc))
   ;; (setq pyim-backends '(dcache-personal dcache-common pinyin-chars))
   ;; (setq pyim-backends '(dcache-common))
@@ -1089,7 +1113,7 @@ ad-do-it)))))
 (setq org2issue-update-file "~/org2issue-test/README.org")
 )
 
- 
+
 
 
 ;;; esup
@@ -1150,7 +1174,7 @@ ad-do-it)))))
 '(setq zotxt-default-bibliography-style "mkbehr-short"))
 )
 
- 
+
 
 
 (use-package zotelo
@@ -1743,7 +1767,7 @@ _~_: modified
 (insert wiznote-formated-timestamp))))
 (global-set-key (kbd "C-c g y") 'wiznote-format-timestamp)
 
- 
+
 
 ;; (replace-regexp-in-string "\/" "-" (w32-get-clipboard-data))
 
@@ -1774,7 +1798,7 @@ _~_: modified
 ;; http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
- 
+
 
 
 ;;; maximize-window: three ways do not work maybe because of the value of initial-frame-alist at the end of configuration

@@ -40,7 +40,9 @@
 (setq TeX-source-correlate-mode t)
 (setq TeX-source-correlate-method 'synctex)
 (setq TeX-view-program-list
-      '(("Evince" "evince %o")
+      '(
+        ("XDG" "xdg-open %o")
+        ("Evince" "evince %o")
         ("SumatraPDF" ("SumatraPDF.exe -reuse-instance" (mode-io-correlate " -forward-search %b %n ") " %o"))
         ("Okular" "okular --unique %o" )
         ("Firefox" "firefox %o")

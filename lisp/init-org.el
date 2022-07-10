@@ -24,7 +24,7 @@
  org-export-kill-product-buffer-when-displayed t
  org-tags-column 80)
 
-
+
 ;;; Sacco General Settings
 
 (define-key global-map (kbd "C-c g l") 'org-toggle-link-display)
@@ -453,11 +453,12 @@ typical word processor."
 
 (after-load 'org
   (define-key org-mode-map (kbd "C-M-<up>") 'org-up-element)
+  (define-key org-mode-map (kbd "C-c p") 'org-open-exported-pdf)
   (when *is-a-mac*
     (define-key org-mode-map (kbd "M-h") nil)
     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
 
-
+
 ;;; org-babel
 (after-load 'org
   (org-babel-do-load-languages
@@ -483,8 +484,17 @@ typical word processor."
      (sqlite . t))))
 
 
-
+
 ;;; Private User Misc Settings
+(defun org-open-exported-pdf ()
+  (interactive)
+  (let* ((file (concat (file-name-sans-extension (buffer-file-name)) ".pdf")))
+    (message "Opening %s..." file)
+    (call-process "xdg-open" nil 0 nil file)
+    (message "Opening %s done" file)
+    ))
+
+
 
 ;;; Do not ask if to avaluate the code blocks
 (defun my-org-confirm-babel-evaluate (lang body)
