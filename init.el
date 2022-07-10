@@ -69,7 +69,7 @@
 (require 'bind-key)
 
 (require 'init-xterm)
-(require 'init-themes)
+
 ;; (require 'init-osx-keys)
 (require 'init-gui-frames)
 ;; (require 'init-dired)
@@ -80,8 +80,12 @@
 (require 'init-flycheck)
 
 (require 'init-recentf)
+(require 'init-basic)
+(require 'init-hydra)
+(require 'init-ui)
 (require 'init-smex)
 (require 'init-ivy)
+(require 'init-themes)
 (require 'init-hippie-expand)
 (require 'init-company)
 (require 'init-windows)

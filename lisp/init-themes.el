@@ -2,7 +2,8 @@
 (require-package 'color-theme-sanityinc-tomorrow)
 
 ;; If you don't customize it, this is the theme you get.
-(setq-default custom-enabled-themes '(sanityinc-tomorrow-bright))
+;; (setq-default custom-enabled-themes '(sanityinc-tomorrow-bright))
+(setq-default custom-enabled-themes '(sanityinc-solarized-light))
 
 ;; Ensure that themes will be applied even if they have not been customized
 (defun reapply-themes ()
@@ -14,6 +15,7 @@
 
 (add-hook 'after-init-hook 'reapply-themes)
 
+;; (reapply-themes)
 
 ;;------------------------------------------------------------------------------
 ;; Toggle between light and dark
