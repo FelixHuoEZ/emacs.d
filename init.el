@@ -99,7 +99,8 @@
 
 (require 'init-vc)
 (require 'init-darcs)
-(require 'init-git)
+(require 'init-vcs)
+;; (require 'init-git)
 (require 'init-github)
 
 (require 'init-projectile)
