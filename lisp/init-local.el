@@ -271,9 +271,11 @@
       ;; (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/\\$env:USERNAME/" file-name "\\\")\""))
       (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/Public/Pictures/" file-name "\\\")\""))
       (rename-file (concat "/mnt/c/Users/Public/Pictures/" file-name) file-path-wsl)
-      (insert (concat "#+ATTR_LATEX: :width 0.5\\textwidth\n"))
-      (org-indent-line)
-      (insert (concat "[[file:" file-path-wsl "]] "))
+      (yas/insert-by-name "newfigure")
+      ;; (insert (concat "#+ATTR_LATEX: :width 0.5\\textwidth\n"))
+      ;; (org-indent-line)
+      ;; (insert (concat "[[file:" file-path-wsl "]] "))
+      (insert file-path-wsl)
       ))
   )
 
@@ -1186,21 +1188,30 @@ ad-do-it)))))
 ;;; yasnippet
 ;;; yet another snippet
 (use-package yasnippet
-:config
-(yas-global-mode 1)
-;; Develop in ~/emacs.d/mysnippets, but also
-;; try out snippets in ~/Downloads/interesting-snippets
-(setq yas-snippet-dirs '("~/.emacs.d/snippets/"
-"~/yasnippet-snippets/"))
+  :config
+  (yas-global-mode 1)
+  ;; Develop in ~/emacs.d/mysnippets, but also
+  ;; try out snippets in ~/Downloads/interesting-snippets
+  (setq yas-snippet-dirs '("~/.emacs.d/snippets/"
+                           "~/yasnippet-snippets/"))
+  (defun yas/insert-by-name (name)
+    (flet ((dummy-prompt
+            (prompt choices &optional display-fn)
+            (declare (ignore prompt))
+            (or (find name choices :key display-fn :test #'string=)
+                (throw 'notfound nil))))
+      (let ((yas/prompt-functions '(dummy-prompt)))
+        (catch 'notfound
+          (yas/insert-snippet t)))))
 
-;; OR, keeping YASnippet defaults try out ~/Downloads/interesting-snippets
-;; (setq yas-snippet-dirs (append yas-snippet-dirs
-;; '("~/Downloads/interesting-snippets")))
+  ;; OR, keeping YASnippet defaults try out ~/Downloads/interesting-snippets
+  ;; (setq yas-snippet-dirs (append yas-snippet-dirs
+  ;; '("~/Downloads/interesting-snippets")))
 
-;; (define-key yas-minor-mode-map (kbd "<tab>") nil)
-;; (define-key yas-minor-mode-map (kbd "TAB") nil)
-;; (define-key yas-minor-mode-map (kbd "<the new key>") 'yas-expand)
-)
+  ;; (define-key yas-minor-mode-map (kbd "<tab>") nil)
+  ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
+  ;; (define-key yas-minor-mode-map (kbd "<the new key>") 'yas-expand)
+  )
 
 
 ;; ox-latex-subfigure
