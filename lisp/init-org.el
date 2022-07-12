@@ -1,28 +1,330 @@
 ;; (maybe-require-package 'org-fstree)
+
+(use-package org
+  :ensure nil
+  :commands (org-dynamic-block-define)
+  :custom-face (org-ellipsis ((t (:foreground nil))))
+  ;; :pretty-hydra
+  ;; ((:title (pretty-hydra-title "Org Template" 'fileicon "org" :face 'all-the-icons-green :height 1.1 :v-adjust 0.0)
+  ;;          :color blue :quit-key "q")
+  ;;  ("Basic"
+  ;;   (("a" (hot-expand "<a") "ascii")
+  ;;    ("c" (hot-expand "<c") "center")
+  ;;    ("C" (hot-expand "<C") "comment")
+  ;;    ("e" (hot-expand "<e") "example")
+  ;;    ("E" (hot-expand "<E") "export")
+  ;;    ("h" (hot-expand "<h") "html")
+  ;;    ("l" (hot-expand "<l") "latex")
+  ;;    ("n" (hot-expand "<n") "note")
+  ;;    ("o" (hot-expand "<q") "quote")
+  ;;    ("v" (hot-expand "<v") "verse"))
+  ;;   "Head"
+  ;;   (("i" (hot-expand "<i") "index")
+  ;;    ("A" (hot-expand "<A") "ASCII")
+  ;;    ("I" (hot-expand "<I") "INCLUDE")
+  ;;    ("H" (hot-expand "<H") "HTML")
+  ;;    ("L" (hot-expand "<L") "LaTeX"))
+  ;;   "Source"
+  ;;   (("s" (hot-expand "<s") "src")
+  ;;    ("m" (hot-expand "<s" "emacs-lisp") "emacs-lisp")
+  ;;    ("y" (hot-expand "<s" "python :results output") "python")
+  ;;    ("p" (hot-expand "<s" "perl") "perl")
+  ;;    ("r" (hot-expand "<s" "ruby") "ruby")
+  ;;    ("S" (hot-expand "<s" "sh") "sh")
+  ;;    ("g" (hot-expand "<s" "go :imports '\(\"fmt\"\)") "golang"))
+  ;;   "Misc"
+  ;;   (("u" (hot-expand "<s" "plantuml :file CHANGE.png") "plantuml")
+  ;;    ("Y" (hot-expand "<s" "ipython :session :exports both :results raw drawer\n$0") "ipython")
+  ;;    ("P" (progn
+  ;;           (insert "#+HEADERS: :results output :exports both :shebang \"#!/usr/bin/env perl\"\n")
+  ;;           (hot-expand "<s" "perl")) "Perl tangled")
+  ;;    ("<" self-insert-command "ins"))))
+  :bind (("C-c a" . org-agenda)
+         ("C-c b" . org-switchb)
+         ("C-c x" . org-capture)
+         :map org-mode-map
+         ("<" . (lambda ()
+                  "Insert org template."
+                  (interactive)
+                  (if (or (region-active-p) (looking-back "^\s*" 1))
+                      (org-hydra/body)
+                    (self-insert-command 1))))
+         :map org-mode-map
+         ("C-M-<up>" . org-up-element)
+         ("C-c p" . org-open-exported-pdf)
+         ("C-<tab>" . nil)
+         ("C-S-<tab>" . nil)
+         )
+  :hook (((org-babel-after-execute org-mode) . org-redisplay-inline-images) ; display image
+         (org-mode . (lambda ()
+                       "Beautify org symbols."
+                       (when centaur-prettify-org-symbols-alist
+                         (if prettify-symbols-alist
+                             (push centaur-prettify-org-symbols-alist prettify-symbols-alist)
+                           (setq prettify-symbols-alist centaur-prettify-org-symbols-alist)))
+                       (prettify-symbols-mode 1)))
+         (org-indent-mode . (lambda()
+                              (diminish 'org-indent-mode)
+                              ;; HACK: Prevent text moving around while using brackets
+                              ;; @see https://github.com/seagle0128/.emacs.d/issues/88
+                              (make-variable-buffer-local 'show-paren-mode)
+                              (setq show-paren-mode nil))))
+  :config
+  ;; For hydra
+  (defun hot-expand (str &optional mod)
+    "Expand org template.
+
+STR is a structure template string recognised by org like <s. MOD is a
+string with additional parameters to add the begin line of the
+structure element. HEADER string includes more parameters that are
+prepended to the element after the #+HEADER: tag."
+    (let (text)
+      (when (region-active-p)
+        (setq text (buffer-substring (region-beginning) (region-end)))
+        (delete-region (region-beginning) (region-end)))
+      (insert str)
+      (if (fboundp 'org-try-structure-completion)
+          (org-try-structure-completion) ; < org 9
+        (progn
+          ;; New template expansion since org 9
+          (require 'org-tempo nil t)
+          (org-tempo-complete-tag)))
+      (when mod (insert mod) (forward-line))
+      (when text (insert text))))
+
+  (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n")
+  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+
+  ;; [[http://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode/13828#13828][Inline verbatim and code with quotes in Org-mode - Emacs Stack Exchange]]
+
+  ;;----------------- 设置各级标题样式 ----------------------
+  (set-face-attribute 'org-level-1 nil :height 1.1 :bold t :foreground "yellow4")
+  (set-face-attribute 'org-level-2 nil :height 1.1 :bold t)
+  (set-face-attribute 'org-level-3 nil :height 1.0 :bold t)
+
+
+  ;; To speed up startup, don't put to init section
+  (setq org-modules nil                 ; Faster loading
+        org-directory centaur-org-directory
+        org-priority-faces '((?A . error)
+                             (?B . warning)
+                             (?C . success))
+
+        ;; Agenda styling
+        org-agenda-files `(,centaur-org-directory)
+        org-agenda-block-separator ?─
+        org-agenda-time-grid
+        '((daily today require-timed)
+          (800 1000 1200 1400 1600 1800 2000)
+          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+        org-agenda-current-time-string
+        "⭠ now ─────────────────────────────────────────────────"
+
+        org-tags-column -80
+        org-log-done 'time
+        org-catch-invisible-edits 'smart
+        org-startup-indented t
+        org-ellipsis (if (char-displayable-p ?⏷) "\t⏷" nil)
+        org-pretty-entities nil
+        org-hide-emphasis-markers t
+        visual-line-mode t
+        org-edit-timestamp-down-means-later t
+        org-archive-mark-done nil
+        org-archive-location "%s_archive::* Archive"
+        org-export-coding-system 'utf-8
+        org-fast-tag-selection-single-key 'expert
+        org-html-validation-link nil
+        org-export-kill-product-buffer-when-displayed t
+        org-support-shift-select t
+        ;;highlight code in src code block
+        org-src-fontify-natively t
+
+        )
+
+  ;; Add new template
+  (add-to-list 'org-structure-template-alist '("n" . "note"))
+
+  ;; Use embedded webkit browser if possible
+  (when (featurep 'xwidget-internal)
+    (push '("\\.\\(x?html?\\|pdf\\)\\'"
+            .
+            (lambda (file _link)
+              (centaur-webkit-browse-url (concat "file://" file) t)))
+          org-file-apps))
+
+  ;; Add gfm/md backends
+  (use-package ox-gfm)
+  (add-to-list 'org-export-backends 'md)
+
+  (with-eval-after-load 'counsel
+    (bind-key [remap org-set-tags-command] #'counsel-org-tag org-mode-map))
+
+  ;; Prettify UI
+  (if emacs/>=27p
+      (use-package org-modern
+        :hook ((org-mode . org-modern-mode)
+               (org-agenda-finalize . org-modern-agenda)
+               (org-modern-mode . (lambda ()
+                                    "Adapt `org-modern-mode'."
+                                    ;; Disable Prettify Symbols mode
+                                    (setq prettify-symbols-alist nil)
+                                    (prettify-symbols-mode -1)))))
+    (progn
+      (use-package org-superstar
+        :if (and (display-graphic-p) (char-displayable-p ?◉))
+        :hook (org-mode . org-superstar-mode)
+        :init (setq org-superstar-headline-bullets-list '("◉""○""◈""◇""⁕")))
+      (use-package org-fancy-priorities
+        :diminish
+        :hook (org-mode . org-fancy-priorities-mode)
+        :init (setq org-fancy-priorities-list
+                    (if (and (display-graphic-p) (char-displayable-p ?🅐))
+                        '("🅐" "🅑" "🅒" "🅓")
+                      '("HIGH" "MEDIUM" "LOW" "OPTIONAL"))))))
+
+  ;; Babel
+  (setq org-confirm-babel-evaluate nil
+        org-src-fontify-natively t
+        org-src-tab-acts-natively t)
+
+  (defvar load-language-alist '(
+                                ;; (R  . t)
+                                (ditaa . t)
+                                ;; (asymptote . t)
+                                (dot . t)
+                                (gnuplot . t)
+                                (haskell . nil)
+                                (latex . t)
+                                ;; (ledger . t)
+                                (ocaml . nil)
+                                (octave . t)
+                                (screen . nil)
+                                ;; (,(if (locate-library "ob-sh") 'sh 'shell) . t)
+                                (sql . nil)
+                                (sqlite . t)
+                                (emacs-lisp . t)
+                                (perl       . t)
+                                (python     . t)
+                                (ruby       . t)
+                                (js         . t)
+                                (css        . t)
+                                (sass       . t)
+                                (C          . t)
+                                (java       . t)
+                                (plantuml   . t)))
+
+  ;; ob-sh renamed to ob-shell since 26.1.
+  (cl-pushnew '(shell . t) load-language-alist)
+
+  (use-package ob-go
+    :init (cl-pushnew '(go . t) load-language-alist))
+
+  (use-package ob-rust
+    :init (cl-pushnew '(rust . t) load-language-alist))
+
+  ;; Install: npm install -g @mermaid-js/mermaid-cli
+  (use-package ob-mermaid
+    :init (cl-pushnew '(mermaid . t) load-language-alist))
+
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               load-language-alist)
+
+  ;; Rich text clipboard
+  (use-package org-rich-yank
+    :bind (:map org-mode-map
+                ("C-M-y" . org-rich-yank)))
+
+  ;; Table of contents
+  (use-package toc-org
+    :hook (org-mode . toc-org-mode))
+
+  ;; Export text/html MIME emails
+  (use-package org-mime
+    :bind (:map message-mode-map
+                ("C-c M-o" . org-mime-htmlize)
+                :map org-mode-map
+                ("C-c M-o" . org-mime-org-buffer-htmlize)))
+
+  ;; Add graphical view of agenda
+  (use-package org-timeline
+    :hook (org-agenda-finalize . org-timeline-insert-timeline))
+
+  (when emacs/>=27p
+    ;; Auto-toggle Org LaTeX fragments
+    (use-package org-fragtog
+      :diminish
+      :hook (org-mode . org-fragtog-mode))
+
+    ;; Preview
+    (use-package org-preview-html
+      :diminish
+      :bind (:map org-mode-map
+                  ("C-c C-h" . org-preview-html-mode))
+      :init (when (featurep 'xwidget-internal)
+              (setq org-preview-html-viewer 'xwidget))))
+
+  ;; Presentation
+  (use-package org-tree-slide
+    :diminish
+    :functions (org-display-inline-images
+                org-remove-inline-images)
+    :bind (:map org-mode-map
+                ("s-<f7>" . org-tree-slide-mode)
+                :map org-tree-slide-mode-map
+                ("<left>" . org-tree-slide-move-previous-tree)
+                ("<right>" . org-tree-slide-move-next-tree)
+                ("S-SPC" . org-tree-slide-move-previous-tree)
+                ("SPC" . org-tree-slide-move-next-tree))
+    :hook ((org-tree-slide-play . (lambda ()
+                                    (text-scale-increase 4)
+                                    (org-display-inline-images)
+                                    (read-only-mode 1)))
+           (org-tree-slide-stop . (lambda ()
+                                    (text-scale-increase 0)
+                                    (org-remove-inline-images)
+                                    (read-only-mode -1))))
+    :init (setq org-tree-slide-header nil
+                org-tree-slide-slide-in-effect t
+                org-tree-slide-heading-emphasis nil
+                org-tree-slide-cursor-init t
+                org-tree-slide-modeline-display 'outside
+                org-tree-slide-skip-done nil
+                org-tree-slide-skip-comments t
+                org-tree-slide-skip-outline-level 3))
+
+  ;; Pomodoro
+  (use-package org-pomodoro
+    :custom-face
+    (org-pomodoro-mode-line ((t (:inherit warning))))
+    (org-pomodoro-mode-line-overtime ((t (:inherit error))))
+    (org-pomodoro-mode-line-break ((t (:inherit success))))
+    :bind (:map org-mode-map
+                ("C-c C-x m" . org-pomodoro))
+    :init
+    (with-eval-after-load 'org-agenda
+      (bind-keys :map org-agenda-mode-map
+                 ("K" . org-pomodoro)
+                 ("C-c C-x m" . org-pomodoro)))))
+
+
+;; Purcell's configs
 (when *is-a-mac*
   (maybe-require-package 'grab-mac-link))
 
 (maybe-require-package 'org-cliplink)
 
 (define-key global-map (kbd "C-c l") 'org-store-link)
-(define-key global-map (kbd "C-c a") 'org-agenda)
 
 ;; Various preferences
-(setq
- ;; org-log-done t
- ;; org-log-done 'time
- org-log-done 'note
- org-startup-indented t
- visual-line-mode t
- org-edit-timestamp-down-means-later t
- org-archive-mark-done nil
- org-hide-emphasis-markers t
- org-catch-invisible-edits 'show
- org-export-coding-system 'utf-8
- org-fast-tag-selection-single-key 'expert
- org-html-validation-link nil
- org-export-kill-product-buffer-when-displayed t
- org-tags-column 80)
+;; (setq
+;;  ;; org-log-done t
+;;  ;; org-log-done 'time
+
+;;  ;; 之前是用的下面这些配置
+;;  ;; org-log-done 'note
+;;  ;; org-catch-invisible-edits 'show
+;;  ;; org-tags-column 80
+;;  )
 
 
 ;;; Sacco General Settings
@@ -36,41 +338,46 @@
 
 ;; (define-key global-map (kbd "C-c l") 'org-store-link)
 ;; (define-key global-map (kbd "C-c a") 'org-agenda)
-(define-key global-map (kbd "C-c b") 'org-iswitchb)
+
+;; 之前是用的下面这一行配置
+;; (define-key global-map (kbd "C-c b") 'org-iswitchb)
+
 ;; (define-key global-map (kbd "C-c b") 'org-table-blank-field)
 
 ;; (setq-default  org-log-done 'note)
 
 ;; solve the impossible problem of escape double quote and single quote
-(after-load 'org
-  ;; (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n\r")
-  ;; (custom-set-variables `(org-emphasis-alist ',org-emphasis-alist))
-  ;; (org-element-set-regexps)
 
-  ;; (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\"'")
+;; (after-load 'org
+;;   ;; (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\n\r")
+;;   ;; (custom-set-variables `(org-emphasis-alist ',org-emphasis-alist))
+;;   ;; (org-element-set-regexps)
 
-  (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n")
-  (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+;;   ;; (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n,\"'")
 
-  ;; [[http://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode/13828#13828][Inline verbatim and code with quotes in Org-mode - Emacs Stack Exchange]]
-  )
+;;   (setcar (nthcdr 2 org-emphasis-regexp-components) " \t\r\n")
+;;   (org-set-emph-re 'org-emphasis-regexp-components org-emphasis-regexp-components)
+
+;;   ;; [[http://emacs.stackexchange.com/questions/13820/inline-verbatim-and-code-with-quotes-in-org-mode/13828#13828][Inline verbatim and code with quotes in Org-mode - Emacs Stack Exchange]]
+;;   )
 
 
+;; 之前是用的下面这一行配置
 ;; set folded headline with inverted triangle
-(setq org-ellipsis "▼")
+;; (setq org-ellipsis "▼")
 
-(after-load 'org
-  ;;----------------- 设置各级标题样式 ----------------------
-  (set-face-attribute 'org-level-1 nil :height 1.1 :bold t :foreground "yellow4")
-  (set-face-attribute 'org-level-2 nil :height 1.1 :bold t)
-  (set-face-attribute 'org-level-3 nil :height 1.0 :bold t)
-  )
+;; (after-load 'org
+;;   ;;----------------- 设置各级标题样式 ----------------------
+;;   (set-face-attribute 'org-level-1 nil :height 1.1 :bold t :foreground "yellow4")
+;;   (set-face-attribute 'org-level-2 nil :height 1.1 :bold t)
+;;   (set-face-attribute 'org-level-3 nil :height 1.0 :bold t)
+;;   )
 
-;;org-bullets
-(require-package 'org-bullets)
-(require 'org-bullets)
-(setq org-bullets-bullet-list  '("✸" "●" "○" "◆" "◇" "▹"))
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+;; ;;org-bullets
+;; (require-package 'org-bullets)
+;; (require 'org-bullets)
+;; (setq org-bullets-bullet-list  '("✸" "●" "○" "◆" "◇" "▹"))
+;; (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
 ;;enable rainbow-delimiters-mode in several major mode, I donot exactly undertant this currently
 (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
@@ -113,9 +420,8 @@
 
 
 ;;; Sacco General Settings Ends
-
 
-
+
 ;;; ditta
 
 ;; Lots of stuff from http://doc.norang.ca/org-mode.html
@@ -152,8 +458,6 @@
       (url-copy-file url org-plantuml-jar-path))))
 
 
-
-
 
 (maybe-require-package 'writeroom-mode)
 
@@ -194,8 +498,6 @@ typical word processor."
 ;;(add-hook 'org-mode-hook 'buffer-face-mode)
 
 
-(setq org-support-shift-select t)
-
 ;;; Capturing
 
 (global-set-key (kbd "C-c c") 'org-capture)
@@ -214,7 +516,7 @@ typical word processor."
                                "~/orgfile/GTD/academic.org"
                                "~/orgfile/GTD/someday.org"
                                "~/orgfile/GTD/birthday.org")))
-
+
 ;;; Refiling
 
 (setq org-refile-use-cache nil)
@@ -255,7 +557,7 @@ typical word processor."
 ;; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes 'confirm)
 
-
+
 ;;; To-do settings
 
 (setq org-todo-keywords
@@ -269,7 +571,7 @@ typical word processor."
               ("PROJECT" :inherit font-lock-string-face))))
 
 
-
+
 ;;; Agenda views
 
 (setq-default org-agenda-clockreport-parameter-plist '(:link t :maxlevel 3))
@@ -361,7 +663,7 @@ typical word processor."
 
 (add-hook 'org-agenda-mode-hook 'hl-line-mode)
 
-
+
 ;;; Org clock
 
 ;; Save the running clock and all clock history when exiting Emacs, load it on startup
@@ -382,7 +684,7 @@ typical word processor."
       '(:hours "%d" :require-hours t :minutes ":%02d" :require-minutes t))
 
 
-
+
 ;;; Show the clocked-in task - if any - in the header line
 (defun sanityinc/show-org-clock-in-header-line ()
   (setq-default header-line-format '((" " org-mode-line-string " "))))
@@ -399,30 +701,21 @@ typical word processor."
   (define-key org-clock-mode-line-map [header-line mouse-1] 'org-clock-menu))
 
 
-
+
 (when (and *is-a-mac* (file-directory-p "/Applications/org-clock-statusbar.app"))
   (add-hook 'org-clock-in-hook
             (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e"
-                                     (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
+                                (concat "tell application \"org-clock-statusbar\" to clock in \"" org-clock-current-task "\""))))
   (add-hook 'org-clock-out-hook
             (lambda () (call-process "/usr/bin/osascript" nil 0 nil "-e"
-                                     "tell application \"org-clock-statusbar\" to clock out"))))
+                                "tell application \"org-clock-statusbar\" to clock out"))))
 
 
-
+
 ;; TODO: warn about inconsistent items, e.g. TODO inside non-PROJECT
 ;; TODO: nested projects!
 
 
-
-;;; Archiving
-
-(setq org-archive-mark-done nil)
-(setq org-archive-location "%s_archive::* Archive")
-
-
-
-
 
 (require-package 'org-pomodoro)
 (setq org-pomodoro-keep-killed-pomodoro-time t)
@@ -452,36 +745,34 @@ typical word processor."
 
 
 (after-load 'org
-  (define-key org-mode-map (kbd "C-M-<up>") 'org-up-element)
-  (define-key org-mode-map (kbd "C-c p") 'org-open-exported-pdf)
   (when *is-a-mac*
     (define-key org-mode-map (kbd "M-h") nil)
     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
 
 
 ;;; org-babel
-(after-load 'org
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   `(
-     ;; (R  . t)
-     (ditaa . t)
-     ;; (asymptote . t)
-     (dot . t)
-     (emacs-lisp . t)
-     (gnuplot . t)
-     (haskell . nil)
-     (latex . t)
-     ;; (ledger . t)
-     (ocaml . nil)
-     (octave . t)
-     (plantuml . t)
-     (python . t)
-     (ruby . t)
-     (screen . nil)
-     (,(if (locate-library "ob-sh") 'sh 'shell) . t)
-     (sql . nil)
-     (sqlite . t))))
+;; (after-load 'org
+;;   (org-babel-do-load-languages
+;;    'org-babel-load-languages
+;;    `(
+;;      ;; (R  . t)
+;;      (ditaa . t)
+;;      ;; (asymptote . t)
+;;      (dot . t)
+;;      (emacs-lisp . t)
+;;      (gnuplot . t)
+;;      (haskell . nil)
+;;      (latex . t)
+;;      ;; (ledger . t)
+;;      (ocaml . nil)
+;;      (octave . t)
+;;      (plantuml . t)
+;;      (python . t)
+;;      (ruby . t)
+;;      (screen . nil)
+;;      (,(if (locate-library "ob-sh") 'sh 'shell) . t)
+;;      (sql . nil)
+;;      (sqlite . t))))
 
 
 
@@ -613,13 +904,31 @@ typical word processor."
 
 
 
-;;highlight code in src code block
-(setq org-src-fontify-natively t)
-(after-load 'org
-  (define-key org-mode-map (kbd "C-<tab>") nil)
-  (define-key org-mode-map (kbd "C-S-<tab>") nil)
-  )
+
+;; Roam
+(when (executable-find "cc")
+  (use-package org-roam
+    :diminish
+    :hook (after-init . org-roam-db-autosync-enable)
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ("C-c n j" . org-roam-dailies-capture-today))
+    :init
+    (setq org-roam-directory (file-truename centaur-org-directory))
+    :config
+    (unless (file-exists-p org-roam-directory)
+      (make-directory org-roam-directory))
+
+    (when emacs/>=27p
+      (use-package org-roam-ui
+        :init
+        (when (featurep 'xwidget-internal)
+          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))))))
+
 
 ;;; Private User Misc Settings Ends
-
+
 (provide 'init-org)
