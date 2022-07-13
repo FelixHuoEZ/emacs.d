@@ -249,7 +249,11 @@
 
 ;;; org-download(abo-abo)
 (use-package org-download
-  :bind ("C-c y" . yank-image-from-win-clipboard-through-powershell)
+  :bind
+  (:prefix "C-c y"
+           :prefix-map yank-image-map
+           ("y" . yank-image-from-win-clipboard-through-powershell)
+           ("u" . yank-image-from-win-clipboard-only-link))
   :config
   ;; (setq org-download-backend 'wget)
   (setq org-download-backend "wget")
@@ -257,6 +261,7 @@
   ;; Drag-and-drop to `dired`
   (add-hook 'dired-mode-hook 'org-download-enable)
   ;;image cut settings
+  (define-prefix-command 'yank-image-map)
   (defun yank-image-from-win-clipboard-through-powershell()
     "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy"
     (interactive)
@@ -277,7 +282,26 @@
       ;; (insert (concat "[[file:" file-path-wsl "]] "))
       (insert file-path-wsl)
       ))
-  )
+  (defun yank-image-from-win-clipboard-only-link ()
+    (interactive)
+    (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
+           (file-dir "./images/")
+           (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
+           ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
+           (file-path-wsl (concat file-dir file-name))
+           )
+      (unless (file-exists-p file-dir)
+        (make-directory file-dir))
+      ;; (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/\\$env:USERNAME/" file-name "\\\")\""))
+      (shell-command (concat powershell " -command \"(Get-Clipboard -Format Image).Save(\\\"C:/Users/Public/Pictures/" file-name "\\\")\""))
+      (rename-file (concat "/mnt/c/Users/Public/Pictures/" file-name) file-path-wsl)
+      ;; (yas/insert-by-name "newfigure")
+      ;; (insert (concat "#+ATTR_LATEX: :width 0.5\\textwidth\n"))
+      ;; (org-indent-line)
+      ;; (insert (concat "[[file:" file-path-wsl "]] "))
+      (insert file-path-wsl)
+      )
+    ))
 
 
 (use-package org-attach-screenshot

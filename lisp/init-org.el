@@ -904,7 +904,6 @@ typical word processor."
 
 
 
-
 ;; Roam
 (when (executable-find "cc")
   (use-package org-roam
