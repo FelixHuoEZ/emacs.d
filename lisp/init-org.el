@@ -53,8 +53,7 @@
          ("C-M-<up>" . org-up-element)
          ("C-c p" . org-open-exported-pdf)
          ("C-<tab>" . nil)
-         ("C-S-<tab>" . nil)
-         )
+         ("C-S-<tab>" . nil))
   :hook (((org-babel-after-execute org-mode) . org-redisplay-inline-images) ; display image
          (org-mode . (lambda ()
                        "Beautify org symbols."
@@ -391,17 +390,17 @@ prepended to the element after the #+HEADER: tag."
 ;;   (add-hook 'org-mode-hook 'org-fancy-priorities-mode))
 
 
-;; ;;How do I make Org-mode open PDF files
-;; (eval-after-load "org"
-;;   '(progn
-;;      ;; .txt files aren't in the list initially, but in case that changes
-;;      ;; in a future version of org, use if to avoid errors
-;;      (if (assoc "\\.txt\\'" org-file-apps)
-;;          (setcdr (assoc "\\.txt\\'" org-file-apps) "notepad.exe %s")
-;;        (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
-;;      ;; Change .pdf association directly within the alist
-;;      (setcdr (assoc "\\.pdf\\'" org-file-apps) "sumatrapdf %s")
-;;      (add-to-list 'org-file-apps '("\\.png\\'" . default))))
+;;How do I make Org-mode open PDF files
+(eval-after-load "org"
+  '(progn
+     ;; .txt files aren't in the list initially, but in case that changes
+     ;; in a future version of org, use if to avoid errors
+     (if (assoc "\\.txt\\'" org-file-apps)
+         (setcdr (assoc "\\.txt\\'" org-file-apps) "notepad.exe %s")
+       (add-to-list 'org-file-apps '("\\.txt\\'" . "notepad.exe %s") t))
+     ;; Change .pdf association directly within the alist
+     (setcdr (assoc "\\.pdf\\'" org-file-apps) "sumatrapdf %s")
+     (add-to-list 'org-file-apps '("\\.png\\'" . default))))
 
 
 ;; 下面这部分应该已经被 truncate 取代了吧？
@@ -497,19 +496,50 @@ typical word processor."
 
 ;;(add-hook 'org-mode-hook 'buffer-face-mode)
 
+(use-package org-protocol
+  :ensure nil)
+
 
 ;;; Capturing
 
-(global-set-key (kbd "C-c c") 'org-capture)
+;; (global-set-key (kbd "C-c c") 'org-capture)
+(defun transform-square-brackets-to-round-ones(string-to-transform)
+  "Transforms [ into ( and ] into ), other chars left unchanged."
+  (concat
+   (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+  )
 
 (setq org-capture-templates
       `(("t" "todo" entry (file "~/orgfile/GTD/newgtd.org") ; "newgtd.org" => org-default-gtd-file
          "* TODO %?\n%U\n" :clock-resume t)
-        ("n" "note" entry (file "~/orgfile/GTD/journal.org") ; "journal.org" => org-default-note-file
+        ("n" "note" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
-        ("a" "academic" entry (file "~/orgfile/GTD/academic.org") ; "academic.org" => academic-note-file
+        ("a" "academic" entry (file+headline ,(concat org-roam-directory "Notes.org") "InboxAcademics")
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
-        ))
+        ;; org-capture-extension
+        ;; https://github.com/sprig/org-capture-extension
+        ;; Open the Registry Editor (Win-R, then type regedit). Within HKEY_CLASSES_ROOT, add a key called org-protocol. Within org-protocol, set the data for the string value with the name (Default) to be URL:org-protocol, add another string value with name URL Protocol and no data, and add a key called shell.
+        ;; Within shell, create a key called open.
+        ;; Within open, create a key called command.
+        ;; Within command, set the data for the string value with the name (Default) to "C:\the\path\to\your\emacsclientw.exe" "%1", updating the path to point to your Emacs installation.
+        ;; For wsl ArchLinux, command should be: wsl -d ArchLinux emacsclient --socket-name emacs-server-file "%1"
+        ("p" "Protocol" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+         "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+        ("L" "Protocol Link" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+         "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
+        ;; org-capture-tag-bookmark
+        ("pb" "Protocol Bookmarks" entry (file+headline  ,(concat org-roam-directory "Notes.org") "Inbox")
+         "* %U - %:annotation  %:initial" :immediate-finish t :kill-buffer t)
+        ("pn" "Protocol Notes" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+         "* %U - %:annotation  %:initial" :immediate-finish t :kill-buffer t)
+        ;; https://www.zmonster.me/2020/06/27/org-roam-introduction.html
+        ;; 暂时没用上，not work
+        ("a" "Annotation" plain (function org-roam-capture--get-point)
+         "%U ${body}\n"
+         :file-name "${slug}"
+         :head "#+title: ${title}\n#+roam_key: ${ref}\n#+roam_alias:\n"
+         :immediate-finish t
+         :unnarrowed t)))
 (setq org-agenda-files (quote ("~/orgfile/GTD/newgtd.org"
                                "~/orgfile/GTD/journal.org"
                                "~/orgfile/GTD/refile-beorg.org"
@@ -916,16 +946,77 @@ typical word processor."
            ("C-c n c" . org-roam-capture)
            ("C-c n j" . org-roam-dailies-capture-today))
     :init
-    (setq org-roam-directory (file-truename centaur-org-directory))
+    (setq org-roam-directory (file-truename dropbox-org-roam-directory))
     :config
     (unless (file-exists-p org-roam-directory)
       (make-directory org-roam-directory))
+    ;; 使用侧边栏而不是完整buffer
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-side-window)
+                   (side . right)
+                   (slot . 0)
+                   (window-width . 0.25)
+                   (window-parameters . ((no-other-window . t)
+                                         (no-delete-other-windows . t)))))
+
+    ;; 标题链接分级显示
+    ;; Codes blow are used to general a hierachy for title nodes that under a file
+    (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+      "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+      If there's no file-level title in the file, return empty string."
+      (or (if (= (org-roam-node-level node) 0)
+              (org-roam-node-title node)
+            (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+          ""))
+    (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+      "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+        If some elements are missing, they will be stripped out."
+      (let ((title     (org-roam-node-title node))
+            (olp       (org-roam-node-olp   node))
+            (level     (org-roam-node-level node))
+            (filetitle (org-roam-node-doom-filetitle node))
+            (separator (propertize " > " 'face 'shadow)))
+        (cl-case level
+          ;; node is a top-level file
+          (0 filetitle)
+          ;; node is a level 1 heading
+          (1 (concat (propertize filetitle 'face '(shadow italic))
+                     separator title))
+          ;; node is a heading with an arbitrary outline path
+          (t (concat (propertize filetitle 'face '(shadow italic))
+                     separator (propertize (string-join olp " > ") 'face '(shadow italic))
+                     separator title)))))
+
+    (setq org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag)))
 
     (when emacs/>=27p
       (use-package org-roam-ui
         :init
         (when (featurep 'xwidget-internal)
-          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))))))
+          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
+        :bind (
+               ("C-c n u". org-roam-ui-open))
+        :config
+        (setq org-roam-ui-sync-theme t
+              org-roam-ui-follow t
+              org-roam-ui-update-on-save t
+              org-roam-ui-open-on-start t)))))
+
+
+(use-package dogears
+  ;; These bindings are optional, of course:
+  :bind (:map global-map
+              ("M-g d" . dogears-go)
+              ("M-g M-b" . dogears-back)
+              ("M-g M-f" . dogears-forward)
+              ("M-g M-d" . dogears-list)
+              ("M-g M-D" . dogears-sidebar)))
+
+(use-package org-ql
+  :config
+  (use-package helm-org-ql))
+(use-package org-sidebar)
 
 
 ;;; Private User Misc Settings Ends

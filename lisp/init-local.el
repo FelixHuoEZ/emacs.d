@@ -36,6 +36,8 @@
       (remove '("\\.pdf\\'" . default) org-file-apps))
 (add-to-list 'org-file-apps '("\\.pdf\\'" . "xdg-open \"%s\""))
 (add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "xdg-open \"-page %1 %s\""))
+(add-to-list 'org-file-apps '("\\.html\\'" . "xdg-open \"%s\""))
+(add-to-list 'org-file-apps '("\\.htm\\'" . "xdg-open \"%s\""))
 ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . "sumatrapdf %s"))
 ;; (add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "sumatrapdf -page %1 %s"))
 

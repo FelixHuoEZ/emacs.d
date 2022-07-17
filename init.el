@@ -114,6 +114,8 @@
 ;; (require 'init-erlang)
 (require 'init-javascript)
 (require 'init-php)
+(setq dropbox-org-directory "/mnt/d/Dropbox/orgfile")
+(setq dropbox-org-roam-directory "/mnt/d/Dropbox/orgfile/roam")
 (require 'init-org)
 (require 'init-ox)
 ;; (require 'init-ox-latex)
