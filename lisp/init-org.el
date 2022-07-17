@@ -290,6 +290,7 @@ prepended to the element after the #+HEADER: tag."
                 org-tree-slide-skip-done nil
                 org-tree-slide-skip-comments t
                 org-tree-slide-skip-outline-level 3))
+  (require 'org-attach-git)
 
   ;; Pomodoro
   (use-package org-pomodoro
@@ -1017,6 +1018,7 @@ typical word processor."
   :config
   (use-package helm-org-ql))
 (use-package org-sidebar)
+
 
 ;;; Private User Misc Settings Ends
 
