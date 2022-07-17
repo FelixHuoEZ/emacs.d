@@ -46,36 +46,65 @@
 (setq org-html-validation-link nil)
 
 
-;; refer to the page [[http://docs.mathjax.org/en/latest/tex.html#][MathJax TeX and LaTeX Support — MathJax 2.7 documentation]]
+;; support for MathJax 3.x
+;; 还是不支持 SIunitx
 (setq org-html-mathjax-template
-      "<script type=\"text/javascript\" src=\"%PATH\"></script>
+      "<script type=\"text/javascript\" id=\"MathJax-script\" async src=\"%PATH\"></script>
 <script type=\"text/x-mathjax-config\">
-MathJax.Hub.Config({
-  extensions: [\"tex2jax.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/physics/physics.js\", \"[Contrib]/sqrtspacing.js\"],
-  TeX: {
-    equationNumbers: { autoNumber: \"AMS\" },
-    extensions: [\"autoload-all.js\", \"AMSmath.js\", \"AMSsymbols.js\", \"color.js\", \"sinuitx.js\", \"physics.js\", \"cancel.js\", \"begingroup.js\", \"sqrtspacing.js\"]
-}
-});
+window.MathJax = {
+  loader: {
+    load: ['[tex]/autoload', '[tex]/ams', '[tex]/color', '[tex]/cancel', '[tex]/physics','[tex]/mathtools', '[tex]/colortbl', '[tex]/gensymb', '[tex]/centernot', '[tex]/colorv2', '[tex]/empheq', '[tex]/textcomp', '[tex]/upgreek', '[tex]/cases']
+  },
+  tex: {
+    tags: \"ams\",
+    packages: {['base', 'autoload', 'ams', 'color', 'cancel', 'physics', 'mathtools', 'colortbl', 'gensymb', 'centernot', 'colorv2', 'empheq', 'textcomp', 'upgreek', 'cases']
+  }
+};
 </script>
 ")
 ;; (setq org-html-mathjax-template "")
 
 (setq org-html-mathjax-options
-      '((path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML")
+      '(
+        (path "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js")
         (scale "100")
         (align "center")
         (indent "2em")
         (mathml nil))
       )
 
+;; Below only support for MathJax 2.x
+;; refer to the page [[http://docs.mathjax.org/en/latest/tex.html#][MathJax TeX and LaTeX Support — MathJax 2.7 documentation]]
+;; (setq org-html-mathjax-template
+;;       "<script type=\"text/javascript\" src=\"%PATH\"></script>
+;; <script type=\"text/x-mathjax-config\">
+;; MathJax.Hub.Config({
+;;   extensions: [\"tex2jax.js\", \"[Contrib]/siunitx/siunitx.js\", \"[Contrib]/physics/physics.js\", \"[Contrib]/sqrtspacing.js\"],
+;;   TeX: {
+;;     equationNumbers: { autoNumber: \"AMS\" },
+;;     extensions: [\"autoload-all.js\", \"AMSmath.js\", \"AMSsymbols.js\", \"color.js\", \"sinuitx.js\", \"physics.js\", \"cancel.js\", \"begingroup.js\", \"sqrtspacing.js\"]
+;; }
+;; });
+;; </script>
+;; ")
+;; ;; (setq org-html-mathjax-template "")
+
 ;; (setq org-html-mathjax-options
-;;       '((path "D:/MyDocuments/My Knowledge/Plugins/Org2Wiz/MathJax/MathJax.js\?config=TeX-AMS-MML_HTMLorMML")
+;;       '(
+;;         (path "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-AMS_HTML")
 ;;         (scale "100")
 ;;         (align "center")
 ;;         (indent "2em")
 ;;         (mathml nil))
 ;;       )
+
+;; ;; (setq org-html-mathjax-options
+;; ;;       '((path "D:/MyDocuments/My Knowledge/Plugins/Org2Wiz/MathJax/MathJax.js\?config=TeX-AMS-MML_HTMLorMML")
+;; ;;         (scale "100")
+;; ;;         (align "center")
+;; ;;         (indent "2em")
+;; ;;         (mathml nil))
+;; ;;       )
 
 
 

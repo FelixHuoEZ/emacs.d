@@ -290,7 +290,41 @@ prepended to the element after the #+HEADER: tag."
                 org-tree-slide-skip-done nil
                 org-tree-slide-skip-comments t
                 org-tree-slide-skip-outline-level 3))
+
+  ;; org-attach
   (require 'org-attach-git)
+  (setq org-attach-dir-relative t)
+  (setq org-attach-use-inheritance t)
+  (setq org-attach-id-dir "attach/")
+
+  ;; attachment 关键字对应图片导出链接不对，hook 一下
+  ;; https://emacs-china.org/t/org-mode-attachment-html/15522/2
+  (defun my/org-attach-expand-links (_)
+    (save-excursion
+      (while (re-search-forward "attachment:" nil t)
+        (let ((link (org-element-context)))
+          (when (and (eq 'link (org-element-type link))
+                     (string-equal "attachment"
+                                   (org-element-property :type link)))
+            (let* ((description (and (org-element-property :contents-begin link)
+                                     (buffer-substring-no-properties
+                                      (org-element-property :contents-begin link)
+                                      (org-element-property :contents-end link))))
+                   (file (org-element-property :path link))
+                   (fullpath (org-attach-expand file))
+                   (current-dir (file-name-directory (or default-directory
+                                                         buffer-file-name)))
+                   (relpath (file-relative-name fullpath current-dir))
+                   (new-link ;;(format "[[file:%s][file:%s]]" relpath relpath)))
+                    (org-link-make-string
+                     (concat "file:" relpath)
+                     description)))
+              (goto-char (org-element-property :end link))
+              (skip-chars-backward " \t")
+              (delete-region (org-element-property :begin link) (point))
+              (insert new-link)))))))
+  (remove-hook 'org-export-before-parsing-hook 'org-attach-expand-links)
+  (add-hook 'org-export-before-parsing-hook 'my/org-attach-expand-links)
 
   ;; Pomodoro
   (use-package org-pomodoro
