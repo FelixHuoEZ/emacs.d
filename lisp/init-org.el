@@ -512,9 +512,9 @@ typical word processor."
 (setq org-capture-templates
       `(("t" "todo" entry (file "~/orgfile/GTD/newgtd.org") ; "newgtd.org" => org-default-gtd-file
          "* TODO %?\n%U\n" :clock-resume t)
-        ("n" "note" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+        ("n" "note" entry (file+headline ,(concat org-roam-directory "notes.org") "Inbox")
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
-        ("a" "academic" entry (file+headline ,(concat org-roam-directory "Notes.org") "InboxAcademics")
+        ("a" "academic" entry (file+headline ,(concat org-roam-directory "notes.org") "InboxAcademics")
          "* %? :NOTE:\n%U\n%a\n" :clock-resume t)
         ;; org-capture-extension
         ;; https://github.com/sprig/org-capture-extension
@@ -523,14 +523,14 @@ typical word processor."
         ;; Within open, create a key called command.
         ;; Within command, set the data for the string value with the name (Default) to "C:\the\path\to\your\emacsclientw.exe" "%1", updating the path to point to your Emacs installation.
         ;; For wsl ArchLinux, command should be: wsl -d ArchLinux emacsclient --socket-name emacs-server-file "%1"
-        ("p" "Protocol" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+        ("p" "Protocol" entry (file+headline ,(concat org-roam-directory "notes.org") "Inbox")
          "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-        ("L" "Protocol Link" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+        ("L" "Protocol Link" entry (file+headline ,(concat org-roam-directory "notes.org") "Inbox")
          "* %? [[%:link][%(transform-square-brackets-to-round-ones \"%:description\")]]\n")
         ;; org-capture-tag-bookmark
-        ("pb" "Protocol Bookmarks" entry (file+headline  ,(concat org-roam-directory "Notes.org") "Inbox")
+        ("pb" "Protocol Bookmarks" entry (file+headline  ,(concat org-roam-directory "notes.org") "Inbox")
          "* %U - %:annotation  %:initial" :immediate-finish t :kill-buffer t)
-        ("pn" "Protocol Notes" entry (file+headline ,(concat org-roam-directory "Notes.org") "Inbox")
+        ("pn" "Protocol Notes" entry (file+headline ,(concat org-roam-directory "notes.org") "Inbox")
          "* %U - %:annotation  %:initial" :immediate-finish t :kill-buffer t)
         ;; https://www.zmonster.me/2020/06/27/org-roam-introduction.html
         ;; 暂时没用上，not work
@@ -1017,7 +1017,6 @@ typical word processor."
   :config
   (use-package helm-org-ql))
 (use-package org-sidebar)
-
 
 ;;; Private User Misc Settings Ends
 
