@@ -1023,7 +1023,40 @@ typical word processor."
                      separator (propertize (string-join olp " > ") 'face '(shadow italic))
                      separator title)))))
 
-    (setq org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag)))
+    (cl-defmethod org-roam-node-type ((node org-roam-node))
+      "Return the TYPE of NODE."
+      (condition-case nil
+          (file-name-nondirectory
+           (directory-file-name
+            (file-name-directory
+             (file-relative-name (org-roam-node-file node) org-roam-directory))))
+        (error "")))
+    (setq org-roam-node-display-template
+          (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+    ;; (setq org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag)))
+
+    (setq org-roam-mode-sections
+          (list #'org-roam-backlinks-section
+                #'org-roam-reflinks-section
+                ;; #'org-roam-unlinked-references-section
+                ))
+
+    ;; how the pop-up buffer is displayed
+    (add-to-list 'display-buffer-alist
+                 '("\\*org-roam\\*"
+                   (display-buffer-in-direction)
+                   (direction . right)
+                   (window-width . 0.33)
+                   (window-height . fit-window-to-buffer)))
+
+    ;; (add-to-list 'display-buffer-alist
+    ;;              '("\\*org-roam\\*"
+    ;;                (display-buffer-in-side-window)
+    ;;                (side . right)
+    ;;                (slot . 0)
+    ;;                (window-width . 0.33)
+    ;;                (window-parameters . ((no-other-window . t)
+    ;;                                      (no-delete-other-windows . t)))))
 
     (when emacs/>=27p
       (use-package org-roam-ui

@@ -1831,6 +1831,11 @@ _~_: modified
 )
 
 
+(use-package keycast
+  :config
+  (keycast-mode))
+
+
 ;; remove the prompt for killing emacsclient buffers 需要放在最后加载
 ;; http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
