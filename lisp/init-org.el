@@ -981,10 +981,10 @@ typical word processor."
            ("C-c n c" . org-roam-capture)
            ("C-c n j" . org-roam-dailies-capture-today))
     :init
-    (setq org-roam-directory (file-truename dropbox-org-roam-directory))
+    (setq org-roam-directory-true (file-truename org-roam-directory))
     :config
-    (unless (file-exists-p org-roam-directory)
-      (make-directory org-roam-directory))
+    (unless (file-exists-p org-roam-directory-true)
+      (make-directory org-roam-directory-true))
     ;; 使用侧边栏而不是完整buffer
     (add-to-list 'display-buffer-alist
                  '("\\*org-roam\\*"

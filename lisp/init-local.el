@@ -1830,11 +1830,13 @@ _~_: modified
 )
 )
 
+;; (use-package keycast
+;;   :config
+;;   (keycast-mode))
 
-(use-package keycast
-  :config
-  (keycast-mode))
-
+;; (use-package minions
+;;   :config
+;;   (minions-mode 1))
 
 ;; remove the prompt for killing emacsclient buffers 需要放在最后加载
 ;; http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
