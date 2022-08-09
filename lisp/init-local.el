@@ -265,10 +265,12 @@
   ;;image cut settings
   (define-prefix-command 'yank-image-map)
   (defun yank-image-from-win-clipboard-through-powershell()
-    "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy"
+    "to simplify the logic, use c:/Users/Public as temporary directoy, and move it into current directoy,
+     save image to file-dir, copy path of image, insert link with yasnippet"
     (interactive)
     (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
-           (file-dir "./images/")
+           (file-dir (concat "./" (org-attach-dir-get-create) "/") )
+           ;; (file-dir "./images/")
            (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
            ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
            (file-path-wsl (concat file-dir file-name))
@@ -285,9 +287,11 @@
       (insert file-path-wsl)
       ))
   (defun yank-image-from-win-clipboard-only-link ()
+    "save image to file-dir, copy path of image, insert raw link"
     (interactive)
     (let* ((powershell "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe")
-           (file-dir "./images/")
+           (file-dir (concat "./" (org-attach-dir-get-create) "/") )
+           ;; (file-dir "./images/")
            (file-name (format-time-string "screenshot_%Y%m%d_%H%M%S.png"))
            ;; (file-path-powershell (concat "c:/Users/\$env:USERNAME/" file-name))
            (file-path-wsl (concat file-dir file-name))
