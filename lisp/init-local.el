@@ -1842,6 +1842,21 @@ _~_: modified
 ;;   :config
 ;;   (minions-mode 1))
 
+(use-package powershell
+  :config
+  (use-package ob-powershell
+    :config
+    (cl-pushnew '(powershell . t) load-language-alist)))
+
+;; zsh
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (if (string-match "\\.zsh$" buffer-file-name)
+                (sh-set-shell "zsh"))))
+
+
+
 ;; remove the prompt for killing emacsclient buffers 需要放在最后加载
 ;; http://stackoverflow.com/questions/268088/how-to-remove-the-prompt-for-killing-emacsclient-buffers
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
