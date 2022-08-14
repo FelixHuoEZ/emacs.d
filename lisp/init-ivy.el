@@ -236,6 +236,24 @@
               (lambda ()
                 (remove-hook 'pre-command-hook 'my-ivy-fly-back-to-present t)))
 
+    ;; exclude GoodSync _gsdata_ directory
+    ;; put an .ignore file to tell counsel-rg to ignore
+
+    ;; see@ [[https://github.com/abo-abo/swiper/issues/2802][Counsel rg base command string to exclude a directory · Issue #2802 · abo-abo/swiper]]
+    ;; (defvar my-rg-excludes '("~/iCloudDrive/logseq/roam/_gsdata_" "~/mnt/d/Dropbox/logseq/roam/_gsdata_")
+    ;;   "List of directories to exclude from `counsel-rg' results.")
+
+    ;; (define-advice counsel-rg
+    ;;     (:around (fn &optional in dir opts &rest args) my-glob)
+    ;;   "Exclude `my-rg-excludes' from `counsel-rg' results."
+    ;;   (let ((dir (or dir default-directory)))
+    ;;     (dolist (x my-rg-excludes)
+    ;;       (let ((glob (and (file-in-directory-p x dir)
+    ;;                        (file-relative-name (expand-file-name "**" x) dir))))
+    ;;         (when glob (setq opts (concat "-g !" glob (and opts " ") opts))))))
+    ;;   (apply fn in dir opts args))
+
+
     ;;
     ;; Improve search experience of `swiper' and `counsel'
     ;;
