@@ -1855,6 +1855,11 @@ _~_: modified
             (if (string-match "\\.zsh$" buffer-file-name)
                 (sh-set-shell "zsh"))))
 
+;; org-logseq
+(use-package org-logseq
+  :quelpa (org-logseq :fetcher github :repo "llcc/org-logseq" :files ("*"))
+  :custom (org-logseq-dir org-roam-directory))
+
 
 
 ;; remove the prompt for killing emacsclient buffers 需要放在最后加载
