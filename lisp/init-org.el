@@ -1088,20 +1088,29 @@ typical word processor."
 (use-package org-sidebar)
 
 ;; auto add created property at heading
-(defun set-creation-date-heading-property ()
-  (save-excursion
-    (org-back-to-heading)
-    (org-set-property "CREATED" (format-time-string "%Y-%m-%d %T"))))
+(defun hsk/org-time-stamp-string (&optional ts)
+  (with-temp-buffer
+    (org-mode)
+    (org-insert-time-stamp (if ts ts (current-time)) t)
+    (buffer-substring (point-min) (point-max))))
+
+(defun hsk/set-creation-date-heading-property ()
+  (org-set-property "CREATED" (hsk/org-time-stamp-string))
+  ;; (save-excursion
+  ;;   (org-back-to-heading)
+  ;;   (org-set-property "CREATED" (format-time-string "%Y-%m-%d %T")))
+  )
 
 (defun hsk/org-mode-date-heading-on ()
   "Turn on heading creation date property"
   (interactive)
-  (add-hook 'org-insert-heading-hook #'set-creation-date-heading-property))
+  (add-hook 'org-insert-heading-hook #'hsk/set-creation-date-heading-property))
 
 (defun hsk/org-mode-date-heading-off ()
   "Turn off heading creation date property"
   (interactive)
-  (remove-hook 'org-insert-heading-hook #'set-creation-date-heading-property))
+  (remove-hook 'org-insert-heading-hook #'hsk/set-creation-date-heading-property))
+(hsk/org-mode-date-heading-on)
 
 ;; auto update updated tag in current file
 (defun hsk/update-org-modified-property ()
