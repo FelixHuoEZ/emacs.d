@@ -1081,10 +1081,87 @@ typical word processor."
               ("M-g M-d" . dogears-list)
               ("M-g M-D" . dogears-sidebar)))
 
+;; query language for Org files
 (use-package org-ql
   :config
   (use-package helm-org-ql))
 (use-package org-sidebar)
+
+;; auto add created property at heading
+(defun set-creation-date-heading-property ()
+  (save-excursion
+    (org-back-to-heading)
+    (org-set-property "CREATED" (format-time-string "%Y-%m-%d %T"))))
+
+(defun hsk/org-mode-date-heading-on ()
+  "Turn on heading creation date property"
+  (interactive)
+  (add-hook 'org-insert-heading-hook #'set-creation-date-heading-property))
+
+(defun hsk/org-mode-date-heading-off ()
+  "Turn off heading creation date property"
+  (interactive)
+  (remove-hook 'org-insert-heading-hook #'set-creation-date-heading-property))
+
+;; auto update updated tag in current file
+(defun hsk/update-org-modified-property ()
+  "If a file contains a '#+UPDATED' property update it to contain
+  the current date/time"
+  (interactive)
+  (save-excursion
+    (widen)
+    (goto-char (point-min))
+    (when (re-search-forward "^#\\+UPDATED:" (point-max) t)
+      (progn
+        (kill-line)
+        (org-insert-time-stamp (current-time) t)
+        ;; (insert (format-time-string " %d/%m/%Y %H:%M:%S") )
+        ))))
+;; (add-hook 'before-save-hook #'hsk/update-org-modified-property nil t)
+(add-hook 'before-save-hook (lambda ()
+                              (when (eq major-mode 'org-mode)
+                                (hsk/update-org-modified-property))))
+
+
+;; auto update updated tag in current heading
+(defun yant/getentryhash ()
+  "Get the hash sum of the text in current entry, except :HASH: and :MODIFIED: property texts."
+  (save-excursion
+    (let* ((beg (progn (org-back-to-heading) (point)))
+           (end (progn
+                  (forward-char)
+                  (if (not (re-search-forward "^\*+ " (point-max) t))
+                      (point-max)
+                    (match-beginning 0))))
+           (full-str (buffer-substring beg end))
+           (str-nohash (if (string-match "^ *:HASH:.+\n" full-str)
+                           (replace-match "" nil nil full-str)
+                         full-str))
+           (str-nohash-nomod (if (string-match "^ *:UPDATED:.+\n" str-nohash)
+                                 (replace-match "" nil nil str-nohash)
+                               str-nohash))
+           (str-nohash-nomod-nopropbeg (if (string-match "^ *:PROPERTIES:\n" str-nohash-nomod)
+                                           (replace-match "" nil nil str-nohash-nomod)
+                                         str-nohash-nomod))
+           (str-nohash-nomod-nopropbeg-end (if (string-match "^ *:END:\n" str-nohash-nomod-nopropbeg)
+                                               (replace-match "" nil nil str-nohash-nomod-nopropbeg)
+                                             str-nohash-nomod-nopropbeg)))
+      (sxhash str-nohash-nomod-nopropbeg-end))))
+
+(defun yant/update-modification-time ()
+  "Set the :UPDATED: property of the current entry to NOW and update :HASH: property."
+  (org-set-property "HASH" (format "%s" (yant/getentryhash)))
+  (org-set-property "UPDATED" (format-time-string "%Y-%m-%d %H:%M")))
+(defun yant/skip-nonmodified ()
+  "Skip org entries, which were not modified according to the :HASH: property"
+  (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+    (if (string= (org-entry-get (point) "HASH" nil) (format "%s" (yant/getentryhash)))
+        next-headline
+      nil)))
+
+(add-hook 'before-save-hook (lambda ()
+                              (when (eq major-mode 'org-mode)
+                                (org-map-entries #'yant/update-modification-time nil 'file #'yant/skip-nonmodified))))
 
 
 ;;; Private User Misc Settings Ends
