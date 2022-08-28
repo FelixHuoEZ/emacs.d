@@ -1745,15 +1745,6 @@ _~_: modified
 (interactive)
 (find-file "~/.emacs.d/init.el"))
 
-(defun restart-tabbar-mode ()
-(interactive)
-;; (tabbar-mode nil)
-;; (tabbar-mode 1)
-)
-
-(restart-tabbar-mode)
-;; (pyim-restart-1 t)
-;; (pyim-restart-1)
 
 (global-set-key (kbd "C-c v") 'view-mode)
 (global-set-key (kbd "C-c g i") 'open-my-init-file)
@@ -1928,5 +1919,15 @@ _~_: modified
 
 ;;; Maximize window: this line must be put at the end of configuration
 (setq-default initial-frame-alist (quote ((fullscreen . maximized))))
+
+(defun restart-tabbar-mode ()
+  (interactive)
+  (tabbar-mode 0)
+  (tabbar-mode 1)
+  )
+
+(restart-tabbar-mode)
+;; (pyim-restart-1 t)
+;; (pyim-restart-1)
 
 (provide 'init-local)
