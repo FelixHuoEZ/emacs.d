@@ -250,12 +250,15 @@
 (add-hook 'emacs-lisp-mode-hook (lambda () (lispy-mode 1)))
 
 ;; org-insert-dir
-(defun hsk/org-insert-dir-from-id-logseq ()
+(defun hsk/org-insert-dir-from-top-level-id-logseq ()
   (interactive)
   (setq m1_temp (make-marker))
   (set-marker m1_temp 0)
   (org-set-property "DIR" (concat logseq-assets-directory-prefix "/" (org-id-get-create m1_temp)))
   (set-marker m1_temp nil))
+(defun hsk/org-insert-dir-from-id-logseq ()
+  (interactive)
+  (org-set-property "DIR" (concat logseq-assets-directory-prefix "/" (org-id-get-create))))
 
 ;;; org-download(abo-abo)
 (use-package org-download
