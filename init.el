@@ -130,6 +130,7 @@
 (setq org-roam-directory "/mnt/d/Dropbox/logseq/roam/")
 (setq dropbox-org-directory "/mnt/d/Dropbox/orgfile/")
 (setq dropbox-org-roam-directory "/mnt/d/Dropbox/orgfile/roam/")
+(setq logseq-assets-directory-prefix "assets")
 (require 'init-org)
 (require 'init-ox)
 ;; (require 'init-ox-latex)
