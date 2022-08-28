@@ -1155,12 +1155,15 @@ typical word processor."
            (str-nohash-nomod-nopropbeg-end (if (string-match "^ *:END:\n" str-nohash-nomod-nopropbeg)
                                                (replace-match "" nil nil str-nohash-nomod-nopropbeg)
                                              str-nohash-nomod-nopropbeg)))
-      (sxhash str-nohash-nomod-nopropbeg-end))))
+      (sxhash str-nohash-nomod-nopropbeg-end)
+      )))
 
 (defun yant/update-modification-time ()
   "Set the :UPDATED: property of the current entry to NOW and update :HASH: property."
   (org-set-property "HASH" (format "%s" (yant/getentryhash)))
-  (org-set-property "UPDATED" (format-time-string "%Y-%m-%d %H:%M")))
+  (org-set-property "UPDATED" (hsk/org-time-stamp-string))
+  ;; (org-set-property "UPDATED" (format-time-string "%Y-%m-%d %H:%M"))
+  )
 (defun yant/skip-nonmodified ()
   "Skip org entries, which were not modified according to the :HASH: property"
   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
