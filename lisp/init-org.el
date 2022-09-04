@@ -1176,6 +1176,14 @@ typical word processor."
                                 (org-map-entries #'yant/update-modification-time nil 'file #'yant/skip-nonmodified))))
 
 
+;; org-excalidraw
+(use-package org-excalidraw
+  :straight (:type git :host github :repo "wdavew/org-excalidraw")
+  ;; :quelpa (org-excalidraw :fetcher github :repo "wdavew/org-excalidraw" :files ("*"))
+  :init
+  (setq org-excalidraw-directory "~/excalidraw_files")
+  )
+
 ;;; Private User Misc Settings Ends
 
 (provide 'init-org)

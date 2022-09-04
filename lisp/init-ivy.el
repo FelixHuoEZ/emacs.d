@@ -122,7 +122,7 @@
   (setq-default counsel-mode-override-describe-bindings t)
   (setq ivy-height 12
         ivy-use-selectable-prompt t
-        ivy-use-virtual-buffers t    ; Enable bookmarks and recentf
+        ivy-use-virtual-buffers t       ; Enable bookmarks and recentf
         ivy-magic-tilde nil
         ivy-fixed-height-minibuffer t
         ivy-count-format "(%d/%d) "
@@ -166,6 +166,22 @@
           counsel-find-file-occur-cmd
           "gls -a | grep -i -E '%s' | tr '\\n' '\\0' | xargs -0 gls -d --group-directories-first"))
   :config
+
+  ;; exclude directories for counsel-rg
+  (defvar my-rg-excludes '("~/.emacs.d/quelpa"
+                           "~/foo" "~/bar")
+    "List of directories to exclude from `counsel-rg' results.")
+
+  (define-advice counsel-rg
+      (:around (fn &optional in dir opts &rest args) my-glob)
+    "Exclude `my-rg-excludes' from `counsel-rg' results."
+    (let ((dir (or dir default-directory)))
+      (dolist (x my-rg-excludes)
+        (let ((glob (and (file-in-directory-p x dir)
+                         (file-relative-name (expand-file-name "**" x) dir))))
+          (when glob (setq opts (concat "-g !" glob (and opts " ") opts))))))
+    (apply fn in dir opts args))
+
   (with-no-warnings
     ;; persist views
     (with-eval-after-load 'savehist

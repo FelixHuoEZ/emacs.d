@@ -2,8 +2,8 @@
 ;;-----------------------------------------------------------------------------
 ;;-----------------------------------------------------------------------------
 (add-hook 'org-mode-hook
-(lambda ()
-(set (make-local-variable 'system-time-locale) "C")))
+          (lambda ()
+            (set (make-local-variable 'system-time-locale) "C")))
 (set-locale-environment "ENU")
 
 
@@ -154,54 +154,54 @@
 
 
 (use-package web-mode
-:config
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 
-(defun my-web-mode-hook ()
-"Hooks for Web mode."
-(setq web-mode-markup-indent-offset 2)
-(setq web-mode-css-indent-offset 2)
-(setq web-mode-code-indent-offset 2)
-)
-(add-hook 'web-mode-hook 'my-web-mode-hook)
-)
+  (defun my-web-mode-hook ()
+    "Hooks for Web mode."
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-css-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    )
+  (add-hook 'web-mode-hook 'my-web-mode-hook)
+  )
 
 
 ;;; fix youdao-dictionary invalid date error
 
 (defun url-cookie-expired-p (cookie)
-"Return non-nil if COOKIE is expired."
-(let ((exp (url-cookie-expires cookie)))
-(and (> (length exp) 0)
-(condition-case ()
-(> (float-time) (float-time (date-to-time exp)))
-(error nil)))))
+  "Return non-nil if COOKIE is expired."
+  (let ((exp (url-cookie-expires cookie)))
+    (and (> (length exp) 0)
+         (condition-case ()
+             (> (float-time) (float-time (date-to-time exp)))
+           (error nil)))))
 ;; https://github.com/xuchunyang/youdao-dictionary.el/issues/1#issuecomment-71359418
 
 
 ;;; extended indent-buffer
 
 (defun indent-buffer()
-(interactive)
-(indent-region (point-min) (point-max)))
+  (interactive)
+  (indent-region (point-min) (point-max)))
 
 (defun indent-region-or-buffer()
-(interactive)
-(save-excursion
-(if (region-active-p)
-(progn
-(indent-region (region-beginning) (region-end))
-(message "Indent selected region."))
-(progn
-(indent-buffer)
-(message "Indent buffer.")))))
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (progn
+          (indent-region (region-beginning) (region-end))
+          (message "Indent selected region."))
+      (progn
+        (indent-buffer)
+        (message "Indent buffer.")))))
 
 (global-set-key (kbd "C-M-\\") 'indent-region-or-buffer)
 
@@ -212,9 +212,9 @@
 
 ;; smartparens-mode
 (use-package smartparens
-:config
-(smartparens-global-mode t)
-)
+  :config
+  (smartparens-global-mode t)
+  )
 
 
 ;;; lispy(abo-abo)
@@ -322,14 +322,14 @@
 
 
 (use-package org-attach-screenshot
-:config
-;; (setq org-attach-screenshot-command-line "mycommand -x -y -z %f")
-(setq org-attach-screenshot-dirfunction
-(lambda ()
-(progn (assert (buffer-file-name))
-(concat (file-name-sans-extension (buffer-file-name))
-"_att"))))
-(setq org-attach-screenshot-relative-links t))
+  :config
+  ;; (setq org-attach-screenshot-command-line "mycommand -x -y -z %f")
+  (setq org-attach-screenshot-dirfunction
+        (lambda ()
+          (progn (assert (buffer-file-name))
+                 (concat (file-name-sans-extension (buffer-file-name))
+                         "_att"))))
+  (setq org-attach-screenshot-relative-links t))
 
 
 (defun my-org-screenshot ()
@@ -365,24 +365,24 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; ace-link(abo-abo)
 (use-package ace-link
-:config
-(ace-link-setup-default)
-(define-key org-mode-map (kbd "M-o") 'ace-link-org)
-;; (define-key gnus-summary-mode-map (kbd "M-o") 'ace-link-gnus)
-;; (define-key gnus-article-mode-map (kbd "M-o") 'ace-link-gnus)
-;; (global-set-key (kbd "M-o") 'ace-link-addr)
-)
+  :config
+  (ace-link-setup-default)
+  (define-key org-mode-map (kbd "M-o") 'ace-link-org)
+  ;; (define-key gnus-summary-mode-map (kbd "M-o") 'ace-link-gnus)
+  ;; (define-key gnus-article-mode-map (kbd "M-o") 'ace-link-gnus)
+  ;; (global-set-key (kbd "M-o") 'ace-link-addr)
+  )
 
 
 (use-package habitica
-:config
-(setq habitica-uid "REDACTED-HABITICA-UID")
-(setq habitica-token "REDACTED-HABITICA-TOKEN")
-;; If you want to try highlighting tasks based on their value, This is very experimental.
-;; (setq habitica-turn-on-highlighting t)
-;; If you want the streak count to appear as a tag for your daily tasks
-(setq habitica-show-streak t)
-)
+  :config
+  (setq habitica-uid "REDACTED-HABITICA-UID")
+  (setq habitica-token "REDACTED-HABITICA-TOKEN")
+  ;; If you want to try highlighting tasks based on their value, This is very experimental.
+  ;; (setq habitica-turn-on-highlighting t)
+  ;; If you want the streak count to appear as a tag for your daily tasks
+  (setq habitica-show-streak t)
+  )
 
 
 ;; (use-package ox-anki
@@ -392,43 +392,43 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; tiny(abo-abo)
 (use-package tiny
-:config
-(tiny-setup-default))
+  :config
+  (tiny-setup-default))
 
 
 ;;; popwin
 
 (use-package popwin
-:config
-(popwin-mode t)
-)
+  :config
+  (popwin-mode t)
+  )
 
 
 
 ;;; ag
 
 (use-package ag
-:config
-(setq-default grep-highlight-matches t
-grep-scroll-output t)
+  :config
+  (setq-default grep-highlight-matches t
+                grep-scroll-output t)
 
-(when *is-a-mac*
-(setq-default locate-command "mdfind"))
+  (when *is-a-mac*
+    (setq-default locate-command "mdfind"))
 
-(when (executable-find "ag")
-(require-package 'ag)
-(require-package 'wgrep-ag)
-;; (setq-default ag-highlight-search t)
-(global-set-key (kbd "M-?") 'ag-project))
-)
+  (when (executable-find "ag")
+    (require-package 'ag)
+    (require-package 'wgrep-ag)
+    ;; (setq-default ag-highlight-search t)
+    (global-set-key (kbd "M-?") 'ag-project))
+  )
 
 
 ;;; hungry-delete
 
 (use-package hungry-delete
-:config
-(global-hungry-delete-mode)
-)
+  :config
+  (global-hungry-delete-mode)
+  )
 
 
 
@@ -440,72 +440,72 @@ grep-scroll-output t)
 ;;; swiper
 
 (use-package swiper
-;; :disabled t
-:config
-(use-package counsel)
-(use-package counsel-projectile
-:config
-(counsel-projectile-mode))
-(ivy-mode 1)
-(setq ivy-use-virtual-buffers t)
+  ;; :disabled t
+  :config
+  (use-package counsel)
+  (use-package counsel-projectile
+    :config
+    (counsel-projectile-mode))
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
 
-;; 让`ivy-read'支持拼音
-;; [[https://emacs-china.org/t/ivy-read/2432][使ivy-read支持拼音搜索 - Emacs-general - Emacs China]]
-(use-package pinyinlib)
+  ;; 让`ivy-read'支持拼音
+  ;; [[https://emacs-china.org/t/ivy-read/2432][使ivy-read支持拼音搜索 - Emacs-general - Emacs China]]
+  (use-package pinyinlib)
 
-(defun re-builder-pinyin (str)
-(or (pinyin-to-utf8 str)
-(ivy--regex-plus str)
-(ivy--regex-ignore-order)
-))
+  (defun re-builder-pinyin (str)
+    (or (pinyin-to-utf8 str)
+        (ivy--regex-plus str)
+        (ivy--regex-ignore-order)
+        ))
 
-(setq ivy-re-builders-alist
-'(
-(t . re-builder-pinyin)
-))
+  (setq ivy-re-builders-alist
+        '(
+          (t . re-builder-pinyin)
+          ))
 
-(defun my-pinyinlib-build-regexp-string (str)
-(progn
-(cond ((equal str ".*")
-".*")
-(t
-(pinyinlib-build-regexp-string str t))))
-)
-(defun my-pinyin-regexp-helper (str)
-(cond ((equal str " ")
-".*")
-((equal str "")
-nil)
-(t
-str)))
+  (defun my-pinyinlib-build-regexp-string (str)
+    (progn
+      (cond ((equal str ".*")
+             ".*")
+            (t
+             (pinyinlib-build-regexp-string str t))))
+    )
+  (defun my-pinyin-regexp-helper (str)
+    (cond ((equal str " ")
+           ".*")
+          ((equal str "")
+           nil)
+          (t
+           str)))
 
-(defun pinyin-to-utf8 (str)
-(cond ((equal 0 (length str))
-nil)
-((equal (substring str 0 1) "!")
-(mapconcat 'my-pinyinlib-build-regexp-string
-(remove nil (mapcar 'my-pinyin-regexp-helper (split-string
-(replace-in-string str "!" "") "")))
-""))
-nil))
+  (defun pinyin-to-utf8 (str)
+    (cond ((equal 0 (length str))
+           nil)
+          ((equal (substring str 0 1) "!")
+           (mapconcat 'my-pinyinlib-build-regexp-string
+                      (remove nil (mapcar 'my-pinyin-regexp-helper (split-string
+                                                                    (replace-in-string str "!" "") "")))
+                      ""))
+          nil))
 
-;; ;; ;;; 这样就可以去掉`pinyin'区配
-;; (defun pinyin-to-utf8 (str)
-;; nil)
-;; 以上部分用来让`ivy-read'支持拼音
-:bind
-(("C-s" . swiper)
-("C-c C-r" . ivy-resume)
-("M-x" . counsel-M-x)
-("C-x C-f" . counsel-find-file)
-("C-c g h" . counsel-git)
-("C-c j" . counsel-git-grep)
-("C-c k" . counsel-ag)
-("C-c l" . counsel-locate)
-("C-S-o" . counsel-rhythmbox)
-;; (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-)
-)
+  ;; ;; ;;; 这样就可以去掉`pinyin'区配
+  ;; (defun pinyin-to-utf8 (str)
+  ;; nil)
+  ;; 以上部分用来让`ivy-read'支持拼音
+  :bind
+  (("C-s" . swiper)
+   ("C-c C-r" . ivy-resume)
+   ("M-x" . counsel-M-x)
+   ("C-x C-f" . counsel-find-file)
+   ("C-c g h" . counsel-git)
+   ("C-c j" . counsel-git-grep)
+   ("C-c k" . counsel-ag)
+   ("C-c l" . counsel-locate)
+   ("C-S-o" . counsel-rhythmbox)
+   ;; (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+   )
+  )
 
 
 (use-package helm
@@ -567,45 +567,45 @@ nil))
 
 ;;; flx-ido
 (use-package flx-ido
-:config
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
-;; disable ido faces to see flx highlights.
-(setq ido-enable-flex-matching t)
-(setq ido-use-faces nil)
-)
+  :config
+  (ido-mode 1)
+  (ido-everywhere 1)
+  (flx-ido-mode 1)
+  ;; disable ido faces to see flx highlights.
+  (setq ido-enable-flex-matching t)
+  (setq ido-use-faces nil)
+  )
 
 ;;; tabbar-ruler
 
 ;;(require 'init-tabbar)
 (use-package tabbar
-:config
-(tab-bar-mode t)
-;;Speed up by not using images
-;;(setq tabbar-use-images nil)
-:bind
-(
-;;Tab navigation key binding
-("C-S-<tab>" . tabbar-backward-tab)
-("C-<tab>" . tabbar-forward-tab)
-;;Tab group navigation key bindings
-("C-M-j" . tabbar-backward-group)
-("C-M-k" . tabbar-forward-group)))
+  :config
+  (tab-bar-mode t)
+  ;;Speed up by not using images
+  ;;(setq tabbar-use-images nil)
+  :bind
+  (
+   ;;Tab navigation key binding
+   ("C-S-<tab>" . tabbar-backward-tab)
+   ("C-<tab>" . tabbar-forward-tab)
+   ;;Tab group navigation key bindings
+   ("C-M-j" . tabbar-backward-group)
+   ("C-M-k" . tabbar-forward-group)))
 
 (use-package tabbar-ruler
-:disabled t
-:config
-(setq tabbar-ruler-global-tabbar t) ; If you want tabbar
-;; (setq tabbar-ruler-global-ruler nil) ; if you want a global ruler
-;; (setq tabbar-ruler-popup-menu nil) ; If you want a popup menu.
-;; (setq tabbar-ruler-popup-toolbar nil) ; If you want a popup toolbar
-;; (setq tabbar-ruler-popup-scrollbar t) ;show scroll-bar on mouse-move
-;; (tabbar-ruler-group-by-projectile-project)
-(tabbar-ruler-group-buffer-groups)
-;; (tabbar-mode)
-;; (global-set-key (kbd "C-c t") 'tabbar-ruler-move)
-)
+  :disabled t
+  :config
+  (setq tabbar-ruler-global-tabbar t) ; If you want tabbar
+  ;; (setq tabbar-ruler-global-ruler nil) ; if you want a global ruler
+  ;; (setq tabbar-ruler-popup-menu nil) ; If you want a popup menu.
+  ;; (setq tabbar-ruler-popup-toolbar nil) ; If you want a popup toolbar
+  ;; (setq tabbar-ruler-popup-scrollbar t) ;show scroll-bar on mouse-move
+  ;; (tabbar-ruler-group-by-projectile-project)
+  (tabbar-ruler-group-buffer-groups)
+  ;; (tabbar-mode)
+  ;; (global-set-key (kbd "C-c t") 'tabbar-ruler-move)
+  )
 
 
 ;;------------------------------------------------
@@ -684,41 +684,41 @@ nil))
 
 ;;; Window numbering(Numbered window shortcuts for Emacs)
 (use-package window-numbering
-:config
-(window-numbering-mode t)
-;; (setq window-numbering-assign-func
-;; (lambda () (when (equal (buffer-name) "*Calculator*") 9))
-)
+  :config
+  (window-numbering-mode t)
+  ;; (setq window-numbering-assign-func
+  ;; (lambda () (when (equal (buffer-name) "*Calculator*") 9))
+  )
 
 
 
 ;;; expand-region
 (use-package expand-region
-:config
-;; Don't use expand-region fast keys
-(setq expand-region-fast-keys-enabled nil)
-;; Show expand-region command used
-(setq er--show-expansion-message t)
-(global-set-key (kbd "M-m") 'er/expand-region)
-;;Also enable mark-paragraph and mark-page
-(defun er/add-text-mode-expansions ()
-(make-variable-buffer-local 'er/try-expand-list)
-(setq er/try-expand-list (append
-er/try-expand-list
-'(mark-paragraph
-mark-page))))
-(add-hook 'text-mode-hook 'er/add-text-mode-expansions)
-)
+  :config
+  ;; Don't use expand-region fast keys
+  (setq expand-region-fast-keys-enabled nil)
+  ;; Show expand-region command used
+  (setq er--show-expansion-message t)
+  (global-set-key (kbd "M-m") 'er/expand-region)
+  ;;Also enable mark-paragraph and mark-page
+  (defun er/add-text-mode-expansions ()
+    (make-variable-buffer-local 'er/try-expand-list)
+    (setq er/try-expand-list (append
+                              er/try-expand-list
+                              '(mark-paragraph
+                                mark-page))))
+  (add-hook 'text-mode-hook 'er/add-text-mode-expansions)
+  )
 
 
 ;;; magit
 (use-package magit
-:config
-(setenv "SSH_ASKPASS" "git-gui--askpass")
-;; (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-:bind (
-("C-x g" . magit-status))
-)
+  :config
+  (setenv "SSH_ASKPASS" "git-gui--askpass")
+  ;; (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+  :bind (
+         ("C-x g" . magit-status))
+  )
 
 
 
@@ -728,29 +728,29 @@ mark-page))))
 ;; TODO: 截图之前交互式地选择一个 buffer 来作为 current org file，那样就不限于在 org 文件的当前 buffer 截图了
 ;; TODO: 带参数来决定 irfanview 的 option，可以使用带参数的C-u 来实现，但是与已实现的带参数来调用 picpick 的功能冲突
 (defun org-img-capture (arg)
-"Take a screenshot into a unique-named file in the current buffer file
+  "Take a screenshot into a unique-named file in the current buffer file
 directory and insert a link to this file.
 [[http://www.jianshu.com/p/77841e0aba46][emacs的工作环境设置 - 简书]]
 [[https://emacs-china.org/t/org-mode-windows-7/2161/9][Org-mode截图与显示图片（Windows 7） - Org-mode - Emacs China]]
 "
-(interactive "P")
-(let ((file-directory (file-name-directory buffer-file-name)))
-(make-directory (concat file-directory "img/") t)
-(let* ((file-fullname
-(concat file-directory "img/img_" (format-time-string "%Y%m%d_%H%M%S") ".png")) ;; (concat file-directory (make-temp-name (concat file-directory "img/img-")) ".png")
-(file-name (file-name-nondirectory file-fullname)))
-;; irfanview cature options
-;; 0 = whole screen
-;; 1 = current monitor, where mouse is located
-;; 2 = foreground window
-;; 3 = foreground window - client area
-;; 4 = rectangle selection
-;; 5 = object selected with the mouse
-;; 6 = start in capture mode (can't be combined with other commandline options)
-;; 7 = fixed rectangle (using capture dialog values or direct input)
-(shell-command (concat "i_view64 /capture=4 /convert=" (format "\"%s\"" file-fullname)))
-(insert (concat "[[./img/" file-name "]]"))
-(if arg (shell-command (format "picpick \"%s\"" file-fullname))))))
+  (interactive "P")
+  (let ((file-directory (file-name-directory buffer-file-name)))
+    (make-directory (concat file-directory "img/") t)
+    (let* ((file-fullname
+            (concat file-directory "img/img_" (format-time-string "%Y%m%d_%H%M%S") ".png")) ;; (concat file-directory (make-temp-name (concat file-directory "img/img-")) ".png")
+           (file-name (file-name-nondirectory file-fullname)))
+      ;; irfanview cature options
+      ;; 0 = whole screen
+      ;; 1 = current monitor, where mouse is located
+      ;; 2 = foreground window
+      ;; 3 = foreground window - client area
+      ;; 4 = rectangle selection
+      ;; 5 = object selected with the mouse
+      ;; 6 = start in capture mode (can't be combined with other commandline options)
+      ;; 7 = fixed rectangle (using capture dialog values or direct input)
+      (shell-command (concat "i_view64 /capture=4 /convert=" (format "\"%s\"" file-fullname)))
+      (insert (concat "[[./img/" file-name "]]"))
+      (if arg (shell-command (format "picpick \"%s\"" file-fullname))))))
 
 (define-key org-mode-map (kbd "C-c r") 'org-img-capture)
 
@@ -762,51 +762,51 @@ directory and insert a link to this file.
 (defvar webster-url "http://www.m-w.com/cgi-bin/dictionary?book=Dictionary&va=")
 
 (defun merriam (word)
-(interactive "slook up a word in merriam-webster: ")
-(let (start (point))
-;;
-(cond ((string= (format "%s" (current-buffer)) "*eww*")
-(eww-browse-url (concat webster-url word)))
-;;
-((bufferp (get-buffer "*eww*"))
-(progn (view-buffer-other-window (get-buffer "*eww*"))
-(eww-browse-url (concat webster-url word))))
-;;
-(t
-(progn (view-buffer-other-window (get-buffer "*scratch*"))
-(eww-browse-url (concat webster-url word)))))))
+  (interactive "slook up a word in merriam-webster: ")
+  (let (start (point))
+    ;;
+    (cond ((string= (format "%s" (current-buffer)) "*eww*")
+           (eww-browse-url (concat webster-url word)))
+          ;;
+          ((bufferp (get-buffer "*eww*"))
+           (progn (view-buffer-other-window (get-buffer "*eww*"))
+                  (eww-browse-url (concat webster-url word))))
+          ;;
+          (t
+           (progn (view-buffer-other-window (get-buffer "*scratch*"))
+                  (eww-browse-url (concat webster-url word)))))))
 
 (global-set-key (kbd "<f5>") 'merriam)
 
 
 ;;; define-word (E2E dictionary, abo-abo)
 (use-package define-word
-;; :disabled t
-:bind (
-;; ("C-c C-y" . define-word-at-point)
-("C-c C-y" . define-word))
-)
+  ;; :disabled t
+  :bind (
+         ;; ("C-c C-y" . define-word-at-point)
+         ("C-c C-y" . define-word))
+  )
 
 
 ;;; youdao-dictionary
 (use-package youdao-dictionary
-:config
-;; Enable Cache
-(setq url-automatic-caching t)
+  :config
+  ;; Enable Cache
+  (setq url-automatic-caching t)
 
-;; Integrate with popwin-el (https://github.com/m2ym/popwin-el)
-;; (push "*Youdao Dictionary*" popwin:special-display-config)
+  ;; Integrate with popwin-el (https://github.com/m2ym/popwin-el)
+  ;; (push "*Youdao Dictionary*" popwin:special-display-config)
 
-;; Set file path for saving search history
-;; (setq youdao-dictionary-search-history-file "~/.emacs.d/.youdao")
+  ;; Set file path for saving search history
+  ;; (setq youdao-dictionary-search-history-file "~/.emacs.d/.youdao")
 
-;; Enable Chinese word segmentation support
-;; (setq youdao-dictionary-use-chinese-word-segmentation t)
+  ;; Enable Chinese word segmentation support
+  ;; (setq youdao-dictionary-use-chinese-word-segmentation t)
 
-:bind (
-       ;; Example Key binding
-       ("C-c u" . youdao-dictionary-search-at-point))
-)
+  :bind (
+         ;; Example Key binding
+         ("C-c u" . youdao-dictionary-search-at-point))
+  )
 
 
 
@@ -933,12 +933,12 @@ directory and insert a link to this file.
 ;;; Don't delete *scratch* buffer
 
 (defun eh-unkillable-scratch-buffer ()
-(if (string= (buffer-name (current-buffer)) "*scratch*")
-(progn
-(delete-region (point-min) (point-max))
-(insert initial-scratch-message)
-nil)
-t))
+  (if (string= (buffer-name (current-buffer)) "*scratch*")
+      (progn
+        (delete-region (point-min) (point-max))
+        (insert initial-scratch-message)
+        nil)
+    t))
 
 (add-hook'kill-buffer-query-functions 'eh-unkillable-scratch-buffer)
 
@@ -946,30 +946,30 @@ t))
 ;;; eshell
 
 (use-package eshell
-:bind (("C-x c" . eshell))
-:config
+  :bind (("C-x c" . eshell))
+  :config
 
-(use-package em-term
-:ensure nil)
-(use-package em-unix
-:ensure nil)
+  (use-package em-term
+    :ensure nil)
+  (use-package em-unix
+    :ensure nil)
 
-(setq eshell-visual-commands
-(append '("aptitude" "mutt" "nano" "crontab" "vim" "less")
-eshell-visual-commands))
-(setq eshell-visual-subcommands
-(list (append '("sudo") eshell-visual-commands)
-'("git" "log" "diff" "show")))
-(setq eshell-visual-options
-'(("git" "--help")))
+  (setq eshell-visual-commands
+        (append '("aptitude" "mutt" "nano" "crontab" "vim" "less")
+                eshell-visual-commands))
+  (setq eshell-visual-subcommands
+        (list (append '("sudo") eshell-visual-commands)
+              '("git" "log" "diff" "show")))
+  (setq eshell-visual-options
+        '(("git" "--help")))
 
-(defun eh-eshell (&optional arg)
-(interactive)
-;; 使用 eshell-exec-visual 第一次打开 term 时，
-;; 不能使用 multi-term 的键盘绑定，原因不知，
-;; 首先运行一下 less, 从而让 multi-term 的键盘绑定生效。
-(eshell-command "less")
-(eshell arg)))
+  (defun eh-eshell (&optional arg)
+    (interactive)
+    ;; 使用 eshell-exec-visual 第一次打开 term 时，
+    ;; 不能使用 multi-term 的键盘绑定，原因不知，
+    ;; 首先运行一下 less, 从而让 multi-term 的键盘绑定生效。
+    (eshell-command "less")
+    (eshell arg)))
 
 
 ;;;ahk-mode
@@ -1014,47 +1014,47 @@ eshell-visual-commands))
 ;;; avy
 
 (use-package avy
-;; :disabled t
-:config
-(avy-setup-default)
-:bind (
-("C-:" . avy-goto-char)
-("C-'" . avy-goto-char-2)
-("M-g g" . avy-goto-line)
-("M-g w" . avy-goto-word-1)
-("M-g e" . avy-goto-word-0)
-)
-)
+  ;; :disabled t
+  :config
+  (avy-setup-default)
+  :bind (
+         ("C-:" . avy-goto-char)
+         ("C-'" . avy-goto-char-2)
+         ("M-g g" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)
+         ("M-g e" . avy-goto-word-0)
+         )
+  )
 
 ;; (require-package 'ace-pinyin)
 (use-package ace-pinyin
-:config
-;; (setq ace-pinyin-use-avy nil) ;; uncomment if you want to use `ace-jump-mode'
-(ace-pinyin-global-mode +1))
+  :config
+  ;; (setq ace-pinyin-use-avy nil) ;; uncomment if you want to use `ace-jump-mode'
+  (ace-pinyin-global-mode +1))
 
 
 ;;; multiple-cursors
 (use-package multiple-cursors
-:config
-;; ;; [[https://www.zhihu.com/question/27478438/answer/59796810][Emacs 有什么奇技淫巧? - 知乎]]
-;; Multiple cursors does not do well when you invoke its commands with M-x. It needs to be bound to keys to work properly. Pull request to fix this is welcome.
-;; (defun cua-or-multicursor ()
-;; (interactive)
-;; (if (use-region-p)
-;; (mc/edit-lines)
-;; (cua-rectangle-mark-mode)))
-;; ;; http://emacs.stackexchange.com/a/9916/514
-;; (eval-after-load "multiple-cursors-core"
-;; (lambda ()
-;; (add-to-list 'mc--default-cmds-to-run-once 'cua-or-multicursor)))
+  :config
+  ;; ;; [[https://www.zhihu.com/question/27478438/answer/59796810][Emacs 有什么奇技淫巧? - 知乎]]
+  ;; Multiple cursors does not do well when you invoke its commands with M-x. It needs to be bound to keys to work properly. Pull request to fix this is welcome.
+  ;; (defun cua-or-multicursor ()
+  ;; (interactive)
+  ;; (if (use-region-p)
+  ;; (mc/edit-lines)
+  ;; (cua-rectangle-mark-mode)))
+  ;; ;; http://emacs.stackexchange.com/a/9916/514
+  ;; (eval-after-load "multiple-cursors-core"
+  ;; (lambda ()
+  ;; (add-to-list 'mc--default-cmds-to-run-once 'cua-or-multicursor)))
 
-:bind (
-("C-M-," . mc/edit-lines)
-("C->" . mc/mark-next-like-this)
-("C-<" . mc/mark-previous-like-this)
-("C-c C-<" . mc/mark-all-like-this)
-)
-)
+  :bind (
+         ("C-M-," . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C-<" . mc/mark-all-like-this)
+         )
+  )
 
 
 ;;; fcitx
@@ -1071,31 +1071,31 @@ eshell-visual-commands))
 ;;; add gitman
 
 (cond
-((eq system-type 'windows-nt)
-(defadvice Info-follow-nearest-node (around gitman activate)
-"When encountering a cross reference to the `gitman' info
+ ((eq system-type 'windows-nt)
+  (defadvice Info-follow-nearest-node (around gitman activate)
+    "When encountering a cross reference to the `gitman' info
 manual, then instead of following that cross reference show
 the actual manpage using the function `woman'."
-(let ((node (Info-get-token
-(point) "\\*note[ \n\t]+"
-"\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
-(if (and node (string-match "^(gitman)\\(.+\\)" node))
-(progn (require 'woman)
-(woman (match-string 1 node)))
-ad-do-it))))
+    (let ((node (Info-get-token
+                 (point) "\\*note[ \n\t]+"
+                 "\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
+      (if (and node (string-match "^(gitman)\\(.+\\)" node))
+          (progn (require 'woman)
+                 (woman (match-string 1 node)))
+        ad-do-it))))
 
-((eq system-type 'gnu/linux)
-(defadvice Info-follow-nearest-node (around gitman activate)
-"When encountering a cross reference to the `gitman' info
+ ((eq system-type 'gnu/linux)
+  (defadvice Info-follow-nearest-node (around gitman activate)
+    "When encountering a cross reference to the `gitman' info
 manual, then instead of following that cross reference show
 the actual manpage using the function `man'."
-(let ((node (Info-get-token
-(point) "\\*note[ \n\t]+"
-"\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
-(if (and node (string-match "^(gitman)\\(.+\\)" node))
-(progn (require 'man)
-(man (match-string 1 node)))
-ad-do-it)))))
+    (let ((node (Info-get-token
+                 (point) "\\*note[ \n\t]+"
+                 "\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
+      (if (and node (string-match "^(gitman)\\(.+\\)" node))
+          (progn (require 'man)
+                 (man (match-string 1 node)))
+        ad-do-it)))))
 
 
 ;; TODO: twittering-mode
@@ -1108,38 +1108,38 @@ ad-do-it)))))
 
 ;; tldr.el
 (use-package tldr
-:config
-;; (tldr-update-docs)
-)
+  :config
+  ;; (tldr-update-docs)
+  )
 
 
 ;; kaomoji 颜文字
 (use-package kaomoji
-:config
-;; (setq kaomoji-table
-;; (append '((("angry" "furious") . "(／‵Д′)／~ ╧╧ ")
-;; (("angry" "punch") . "#???）?彡☆))?Д?)?∵"))
-;; kaomoji-table))
-)
+  :config
+  ;; (setq kaomoji-table
+  ;; (append '((("angry" "furious") . "(／‵Д′)／~ ╧╧ ")
+  ;; (("angry" "punch") . "#???）?彡☆))?Д?)?∵"))
+  ;; kaomoji-table))
+  )
 
 
 
 ;; hexo.el
 (use-package hexo
-:config
-(defun hexo-hsk-blog ()
-(interactive)
-(hexo "~/blog/")))
+  :config
+  (defun hexo-hsk-blog ()
+    (interactive)
+    (hexo "~/blog/")))
 
 ;;; blog-admin
 (use-package blog-admin
-:config
-(setq blog-admin-backend-path "~/blog")
-(setq blog-admin-backend-type 'hexo)
-(setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
-(setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
-;; (setq blog-admin-backend-hexo-config-file "my_config.yml") ;; default assumes _config.yml
-)
+  :config
+  (setq blog-admin-backend-path "~/blog")
+  (setq blog-admin-backend-type 'hexo)
+  (setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
+  (setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
+  ;; (setq blog-admin-backend-hexo-config-file "my_config.yml") ;; default assumes _config.yml
+  )
 ;; (add-to-list 'load-path "~/.emacs.d/elpa/blog-admin")
 ;; (require 'blog-admin)
 ;; When change home directory, use the following line to make soft link which point to the blog directory in the Dropbox sync directory
@@ -1147,14 +1147,14 @@ ad-do-it)))))
 
 ;;; org2issue
 (use-package org2issue
-:config
-;;(require-package 'ox-gfm)
-;;(require 'ox-gfm)
-(setq org2issue-user "private-github-user")
-(setq org2issue-blog-repo "org2issue-test")
-(setq org2issue-browse-issue t)
-(setq org2issue-update-file "~/org2issue-test/README.org")
-)
+  :config
+  ;;(require-package 'ox-gfm)
+  ;;(require 'ox-gfm)
+  (setq org2issue-user "private-github-user")
+  (setq org2issue-blog-repo "org2issue-test")
+  (setq org2issue-browse-issue t)
+  (setq org2issue-update-file "~/org2issue-test/README.org")
+  )
 
 
 
@@ -1166,64 +1166,65 @@ ad-do-it)))))
 ;;; helm-github-stars
 ;;; go to github starred project
 (use-package helm-github-stars
-:config
-(setq helm-github-stars-username "private-github-user")
-;; (setq helm-github-stars-cache-file "/cache/path")
+  :config
+  (setq helm-github-stars-username "private-github-user")
+  ;; (setq helm-github-stars-cache-file "/cache/path")
 ;;;; refresh cache: M-x helm-github-stars-fetch
-(setq helm-github-stars-refetch-time 0.5)
-;; (setq helm-github-stars-name-length nil)
-:bind (("C-c g s" . helm-github-stars))
-)
+  (setq helm-github-stars-refetch-time 0.5)
+  ;; (setq helm-github-stars-name-length nil)
+  :bind (("C-c g s" . helm-github-stars))
+  )
 
 
 ;;; helm-chrome
 (use-package helm-chrome
-:config
-;; (setq helm-chrome-use-urls t)
-;; (helm-chrome-reload-bookmarks)
-)
+  :config
+  ;; (setq helm-chrome-use-urls t)
+  ;; (helm-chrome-reload-bookmarks)
+  )
 
 (use-package helm-google
-:config
-:bind
-(("C-h j" . helm-google)))
+  :config
+  :bind
+  (("C-h j" . helm-google)))
 
 
 ;;; vim-empty-mode
 ;;; add tilde at the empty line below the end of file
 (use-package vim-empty-lines-mode
-:disabled t
-:config
-(global-vim-empty-lines-mode -1)
-;; (add-hook 'after-init-hook 'vim-empty-lines-mode)
-;; (setq vim-empty-lines-indicator "**********************")
-)
+  :disabled t
+  :config
+  (global-vim-empty-lines-mode -1)
+  ;; (add-hook 'after-init-hook 'vim-empty-lines-mode)
+  ;; (setq vim-empty-lines-indicator "**********************")
+  )
 
 
 ;;; org-zotxt-mode
 ;;; zotero connection
+;;; zotxt is a Zotero extension for supporting utilities that deal with plain text files (e.g., markdown, reStructuredText, latex, etc.)
 (use-package zotxt
-:config
-(require 'org-zotxt)
-;; Activate org-zotxt-mode in org-mode buffers
-(add-hook 'org-mode-hook (lambda () (org-zotxt-mode 1)))
-;; Bind something to replace the awkward C-u C-c " i
-(define-key org-mode-map
-(kbd "C-c \" \"") (lambda () (interactive)
-(org-zotxt-insert-reference-link '(4))))
-;; Change citation format to be less cumbersome in files.
-;; You'll need to install mkbehr-short into your style manager first.
-(eval-after-load "zotxt"
-'(setq zotxt-default-bibliography-style "mkbehr-short"))
-)
+  :config
+  (require 'org-zotxt)
+  ;; Activate org-zotxt-mode in org-mode buffers
+  (add-hook 'org-mode-hook (lambda () (org-zotxt-mode 1)))
+  ;; Bind something to replace the awkward C-u C-c " i
+  (define-key org-mode-map
+    (kbd "C-c \" \"") (lambda () (interactive)
+                        (org-zotxt-insert-reference-link '(4))))
+  ;; Change citation format to be less cumbersome in files.
+  ;; You'll need to install mkbehr-short into your style manager first.
+  (eval-after-load "zotxt"
+    '(setq zotxt-default-bibliography-style "mkbehr-short"))
+  )
 
 
 
 
 (use-package zotelo
-:config
-(add-hook 'TeX-mode-hook 'zotelo-minor-mode)
-(add-hook 'org-mode-hook 'zotelo-minor-mode))
+  :config
+  (add-hook 'TeX-mode-hook 'zotelo-minor-mode)
+  (add-hook 'org-mode-hook 'zotelo-minor-mode))
 
 
 ;;; yasnippet
@@ -1257,73 +1258,73 @@ ad-do-it)))))
 
 ;; ox-latex-subfigure
 (use-package ox-latex-subfigure
-:ensure nil
-:disabled t
-:load-path "~/.emacs.d/site-lisp/ox-latex-subfigure/"
-:config
-(require 'ox-latex-subfigure)
-(setq org-latex-caption-above nil
-org-latex-prefer-user-labels t))
+  :ensure nil
+  :disabled t
+  :load-path "~/.emacs.d/site-lisp/ox-latex-subfigure/"
+  :config
+  (require 'ox-latex-subfigure)
+  (setq org-latex-caption-above nil
+        org-latex-prefer-user-labels t))
 
 (use-package org2ctex
-;; :load-path "elpa-24.5/ox-latex-chinese/"
-;; :disabled t
-:config
-;; (setq org-latex-create-formula-image-program 'dvipng) ;速度很快，但 *默认* 不支持中文
-(setq org-latex-create-formula-image-program 'imagemagick) ;速度较慢，但支持中文
-(setq org-format-latex-options
-(plist-put org-format-latex-options :scale 2.0)) ;调整 LaTeX 预览图片的大小
-(setq org-format-latex-options
-(plist-put org-format-latex-options :html-scale 2.5)) ;调整 HTML 文件中 LaTeX 图像的大小
+  ;; :load-path "elpa-24.5/ox-latex-chinese/"
+  ;; :disabled t
+  :config
+  ;; (setq org-latex-create-formula-image-program 'dvipng) ;速度很快，但 *默认* 不支持中文
+  (setq org-latex-create-formula-image-program 'imagemagick) ;速度较慢，但支持中文
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :scale 2.0)) ;调整 LaTeX 预览图片的大小
+  (setq org-format-latex-options
+        (plist-put org-format-latex-options :html-scale 2.5)) ;调整 HTML 文件中 LaTeX 图像的大小
 
-(org2ctex-toggle t)
-;; (setq oxlc/org-latex-commands '("latexmk -xelatex -g -pdf %f"))
-;; 升级 texlive 的 latexmk 之后， -xelatex 改变导致下面这一行命令不能用了
-;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg -pdf %b.tex"))
-(setq org2ctex-latex-commands '("latexmk -xelatex -g %f"))
-;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %f"))
-;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %b.tex"))
-;; %O 会被自动转义，现在也没办法，先去掉吧
-;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %O %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
-;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
-;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+  (org2ctex-toggle t)
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -g -pdf %f"))
+  ;; 升级 texlive 的 latexmk 之后， -xelatex 改变导致下面这一行命令不能用了
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg -pdf %b.tex"))
+  (setq org2ctex-latex-commands '("latexmk -xelatex -g %f"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %f"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -xelatex -gg %b.tex"))
+  ;; %O 会被自动转义，现在也没办法，先去掉吧
+  ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %O %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
+  ;; (setq oxlc/org-latex-commands '("latexmk -pdflatex=\"xelatex %S\" -pdf -dvi- -ps- -gg -pdf %b.tex"))
 
-(defun org2ctex-export-to-pdf-quick ()
-(interactive)
-(let ((org2ctex-latex-commands '("latexmk -xelatex -g -pdf %f")))
-(org-latex-export-to-pdf)))
+  (defun org2ctex-export-to-pdf-quick ()
+    (interactive)
+    (let ((org2ctex-latex-commands '("latexmk -xelatex -g -pdf %f")))
+      (org-latex-export-to-pdf)))
 
-;; latex
-;; (setq org-latex-coding-system 'utf-8) ; I do not know what the sentence do
-(setq org-export-allow-bind-keywords t)
+  ;; latex
+  ;; (setq org-latex-coding-system 'utf-8) ; I do not know what the sentence do
+  (setq org-export-allow-bind-keywords t)
 
-;; booktabs usage, table centering and removal of every horizontal rule but the first one (in a "table.el" table only)
-(setq org-latex-tables-booktabs t)
-(setq org-latex-tables-centered t)
+  ;; booktabs usage, table centering and removal of every horizontal rule but the first one (in a "table.el" table only)
+  (setq org-latex-tables-booktabs t)
+  (setq org-latex-tables-centered t)
 
-;; Export backends
-(setq org-export-backends (quote (ascii beamer html icalendar latex odt)))
+  ;; Export backends
+  (setq org-export-backends (quote (ascii beamer html icalendar latex odt)))
 
-;; cdlatex configuration
-(require-package 'cdlatex)
-(require 'cdlatex)
-(add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+  ;; cdlatex configuration
+  (require-package 'cdlatex)
+  (require 'cdlatex)
+  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 
-;; my own settings by hsk
-;; 不要在latex输出文件中插入\maketitle
-;; (setq org-latex-title-command "")
-(setq org-latex-title-command "\\maketitle")
-(setq org-latex-toc-command "\\tableofcontents")
-;; (setq org-latex-date-format "%Y-%m-%d") ; I do not know what the sentence do
+  ;; my own settings by hsk
+  ;; 不要在latex输出文件中插入\maketitle
+  ;; (setq org-latex-title-command "")
+  (setq org-latex-title-command "\\maketitle")
+  (setq org-latex-toc-command "\\tableofcontents")
+  ;; (setq org-latex-date-format "%Y-%m-%d") ; I do not know what the sentence do
 
-;; 不导出 oxlc 中设置的默认字体
-(setq org2ctex-latex-fonts nil)
+  ;; 不导出 oxlc 中设置的默认字体
+  (setq org2ctex-latex-fonts nil)
 
-;; latex class redefinition in org
-;; ctex for Chinese
-(setq org2ctex-latex-classes
-'(("ctexart"
-"\\documentclass[fontset=windowsnew,UTF8,a4paper,zihao=-4]{ctexart}
+  ;; latex class redefinition in org
+  ;; ctex for Chinese
+  (setq org2ctex-latex-classes
+        '(("ctexart"
+           "\\documentclass[fontset=windowsnew,UTF8,a4paper,zihao=-4]{ctexart}
 [DEFAULT-PACKAGES]
 [PACKAGES]
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}
@@ -1348,117 +1349,117 @@ org-latex-prefer-user-labels t))
 ;;; \\setmonofont{Monaco} % 英文等宽字体
 ;;; \\setmonofont{Courier New} % 英文等宽字体
 ;;; \\setsansfont{Trebuchet MS} % 英文无衬线字体
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-("ctexrep"
-"\\documentclass[fontset=none,UTF8,a4paper,zihao=-4]{ctexrep}
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
+          ("ctexrep"
+           "\\documentclass[fontset=none,UTF8,a4paper,zihao=-4]{ctexrep}
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}"
-("\\part{%s}" . "\\part*{%s}")
-("\\chapter{%s}" . "\\chapter*{%s}")
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-("ctexbook"
-"\\documentclass[fontset=none,UTF8,a4paper,zihao=-4]{ctexbook}
+           ("\\part{%s}" . "\\part*{%s}")
+           ("\\chapter{%s}" . "\\chapter*{%s}")
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+          ("ctexbook"
+           "\\documentclass[fontset=none,UTF8,a4paper,zihao=-4]{ctexbook}
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}"
-("\\part{%s}" . "\\part*{%s}")
-("\\chapter{%s}" . "\\chapter*{%s}")
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
-("beamer"
-"\\documentclass[presentation]{beamer}
+           ("\\part{%s}" . "\\part*{%s}")
+           ("\\chapter{%s}" . "\\chapter*{%s}")
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))
+          ("beamer"
+           "\\documentclass[presentation]{beamer}
 \\usepackage[UTF8,space]{ctex}
 [NO-DEFAULT-PACKAGES]
 [PACKAGES]
 [EXTRA]
 "
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-)
-("article"
-"\\documentclass{article}
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           )
+          ("article"
+           "\\documentclass{article}
 \\usepackage[top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm]{geometry}"
-("\\section{%s}" . "\\section*{%s}")
-("\\subsection{%s}" . "\\subsection*{%s}")
-("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-("\\paragraph{%s}" . "\\paragraph*{%s}")
-("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+           ("\\section{%s}" . "\\section*{%s}")
+           ("\\subsection{%s}" . "\\subsection*{%s}")
+           ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+           ("\\paragraph{%s}" . "\\paragraph*{%s}")
+           ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 
-;; org不建议自定义org-latex-default-package-alist变量，但"inputenc" and "fontenc"两个宏包似乎和xelatex有冲突，调整默认值！
-;; 如果直接设置该变量，可以直接去除这三个 cell，不需要下面这三段代码
-;; (setf org-latex-default-packages-alist
-;; (remove '("AUTO" "inputenc" t) org-latex-default-packages-alist))
-;; (setf org-latex-default-packages-alist
-;; (remove '("T1" "fontenc" t) org-latex-default-packages-alist))
-;; (setf org-latex-default-packages-alist
-;; (remove '("normalem" "ulem" t) org-latex-default-packages-alist))
-;; (setf org-latex-default-packages-alist
-;; (remove '("" "textcomp" t) org-latex-default-packages-alist))
+  ;; org不建议自定义org-latex-default-package-alist变量，但"inputenc" and "fontenc"两个宏包似乎和xelatex有冲突，调整默认值！
+  ;; 如果直接设置该变量，可以直接去除这三个 cell，不需要下面这三段代码
+  ;; (setf org-latex-default-packages-alist
+  ;; (remove '("AUTO" "inputenc" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;; (remove '("T1" "fontenc" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;; (remove '("normalem" "ulem" t) org-latex-default-packages-alist))
+  ;; (setf org-latex-default-packages-alist
+  ;; (remove '("" "textcomp" t) org-latex-default-packages-alist))
 
 
-;; customize default packages alist
-(setf org2ctex-latex-default-packages-alist
-(remove '("" "textcomp" t) org2ctex-latex-default-packages-alist))
-;; (setf org2ctex-latex-default-packages-alist
-;; (remove '("T1" "fontenc" t ("pdflatex")) org2ctex-latex-default-packages-alist))
-(setf org2ctex-latex-default-packages-alist
-(remove '("" "hyperref" nil) org2ctex-latex-default-packages-alist))
-(setf org2ctex-latex-default-packages-alist
-(remove '("" "capt-of" nil) org2ctex-latex-default-packages-alist))
-(add-to-list 'org2ctex-latex-default-packages-alist '("normalem" "ulem" t))
-(add-to-list 'org2ctex-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
-(add-to-list 'org2ctex-latex-default-packages-alist '("" "float" nil))
-(add-to-list 'org2ctex-latex-default-packages-alist '("" "titletoc" nil))
-(add-to-list 'org2ctex-latex-default-packages-alist '("" "titling" nil))
-(add-to-list 'org2ctex-latex-default-packages-alist '("" "array" nil))
+  ;; customize default packages alist
+  (setf org2ctex-latex-default-packages-alist
+        (remove '("" "textcomp" t) org2ctex-latex-default-packages-alist))
+  ;; (setf org2ctex-latex-default-packages-alist
+  ;; (remove '("T1" "fontenc" t ("pdflatex")) org2ctex-latex-default-packages-alist))
+  (setf org2ctex-latex-default-packages-alist
+        (remove '("" "hyperref" nil) org2ctex-latex-default-packages-alist))
+  (setf org2ctex-latex-default-packages-alist
+        (remove '("" "capt-of" nil) org2ctex-latex-default-packages-alist))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("normalem" "ulem" t))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("colorlinks=true,linkcolor=blue,citecolor=blue" "hyperref" nil))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("" "float" nil))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("" "titletoc" nil))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("" "titling" nil))
+  (add-to-list 'org2ctex-latex-default-packages-alist '("" "array" nil))
 
-(setq org2ctex-latex-packages-alist
-'(("" "tikz" nil)
-;; ctex will automatically load xeCJKfntef, which will load CJKulem
-;; ("" "CJKulem" nil)
-;; use pifont only if use ding
-;; ("" "pifont" nil)
-;; xltxtra loads fontspec, metalogo, realscripts. Many features are incorporated into fontspec
-("" "xltxtra" t)
-("" "fontspec" nil)
-("" "xunicode" nil)
-;; ("" "newtxmath" t)
-;; ("" "newtxtext" nil)
-;; ("" "esint" nil)
-;; ("" "mathpazo" nil) ; required by siunitx, but actually no matter
-;; ("" "graphicx" nil)
-;; ("top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm" "geometry" nil)
-("" "caption" nil)
-("" "multicol" nil)
-("" "multirow" nil)
-("" "booktabs" nil)
-("" "cancel" nil)
-("" "cleveref" nil)
-("" "colortbl" nil)
-("" "csquotes" nil)
-("" "helvet" nil)
-("" "pgfplots" nil)
-("" "xcolor" t)
-("" "siunitx" t)
-;; ("" "upgreek" nil)
-("" "physics" nil)
-("" "bm" t)
-("" "lscape" nil)
-("" "fancyhdr" nil)
-;; ("" "titlesec" nil) titlesec conflict with titling for the command thetitle
-;; ("" "cite" nil)
-("numbers,square,super,sort&compress" "natbib" nil)
-("" "listings" nil)
-("" "zhspacing" nil)
-("" "tabularx" nil)
-("" "pdflscape" nil)
-"
+  (setq org2ctex-latex-packages-alist
+        '(("" "tikz" nil)
+          ;; ctex will automatically load xeCJKfntef, which will load CJKulem
+          ;; ("" "CJKulem" nil)
+          ;; use pifont only if use ding
+          ;; ("" "pifont" nil)
+          ;; xltxtra loads fontspec, metalogo, realscripts. Many features are incorporated into fontspec
+          ("" "xltxtra" t)
+          ("" "fontspec" nil)
+          ("" "xunicode" nil)
+          ;; ("" "newtxmath" t)
+          ;; ("" "newtxtext" nil)
+          ;; ("" "esint" nil)
+          ;; ("" "mathpazo" nil) ; required by siunitx, but actually no matter
+          ;; ("" "graphicx" nil)
+          ;; ("top=2.54cm, bottom=2.54cm, left=3.17cm, right=3.17cm" "geometry" nil)
+          ("" "caption" nil)
+          ("" "multicol" nil)
+          ("" "multirow" nil)
+          ("" "booktabs" nil)
+          ("" "cancel" nil)
+          ("" "cleveref" nil)
+          ("" "colortbl" nil)
+          ("" "csquotes" nil)
+          ("" "helvet" nil)
+          ("" "pgfplots" nil)
+          ("" "xcolor" t)
+          ("" "siunitx" t)
+          ;; ("" "upgreek" nil)
+          ("" "physics" nil)
+          ("" "bm" t)
+          ("" "lscape" nil)
+          ("" "fancyhdr" nil)
+          ;; ("" "titlesec" nil) titlesec conflict with titling for the command thetitle
+          ;; ("" "cite" nil)
+          ("numbers,square,super,sort&compress" "natbib" nil)
+          ("" "listings" nil)
+          ("" "zhspacing" nil)
+          ("" "tabularx" nil)
+          ("" "pdflscape" nil)
+          "
 % early generated document maybe need the following sentences
 % \\newcommand{\\circlenum}[1]{\\ding{\\numexpr171+#1}}
 % \\DeclareSymbolFont{matha}{OML}{txmi}{m}{it}% txfonts
@@ -1478,10 +1479,10 @@ org-latex-prefer-user-labels t))
 \\makeatother
 "))
 
-(setq org-latex-packages-alist 'org2ctex-latex-packages-alist)
-(setq org-format-latex-options (plist-put org-format-latex-options :scale 1.3))
+  (setq org-latex-packages-alist 'org2ctex-latex-packages-alist)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.3))
 
-(setq org-pretty-entities nil))
+  (setq org-pretty-entities nil))
 
 
 (use-package evil-tutor)
@@ -1490,110 +1491,110 @@ org-latex-prefer-user-labels t))
 ;;; cheatsheet
 
 (use-package cheatsheet
-:config
-(cheatsheet-add :group 'Common
-:key "C-x C-c"
-:description "leave Emacs.")
-)
+  :config
+  (cheatsheet-add :group 'Common
+                  :key "C-x C-c"
+                  :description "leave Emacs.")
+  )
 
 
 (use-package helm-descbinds
-:config
-(helm-descbinds-mode))
+  :config
+  (helm-descbinds-mode))
 
 (use-package which-key
-:config
-(which-key-mode)
-(which-key-setup-side-window-right-bottom)
-(setq which-key-idle-delay 0.6))
+  :config
+  (which-key-mode)
+  (which-key-setup-side-window-right-bottom)
+  (setq which-key-idle-delay 0.6))
 
 
 ;;; uimage - darksun - lujun9972
 
 (use-package uimage
-:config
-;; (push `(,(concat "\\(`\\|\\[\\[\\|<\\)?"
-;; "\\(\\(file:http://\\)" uimage-mode-image-filename-regex "\\)"
-;; "\\(\\]\\]\\|>\\|'\\)?") . 2)
-;; uimage-mode-image-regex-alist )
-(uimage-mode)
-)
+  :config
+  ;; (push `(,(concat "\\(`\\|\\[\\[\\|<\\)?"
+  ;; "\\(\\(file:http://\\)" uimage-mode-image-filename-regex "\\)"
+  ;; "\\(\\]\\]\\|>\\|'\\)?") . 2)
+  ;; uimage-mode-image-regex-alist )
+  (uimage-mode)
+  )
 
 
 ;;; mode-icons
 (use-package mode-icons
-:disabled t
-:config
-(mode-icons-mode)
-;;(setq mode-icons-change-mode-name nil)
-)
+  :disabled t
+  :config
+  (mode-icons-mode)
+  ;;(setq mode-icons-change-mode-name nil)
+  )
 
 
 ;;; vdiff
 
 (use-package vdiff
-:disabled t
-:config
-(define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
-)
+  :disabled t
+  :config
+  (define-key vdiff-mode-map (kbd "C-c") vdiff-mode-prefix-map)
+  )
 
 
 ;;; symon
 (use-package symon
-:config
-;; (symon-mode)
-)
+  :config
+  ;; (symon-mode)
+  )
 
 
 ;;; figlet
 (use-package figlet
-:config
-;; (setq figlet-font-directory "c:/emacs/.emacs.d/win-apps/figlet/fonts")
-(setq figlet-font-directory (expand-file-name "~/.emacs.d/win-apps/figlet/fonts") )
-(setq figlet-options `("-d",figlet-font-directory))
-)
+  :config
+  ;; (setq figlet-font-directory "c:/emacs/.emacs.d/win-apps/figlet/fonts")
+  (setq figlet-font-directory (expand-file-name "~/.emacs.d/win-apps/figlet/fonts") )
+  (setq figlet-options `("-d",figlet-font-directory))
+  )
 
 
 ;;; hyperbole
 
 (use-package hyperbole
-:disabled t
-)
+  :disabled t
+  )
 
 ;;; sublimity, a substitute of minimap
 (use-package sublimity
-:disabled t
-:config
-(require 'sublimity-scroll)
-(require 'sublimity-map)
-;; (require 'sublimity-attractive)
+  :disabled t
+  :config
+  (require 'sublimity-scroll)
+  (require 'sublimity-map)
+  ;; (require 'sublimity-attractive)
 
-(setq sublimity-scroll-weight 10
-sublimity-scroll-drift-length 5)
-(setq sublimity-map-size 20)
-(setq sublimity-map-fraction 0.3)
-(setq sublimity-map-text-scale -7)
-;; (add-hook 'sublimity-map-setup-hook
-;; (lambda ()
-;; (setq buffer-face-mode-face '(:family "Monospace"))
-;; (buffer-face-mode)))
+  (setq sublimity-scroll-weight 10
+        sublimity-scroll-drift-length 5)
+  (setq sublimity-map-size 20)
+  (setq sublimity-map-fraction 0.3)
+  (setq sublimity-map-text-scale -7)
+  ;; (add-hook 'sublimity-map-setup-hook
+  ;; (lambda ()
+  ;; (setq buffer-face-mode-face '(:family "Monospace"))
+  ;; (buffer-face-mode)))
 
-(sublimity-mode 1)
-)
+  (sublimity-mode 1)
+  )
 
 
 ;;; beacon-mode
 (use-package beacon
-:config
-(beacon-mode 1))
+  :config
+  (beacon-mode 1))
 
 
 ;;; command-log-mode
 (use-package command-log-mode
-:config
-(add-hook 'LaTeX-mode-hook 'command-log-mode)
-(add-hook 'emacs-lisp-mode-hook 'command-log-mode)
-)
+  :config
+  (add-hook 'LaTeX-mode-hook 'command-log-mode)
+  (add-hook 'emacs-lisp-mode-hook 'command-log-mode)
+  )
 
 ;;; zhihu-daily
 (use-package helm-zhihu-daily)
@@ -1602,10 +1603,10 @@ sublimity-scroll-drift-length 5)
 
 ;;; neotree
 (use-package neotree
-:config
-;; (use-package all-the-icons)
-;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
-:bind (("<f8>" . neotree-toggle)))
+  :config
+  ;; (use-package all-the-icons)
+  ;; (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
+  :bind (("<f8>" . neotree-toggle)))
 
 
 (use-package verify-url)
@@ -1619,11 +1620,11 @@ sublimity-scroll-drift-length 5)
 
 
 (use-package hydra
-:disabled t
-:config
-(defhydra hydra-buffer-menu (:color pink
-:hint nil)
-"
+  :disabled t
+  :config
+  (defhydra hydra-buffer-menu (:color pink
+                                      :hint nil)
+    "
 ^Mark^ ^Unmark^ ^Actions^ ^Search
 ^^^^^^^^-----------------------------------------------------------------
 _m_: mark _u_: unmark _x_: execute _R_: re-isearch
@@ -1632,77 +1633,77 @@ _d_: delete ^ ^ _g_: refresh _O_: multi-occur
 _D_: delete up ^ ^ _T_: files only: % -28`Buffer-menu-files-only
 _~_: modified
 "
-("m" Buffer-menu-mark)
-("u" Buffer-menu-unmark)
-("U" Buffer-menu-backup-unmark)
-("d" Buffer-menu-delete)
-("D" Buffer-menu-delete-backwards)
-("s" Buffer-menu-save)
-("~" Buffer-menu-not-modified)
-("x" Buffer-menu-execute)
-("b" Buffer-menu-bury)
-("g" revert-buffer)
-("T" Buffer-menu-toggle-files-only)
-("O" Buffer-menu-multi-occur :color blue)
-("I" Buffer-menu-isearch-buffers :color blue)
-("R" Buffer-menu-isearch-buffers-regexp :color blue)
-("c" nil "cancel")
-("v" Buffer-menu-select "select" :color blue)
-("o" Buffer-menu-other-window "other-window" :color blue)
-("q" quit-window "quit" :color blue))
+    ("m" Buffer-menu-mark)
+    ("u" Buffer-menu-unmark)
+    ("U" Buffer-menu-backup-unmark)
+    ("d" Buffer-menu-delete)
+    ("D" Buffer-menu-delete-backwards)
+    ("s" Buffer-menu-save)
+    ("~" Buffer-menu-not-modified)
+    ("x" Buffer-menu-execute)
+    ("b" Buffer-menu-bury)
+    ("g" revert-buffer)
+    ("T" Buffer-menu-toggle-files-only)
+    ("O" Buffer-menu-multi-occur :color blue)
+    ("I" Buffer-menu-isearch-buffers :color blue)
+    ("R" Buffer-menu-isearch-buffers-regexp :color blue)
+    ("c" nil "cancel")
+    ("v" Buffer-menu-select "select" :color blue)
+    ("o" Buffer-menu-other-window "other-window" :color blue)
+    ("q" quit-window "quit" :color blue))
 
-(define-key Buffer-menu-mode-map "." 'hydra-buffer-menu/body)
-)
+  (define-key Buffer-menu-mode-map "." 'hydra-buffer-menu/body)
+  )
 
 
 ;;;persp-mode
 (use-package persp-mode
-:disabled t
-:config
-(with-eval-after-load "persp-mode-autoloads"
-(setq wg-morph-on nil) ;; switch off animation
-(setq persp-autokill-buffer-on-remove 'kill-weak)
-(add-hook 'after-init-hook #'(lambda () (persp-mode 1))))
+  :disabled t
+  :config
+  (with-eval-after-load "persp-mode-autoloads"
+    (setq wg-morph-on nil) ;; switch off animation
+    (setq persp-autokill-buffer-on-remove 'kill-weak)
+    (add-hook 'after-init-hook #'(lambda () (persp-mode 1))))
 
-(with-eval-after-load "persp-mode"
-(global-set-key (kbd "C-x b") #'persp-switch-to-buffer)
-(global-set-key (kbd "C-x k") #'persp-kill-buffer))
-)
+  (with-eval-after-load "persp-mode"
+    (global-set-key (kbd "C-x b") #'persp-switch-to-buffer)
+    (global-set-key (kbd "C-x k") #'persp-kill-buffer))
+  )
 
 
 
 ;; symbol-overlay
 (use-package symbol-overlay
-:disabled t
-:bind
-(("M-i" . symbol-overlay-put)
-("M-u" . symbol-overlay-switch-backward)
-("M-o" . symbol-overlay-switch-forward)))
+  :disabled t
+  :bind
+  (("M-i" . symbol-overlay-put)
+   ("M-u" . symbol-overlay-switch-backward)
+   ("M-o" . symbol-overlay-switch-forward)))
 
 
 
 ;; langtool
 (use-package langtool
-:config
-(setq langtool-language-tool-jar (expand-file-name "win-apps/langtool/languagetool-commandline.jar" user-emacs-directory))
-(setq langtool-default-language "en-US")
-;; (setq langtool-mother-tongue "en")
-:bind
-(("C-x 4 w" . langtool-check)
-("C-x 4 W" . langtool-check-done)
-("C-x 4 l" . langtool-switch-default-language)
-("C-x 4 4" . langtool-show-message-at-point)
-("C-x 4 c" . langtool-correct-buffer)
-))
+  :config
+  (setq langtool-language-tool-jar (expand-file-name "win-apps/langtool/languagetool-commandline.jar" user-emacs-directory))
+  (setq langtool-default-language "en-US")
+  ;; (setq langtool-mother-tongue "en")
+  :bind
+  (("C-x 4 w" . langtool-check)
+   ("C-x 4 W" . langtool-check-done)
+   ("C-x 4 l" . langtool-switch-default-language)
+   ("C-x 4 4" . langtool-show-message-at-point)
+   ("C-x 4 c" . langtool-correct-buffer)
+   ))
 
 
 ;; centered-window-mode
 ;; works not well
 (use-package centered-window-mode
-:disabled t
-:config
-(centered-window-mode t)
-)
+  :disabled t
+  :config
+  (centered-window-mode t)
+  )
 
 
 ;; helpful
@@ -1717,33 +1718,33 @@ _~_: modified
 
 ;; chinese-gbk 编码的 shell 终端
 (defun gshell()
-(interactive)
-(let ((coding-system-for-read 'chinese-gbk)
-(coding-system-for-write 'chinese-gbk)
-(file-name-coding-system 'gbk))
-(shell)))
+  (interactive)
+  (let ((coding-system-for-read 'chinese-gbk)
+        (coding-system-for-write 'chinese-gbk)
+        (file-name-coding-system 'gbk))
+    (shell)))
 ;; utf-8-unix 编码的 shell 终端
 (defun ushell()
-(interactive)
-(let ((coding-system-for-read 'utf-8)
-(coding-system-for-write 'utf-8))
-(shell)))
+  (interactive)
+  (let ((coding-system-for-read 'utf-8)
+        (coding-system-for-write 'utf-8))
+    (shell)))
 
 (defun gtd ()
-(interactive)
-(find-file "~/GTD/newgtd.org"))
+  (interactive)
+  (find-file "~/GTD/newgtd.org"))
 
 (defun my-customize-org ()
-(interactive)
-(find-file "~/.emacs.d/lisp/init-org.el"))
+  (interactive)
+  (find-file "~/.emacs.d/lisp/init-org.el"))
 
 (defun my-customize-local ()
-(interactive)
-(find-file "~/.emacs.d/lisp/init-local.el"))
+  (interactive)
+  (find-file "~/.emacs.d/lisp/init-local.el"))
 
 (defun open-my-init-file ()
-(interactive)
-(find-file "~/.emacs.d/init.el"))
+  (interactive)
+  (find-file "~/.emacs.d/init.el"))
 
 
 (global-set-key (kbd "C-c v") 'view-mode)
@@ -1761,22 +1762,22 @@ _~_: modified
 ;; [[http://ergoemacs.org/emacs/elisp_browse_url.html][Emacs Lisp: View URL in Web Browser: browse-url]]
 ;; [[http://ergoemacs.org/emacs/emacs_set_default_browser.html][Emacs: Set Default Browser]]
 (defun hsk/browse-url-with-chrome (url &optional _new-window)
-(interactive (browse-url-interactive-arg "URL: "))
-(setq url (browse-url-encode-url url))
-(cond
-((string-equal system-type "windows-nt") ; Windows
-(shell-command (concat "chrome " url)))
-((string-equal system-type "gnu/linux")
-(shell-command (concat "chrome " url)))
-((string-equal system-type "darwin") ; Mac
-(shell-command (concat "open -a Chrome.app " url)))))
+  (interactive (browse-url-interactive-arg "URL: "))
+  (setq url (browse-url-encode-url url))
+  (cond
+   ((string-equal system-type "windows-nt") ; Windows
+    (shell-command (concat "chrome " url)))
+   ((string-equal system-type "gnu/linux")
+    (shell-command (concat "chrome " url)))
+   ((string-equal system-type "darwin") ; Mac
+    (shell-command (concat "open -a Chrome.app " url)))))
 
 ;; set env var named “path” by appending a new path
 (setenv "PATH"
-(concat
-"C:/Program Files (x86)/Google/Chrome/Application/"
-";"
-(getenv "PATH")))
+        (concat
+         "C:/Program Files (x86)/Google/Chrome/Application/"
+         ";"
+         (getenv "PATH")))
 
 ;; (setq browse-url-browser-function 'hsk/browse-url-with-chrome)
 ;; (setq browse-url-browser-function 'eww-browse-url)
@@ -1804,10 +1805,10 @@ _~_: modified
 
 ;; Wiznote Customization
 (defun wiznote-format-timestamp ()
-(interactive)
-(let ((wiznote-formated-timestamp (replace-regexp-in-string "\/" "-" (w32-get-clipboard-data))))
-(if wiznote-formated-timestamp
-(insert wiznote-formated-timestamp))))
+  (interactive)
+  (let ((wiznote-formated-timestamp (replace-regexp-in-string "\/" "-" (w32-get-clipboard-data))))
+    (if wiznote-formated-timestamp
+        (insert wiznote-formated-timestamp))))
 (global-set-key (kbd "C-c g y") 'wiznote-format-timestamp)
 
 
@@ -1823,18 +1824,18 @@ _~_: modified
 
 ;; geeknote
 (use-package geeknote
-:init
-;; (setq geeknote-command "geeknote")
-;; :config
-:bind (
-("C-c n c" . geeknote-create)
-("C-c n e" . geeknote-edit)
-("C-c n f" . geeknote-find)
-("C-c n s" . geeknote-show)
-("C-c n r" . geeknote-remove)
-("C-c n m" . geeknote-move)
-)
-)
+  :init
+  ;; (setq geeknote-command "geeknote")
+  ;; :config
+  :bind (
+         ("C-c n c" . geeknote-create)
+         ("C-c n e" . geeknote-edit)
+         ("C-c n f" . geeknote-find)
+         ("C-c n s" . geeknote-show)
+         ("C-c n r" . geeknote-remove)
+         ("C-c n m" . geeknote-move)
+         )
+  )
 
 ;; (use-package keycast
 ;;   :config
@@ -1869,6 +1870,58 @@ _~_: modified
 (remove-hook 'kill-buffer-query-functions 'server-kill-buffer-query-function)
 
 
+;; 高亮括号内的代码
+(unless (package-installed-p 'highlight-blocks)
+  (package-install 'highlight-blocks))
+
+(require 'highlight-blocks)
+
+(setq highlight-blocks--rainbow-colors
+      '("#BAFFFF" "#FFCACA" "#FFFFBA" "#CACAFF" "#CAFFCA" "#FFBAFF"))
+
+(setq highlight-blocks-max-face-count
+      (length highlight-blocks--rainbow-colors))
+
+(defun highlight-blocks--define-rainbow-colors (colors)
+  (dotimes (i (length colors))
+    (face-spec-set
+     (intern (format "highlight-blocks-depth-%d-face" (1+ i)))
+     `((((class color) (background dark))  :background ,(nth i colors))
+       (((class color) (background light)) :background ,(nth i colors)))
+     'face-defface-spec)))
+
+(highlight-blocks--define-rainbow-colors highlight-blocks--rainbow-colors)
+
+;; Put the mode hooks where you want it, for example
+;;
+(add-hook 'emacs-lisp-mode-hook       'highlight-blocks-mode)
+(add-hook 'lisp-interaction-mode-hook 'highlight-blocks-mode)
+(add-hook 'lisp-mode-hook             'highlight-blocks-mode)
+
+;; (defun highlight-blocks--get-bounds ()
+;;   "Get the bounds of the nested blocks the point is in.
+;; The returned value is a list of conses, where car is the start of a
+;; block and cdr is the end of a block, starting from the outermost
+;; block."
+;;   (let ((result '())
+;;         (parse-sexp-ignore-comments t))
+;;     (condition-case nil
+;;         (let* ((parse-state (syntax-ppss))
+;;                (starting-pos (if (or (nth 3 parse-state)
+;;                                      (nth 4 parse-state))
+;;                                  (nth 8 parse-state)
+;;                                (point)))
+;;                (begins (nreverse (nth 9 parse-state)))
+;;                (end starting-pos)
+;;                (i 0))
+;;           (while (or (eq highlight-blocks-max-innermost-block-count t)
+;;                      (< i highlight-blocks-max-innermost-block-count))
+;;             (setq end (scan-lists end 1 1))
+;;             (push (cons (pop begins) end) result)
+;;             (setq i (1+ i))))
+;;       (scan-error))
+;;     ;; 修改下这个函数函数的返回值，可以只高亮当前所在的块
+;;     (last result)))
 
 
 ;;; maximize-window: three ways do not work maybe because of the value of initial-frame-alist at the end of configuration
@@ -1917,8 +1970,6 @@ _~_: modified
 ;; (my-maximized))
 
 
-;;; Maximize window: this line must be put at the end of configuration
-(setq-default initial-frame-alist (quote ((fullscreen . maximized))))
 
 (defun restart-tabbar-mode ()
   (interactive)
@@ -1929,5 +1980,8 @@ _~_: modified
 (restart-tabbar-mode)
 ;; (pyim-restart-1 t)
 ;; (pyim-restart-1)
+
+;;; Maximize window: this line must be put at the end of configuration
+(setq-default initial-frame-alist (quote ((fullscreen . maximized))))
 
 (provide 'init-local)
