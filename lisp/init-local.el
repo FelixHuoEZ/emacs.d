@@ -1859,9 +1859,9 @@ _~_: modified
                 (sh-set-shell "zsh"))))
 
 ;; org-logseq
-(use-package org-logseq
-  :quelpa (org-logseq :fetcher github :repo "llcc/org-logseq" :files ("*"))
-  :custom (org-logseq-dir org-roam-directory))
+;; (use-package org-logseq
+;;   :quelpa (org-logseq :fetcher github :repo "llcc/org-logseq" :files ("*"))
+;;   :custom (org-logseq-dir org-roam-directory))
 
 
 

@@ -994,7 +994,7 @@ typical word processor."
 (when (executable-find "cc")
   (use-package org-roam
     :diminish
-    :hook (after-init . org-roam-db-autosync-enable)
+    ;; :hook (after-init . org-roam-db-autosync-enable)
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n g" . org-roam-graph)
@@ -1003,6 +1003,8 @@ typical word processor."
            ("C-c n j" . org-roam-dailies-capture-today))
     :init
     (setq org-roam-directory-true (file-truename org-roam-directory))
+    (setq org-roam-file-exclude-regexp
+          (concat "^" (expand-file-name org-roam-directory) "logseq/bak/.*$"))
     :config
     (unless (file-exists-p org-roam-directory-true)
       (make-directory org-roam-directory-true))
@@ -1204,6 +1206,20 @@ typical word processor."
   :init
   (setq org-excalidraw-directory "~/excalidraw_files")
   )
+
+;; org-ai
+(use-package org-ai
+  :ensure
+  :commands (org-ai-mode)
+  :custom
+  (org-ai-openai-api-token "<ENTER YOUR API TOKEN HERE>")
+  :init
+  (add-hook 'org-mode-hook #'org-ai-mode)
+  :config
+  ;; if you are on the gpt-4 beta:
+  (setq org-ai-default-chat-model "gpt-4")
+  ;; if you are using yasnippet and want `ai` snippets
+  (org-ai-install-yasnippets))
 
 ;;; Private User Misc Settings Ends
 
