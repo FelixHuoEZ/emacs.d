@@ -192,6 +192,8 @@
 (when *is-a-mac*
 (require-package 'osx-location))
 (maybe-require-package 'regex-tool)
+(require 're-builder)
+(setq reb-re-syntax 'string)
 (maybe-require-package 'dotenv-mode)
 
 ;;----------------------------------------------------------------------------
