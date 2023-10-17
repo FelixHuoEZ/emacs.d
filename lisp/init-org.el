@@ -933,11 +933,24 @@ typical word processor."
 ;; (advice-remove 'org-create-formula-image #'org-renumber-environment)
 
 ;;; org-ref and bibtex
-
+(require 'org-ref-ivy)
 (use-package org-ref
-  :disabled t
+  ;; :disabled t
+  :bind
+  (:map org-mode-map
+        ("C-c ]" . org-ref-insert-link))
   :config
+  (use-package bibtex
+    :config
+    (setq bibtex-autokey-year-length 4
+          bibtex-autokey-name-year-separator "-"
+          bibtex-autokey-year-title-separator "-"
+          bibtex-autokey-titleword-separator "-"
+          bibtex-autokey-titlewords 2
+          bibtex-autokey-titlewords-stretch 1
+          bibtex-autokey-titleword-length 5))
   (use-package ivy-bibtex)
+  ;; (use-package org-ref-ivy)
   (require 'doi-utils)
   ;; doi-utils-add-bibtex-entry-from-doi and doi-utils-add-entry-from-crossref-query
   (require 'org-ref-wos)
@@ -949,7 +962,7 @@ typical word processor."
   (require 'x2bib)
 
   (setq org-latex-prefer-user-labels t)
-  (setq org-ref-completion-library 'org-ref-ivy-cite)
+  ;; (setq org-ref-completion-library 'org-ref-ivy-cite)
   ;; on Linux or macOS, just use ln command to make a symbol link or hard link
   ;; on Windows, you should make a symbol link from your zotero export bib file to ~/.emacs.d/zoterobib.bib
   ;; mklink "<path-to-home>/.emacs.d/zoterobib.bib" "<path-and-filename-to-zotero-export-bib>"
@@ -958,12 +971,24 @@ typical word processor."
   (setq bibtex-completion-notes-symbol "✎")
 
   ;; see org-ref for use of these variables
-  (setq org-ref-bibliography-notes "D:/MyDocuments/My Knowledge/Data/private-email@example.invalid/Academic/Projects/S 波段双圆极化天线/S波段双圆极化天线文档/双圆极化天线论文笔记.org_Attachments/note-of-dual-circular-polarized-antenna-papers.org"
-        org-ref-default-bibliography '("E:/Zotero/autobib/zoteroexport.bib")
-        org-ref-pdf-directory "E:/Zotero/storage/")
+  ;; (setq org-ref-bibliography-notes "D:/MyDocuments/My Knowledge/Data/private-email@example.invalid/Academic/Projects/S 波段双圆极化天线/S波段双圆极化天线文档/双圆极化天线论文笔记.org_Attachments/note-of-dual-circular-polarized-antenna-papers.org"
+  ;;       org-ref-default-bibliography '("E:/Zotero/autobib/zoteroexport.bib")
+  ;;       org-ref-pdf-directory "E:/Zotero/storage/")
   (setq bibtex-completion-bibliography "E:/Zotero/autobib/zoteroexport.bib"
         bibtex-completion-library-path "E:/Zotero/storage"
-        bibtex-completion-notes-path "E:/Zotero/storage")
+        bibtex-completion-notes-path "E:/Zotero/storage"
+        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+
+        bibtex-completion-additional-search-fields '(keywords)
+        bibtex-completion-display-formats
+        '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
+          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
+          (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+          (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
+          (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
+        bibtex-completion-pdf-open-function
+        (lambda (fpath)
+          (call-process "open" nil 0 nil fpath)))
 
   ;; open pdf with system pdf viewer (works on mac)
   ;; (setq bibtex-completion-pdf-open-function
@@ -984,8 +1009,7 @@ typical word processor."
           (org-open-file pdf-file)
         (message "No PDF found for %s" key))))
 
-  (setq org-ref-open-pdf-function 'hsk/org-ref-open-pdf-at-point)
-  )
+  (setq org-ref-open-pdf-function 'hsk/org-ref-open-pdf-at-point))
 
 
 
