@@ -92,6 +92,9 @@ AGENTS.md
 /forge-database.sqlite
 /forge-database.sqlite-*
 
+# cnfonts 运行时状态
+/cnfonts
+
 # emacs-rime 本地目录
 /rime/
 

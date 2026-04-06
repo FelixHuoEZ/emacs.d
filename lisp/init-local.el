@@ -18,6 +18,17 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
     ("emacs_abbrev_private.el" . "lisp/emacs_abbrev_private.el"))
   "Files to bootstrap from the private sync directory.")
 
+(defvar hsk/private-sync--warning-cache (make-hash-table :test #'equal)
+  "Warnings already emitted for rejected private sync paths.")
+
+(defun hsk/private-sync--warn-once (key format-string &rest args)
+  "Display a private sync warning identified by KEY."
+  (unless (gethash key hsk/private-sync--warning-cache)
+    (puthash key t hsk/private-sync--warning-cache)
+    (display-warning 'init-local
+                     (apply #'format format-string args)
+                     :warning)))
+
 (defun hsk/private-sync--candidate-directories ()
   (let ((env-dir (getenv "EMACS_PRIVATE_SYNC_DIR")))
     (cl-delete-duplicates
@@ -36,8 +47,51 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
      :test #'string-equal)))
 
 (defun hsk/private-sync--directory ()
-  (cl-find-if #'file-directory-p
-              (hsk/private-sync--candidate-directories)))
+  (cl-loop for directory in (hsk/private-sync--candidate-directories)
+           for trusted = (hsk/private-sync--trusted-path directory "private sync directory")
+           when trusted return trusted))
+
+(defun hsk/private-sync-subdirectory (name &optional create)
+  "Return NAME under the private sync directory.
+When CREATE is non-nil, ensure the directory exists."
+  (when-let ((sync-dir (hsk/private-sync--directory)))
+    (let ((directory (expand-file-name name sync-dir)))
+      (when create
+        (make-directory directory t))
+      directory)))
+
+(defun hsk/private-sync--safe-permissions-p (path)
+  "Return non-nil when PATH is not group/world writable."
+  (when-let ((mode (file-modes path)))
+    (zerop (logand mode #o022))))
+
+(defun hsk/private-sync--owned-by-current-user-p (path)
+  "Return non-nil when PATH is owned by the current user."
+  (when-let ((attrs (file-attributes path 'integer)))
+    (eq (nth 2 attrs) (user-uid))))
+
+(defun hsk/private-sync--trusted-path (path description)
+  "Return trusted truename for PATH or nil after warning.
+DESCRIPTION is used in warning messages."
+  (when path
+    (let ((truename (ignore-errors (file-truename path))))
+      (cond
+       ((or (null truename)
+            (not (file-exists-p truename)))
+        nil)
+       ((not (hsk/private-sync--owned-by-current-user-p truename))
+        (hsk/private-sync--warn-once
+         (list :owner truename)
+         "Skipping %s %s because it is not owned by the current user."
+         description truename)
+        nil)
+       ((not (hsk/private-sync--safe-permissions-p truename))
+        (hsk/private-sync--warn-once
+         (list :mode truename)
+         "Skipping %s %s because it is group/world writable."
+         description truename)
+        nil)
+       (t truename)))))
 
 (defun hsk/private-sync--same-link-target-p (path source)
   (and (file-symlink-p path)
@@ -76,7 +130,12 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
        (expand-file-name (cdr entry) user-emacs-directory)))))
 
 (hsk/private-sync-bootstrap)
-(require 'init-local-private nil t)
+(when (hsk/private-sync--trusted-path
+       (expand-file-name "lisp/init-local-private.el" user-emacs-directory)
+       "private config file")
+  ;; This file is executable Elisp. Only load it from a trusted private sync path.
+  (load (expand-file-name "lisp/init-local-private.el" user-emacs-directory)
+        nil t))
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -93,8 +152,12 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
 (setq debug-on-error t)
 ;;Turn on abbrev mode
 (load (expand-file-name "lisp/emacs_abbrev.el" user-emacs-directory))
-(load (expand-file-name "lisp/emacs_abbrev_private.el" user-emacs-directory)
-      t 'nomessage)
+(when (hsk/private-sync--trusted-path
+       (expand-file-name "lisp/emacs_abbrev_private.el" user-emacs-directory)
+       "private abbrev file")
+  ;; This file is executable Elisp. Only load it from a trusted private sync path.
+  (load (expand-file-name "lisp/emacs_abbrev_private.el" user-emacs-directory)
+        t 'nomessage))
 (global-set-key (kbd "C-h C-f") 'find-function)
 (setq desktop-restore-frames t)
 (unless noninteractive
@@ -159,7 +222,10 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
 (use-package cnfonts
   :demand t
   :init
-  (setq cnfonts-verbose nil)
+  (setq cnfonts-verbose nil
+        cnfonts-directory
+        (or (hsk/private-sync-subdirectory "cnfonts" t)
+            (locate-user-emacs-file "cnfonts/")))
   :config
   ;; (cl-prettyprint (font-family-list))
   ;; (print (font-family-list))
@@ -172,7 +238,9 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
   (setq cnfonts-personal-fontnames
         '(
           ()
-          ("方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
+          ("Hiragino Sans GB" "STHeiti" "方正书宋简体" "方正字迹-典雅楷体简体" "方正宋刻本秀楷简体" "方正正纤黑简体" "方正清刻本悦宋简体" "方正苏新诗柳楷简体" "冬青黑体简体中文 W3" "冬青黑体简体中文 W6" "文泉驿微米黑" "思源黑体 Regular" "思源黑体 Normal" "思源黑体 Medium" "思源黑体 Light" "思源黑体 Heavy" "思源黑体 ExtraLight" "思源黑体 Bold" "冬青黑体" "思源黑体" "方正兰亭准黑_GBK" "方正兰亭黑_GBK" "方正兰亭纤黑_GBK" "Microsoft YaHei UI")
+          ()
+          ("Apple Symbols" "Apple Color Emoji")
           ()
           ))
 
@@ -181,33 +249,6 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
   (cnfonts-enable)
 
   ;; (setq cnfonts-use-face-font-rescale t) ;cannot be used in Windows
-
-  (defun my-set-symbol-fonts (fontsizes-list)
-    (let* ((fontname "NotoColorEmoji")
-           (fontsize (nth 0 fontsizes-list))
-           (fontspec (font-spec :name fontname
-                                :size fontsize
-                                :weight 'normal
-                                :slant 'normal)))
-      (if (cnfonts--fontspec-valid-p fontspec)
-          (set-fontset-font "fontset-default" 'symbol fontspec nil 'append)
-        (message "字体 %S 不存在！" fontname))))
-
-
-  (defun my-set-exta-fonts (fontsizes-list)
-    (let* ((fontname "Microsoft YaHei UI")
-           (fontsize (nth 1 fontsizes-list))
-           (fontspec (font-spec :name fontname
-                                :size fontsize
-                                :weight 'normal
-                                :slant 'normal)))
-      (if (cnfonts--fontspec-valid-p fontspec)
-          (set-fontset-font "fontset-default" '(#x3400 . #x4DFF) fontspec nil 'append)
-        (message "字体 %S 不存在！" fontname))))
-
-  (add-hook 'cnfonts-set-font-finish-hook 'my-set-symbol-fonts)
-  (add-hook 'cnfonts-set-font-finish-hook 'my-set-exta-fonts)
-
 
   (defvar my-line-spacing-alist
     '((9 . 0.1) (10 . 0.9) (11.5 . 0.2)
@@ -224,6 +265,7 @@ When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
           (setq line-spacing-alist nil)
           (setq-default line-spacing (cdr list))))))
 
+  ;; Let `cnfonts' own font selection. Keep only layout tweaks here.
   (add-hook 'cnfonts-set-font-finish-hook #'my-line-spacing-setup)
 
   :bind
