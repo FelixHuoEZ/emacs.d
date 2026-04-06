@@ -899,7 +899,9 @@ directory and insert a link to this file.
 
 ;;; youdao-dictionary
 (use-package youdao-dictionary
-  :config
+  :commands (youdao-dictionary-search-at-point)
+  :defer t
+  :init
   ;; Enable Cache
   (setq url-automatic-caching t)
 

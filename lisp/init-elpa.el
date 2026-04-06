@@ -98,7 +98,11 @@ locate PACKAGE."
 ;;; Fire up package.el
 
 (setq package-enable-at-startup nil)
-(package-initialize)
+(let ((inhibit-message t)
+      (message-log-max nil))
+  ;; Some third-party package autoloads emit obsolete-advice noise during
+  ;; activation on modern Emacs. Keep startup quiet while still surfacing errors.
+  (package-initialize))
 
 
 
