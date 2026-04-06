@@ -1183,10 +1183,10 @@ the actual manpage using the function `man'."
   ;; (helm-chrome-reload-bookmarks)
   )
 
-(use-package helm-google
-  :config
-  :bind
-  (("C-h j" . helm-google)))
+;; (use-package helm-google
+;;   :config
+;;   :bind
+;;   (("C-h j" . helm-google)))
 
 
 ;;; vim-empty-mode
@@ -1502,11 +1502,11 @@ the actual manpage using the function `man'."
   :config
   (helm-descbinds-mode))
 
-(use-package which-key
-  :config
-  (which-key-mode)
-  (which-key-setup-side-window-right-bottom)
-  (setq which-key-idle-delay 0.6))
+;; (use-package which-key
+;;   :config
+;;   (which-key-mode)
+;;   (which-key-setup-side-window-right-bottom)
+;;   (setq which-key-idle-delay 0.6))
 
 
 ;;; uimage - darksun - lujun9972

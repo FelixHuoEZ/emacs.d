@@ -933,7 +933,7 @@ typical word processor."
 ;; (advice-remove 'org-create-formula-image #'org-renumber-environment)
 
 ;;; org-ref and bibtex
-(require 'org-ref-ivy)
+;; (require 'org-ref-ivy)
 (use-package org-ref
   ;; :disabled t
   :bind
@@ -1015,108 +1015,108 @@ typical word processor."
 
 
 ;; Roam
-(when (executable-find "cc")
-  (use-package org-roam
-    :diminish
-    ;; :hook (after-init . org-roam-db-autosync-enable)
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture)
-           ("C-c n j" . org-roam-dailies-capture-today))
-    :init
-    (setq org-roam-directory-true (file-truename org-roam-directory))
-    (setq org-roam-file-exclude-regexp
-          (concat "^" (expand-file-name org-roam-directory) "logseq/bak/.*$"))
-    :config
-    (unless (file-exists-p org-roam-directory-true)
-      (make-directory org-roam-directory-true))
-    ;; 使用侧边栏而不是完整buffer
-    (add-to-list 'display-buffer-alist
-                 '("\\*org-roam\\*"
-                   (display-buffer-in-side-window)
-                   (side . right)
-                   (slot . 0)
-                   (window-width . 0.25)
-                   (window-parameters . ((no-other-window . t)
-                                         (no-delete-other-windows . t)))))
+;; (when (executable-find "cc")
+;;   (use-package org-roam
+;;     :diminish
+;;     ;; :hook (after-init . org-roam-db-autosync-enable)
+;;     :bind (("C-c n l" . org-roam-buffer-toggle)
+;;            ("C-c n f" . org-roam-node-find)
+;;            ("C-c n g" . org-roam-graph)
+;;            ("C-c n i" . org-roam-node-insert)
+;;            ("C-c n c" . org-roam-capture)
+;;            ("C-c n j" . org-roam-dailies-capture-today))
+;;     :init
+;;     (setq org-roam-directory-true (file-truename org-roam-directory))
+;;     (setq org-roam-file-exclude-regexp
+;;           (concat "^" (expand-file-name org-roam-directory) "logseq/bak/.*$"))
+;;     :config
+;;     (unless (file-exists-p org-roam-directory-true)
+;;       (make-directory org-roam-directory-true))
+;;     ;; 使用侧边栏而不是完整buffer
+;;     (add-to-list 'display-buffer-alist
+;;                  '("\\*org-roam\\*"
+;;                    (display-buffer-in-side-window)
+;;                    (side . right)
+;;                    (slot . 0)
+;;                    (window-width . 0.25)
+;;                    (window-parameters . ((no-other-window . t)
+;;                                          (no-delete-other-windows . t)))))
 
-    ;; 标题链接分级显示
-    ;; Codes blow are used to general a hierachy for title nodes that under a file
-    (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
-      "Return the value of \"#+title:\" (if any) from file that NODE resides in.
-      If there's no file-level title in the file, return empty string."
-      (or (if (= (org-roam-node-level node) 0)
-              (org-roam-node-title node)
-            (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
-          ""))
-    (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
-      "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
-        If some elements are missing, they will be stripped out."
-      (let ((title     (org-roam-node-title node))
-            (olp       (org-roam-node-olp   node))
-            (level     (org-roam-node-level node))
-            (filetitle (org-roam-node-doom-filetitle node))
-            (separator (propertize " > " 'face 'shadow)))
-        (cl-case level
-          ;; node is a top-level file
-          (0 filetitle)
-          ;; node is a level 1 heading
-          (1 (concat (propertize filetitle 'face '(shadow italic))
-                     separator title))
-          ;; node is a heading with an arbitrary outline path
-          (t (concat (propertize filetitle 'face '(shadow italic))
-                     separator (propertize (string-join olp " > ") 'face '(shadow italic))
-                     separator title)))))
+;;     ;; 标题链接分级显示
+;;     ;; Codes blow are used to general a hierachy for title nodes that under a file
+;;     (cl-defmethod org-roam-node-doom-filetitle ((node org-roam-node))
+;;       "Return the value of \"#+title:\" (if any) from file that NODE resides in.
+;;       If there's no file-level title in the file, return empty string."
+;;       (or (if (= (org-roam-node-level node) 0)
+;;               (org-roam-node-title node)
+;;             (org-roam-get-keyword "TITLE" (org-roam-node-file node)))
+;;           ""))
+;;     (cl-defmethod org-roam-node-doom-hierarchy ((node org-roam-node))
+;;       "Return hierarchy for NODE, constructed of its file title, OLP and direct title.
+;;         If some elements are missing, they will be stripped out."
+;;       (let ((title     (org-roam-node-title node))
+;;             (olp       (org-roam-node-olp   node))
+;;             (level     (org-roam-node-level node))
+;;             (filetitle (org-roam-node-doom-filetitle node))
+;;             (separator (propertize " > " 'face 'shadow)))
+;;         (cl-case level
+;;           ;; node is a top-level file
+;;           (0 filetitle)
+;;           ;; node is a level 1 heading
+;;           (1 (concat (propertize filetitle 'face '(shadow italic))
+;;                      separator title))
+;;           ;; node is a heading with an arbitrary outline path
+;;           (t (concat (propertize filetitle 'face '(shadow italic))
+;;                      separator (propertize (string-join olp " > ") 'face '(shadow italic))
+;;                      separator title)))))
 
-    (cl-defmethod org-roam-node-type ((node org-roam-node))
-      "Return the TYPE of NODE."
-      (condition-case nil
-          (file-name-nondirectory
-           (directory-file-name
-            (file-name-directory
-             (file-relative-name (org-roam-node-file node) org-roam-directory))))
-        (error "")))
-    (setq org-roam-node-display-template
-          (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
-    ;; (setq org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag)))
+;;     (cl-defmethod org-roam-node-type ((node org-roam-node))
+;;       "Return the TYPE of NODE."
+;;       (condition-case nil
+;;           (file-name-nondirectory
+;;            (directory-file-name
+;;             (file-name-directory
+;;              (file-relative-name (org-roam-node-file node) org-roam-directory))))
+;;         (error "")))
+;;     (setq org-roam-node-display-template
+;;           (concat "${type:15} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+;;     ;; (setq org-roam-node-display-template (concat "${type:15} ${doom-hierarchy:80} " (propertize "${tags:*}" 'face 'org-tag)))
 
-    (setq org-roam-mode-sections
-          (list #'org-roam-backlinks-section
-                #'org-roam-reflinks-section
-                ;; #'org-roam-unlinked-references-section
-                ))
+;;     (setq org-roam-mode-sections
+;;           (list #'org-roam-backlinks-section
+;;                 #'org-roam-reflinks-section
+;;                 ;; #'org-roam-unlinked-references-section
+;;                 ))
 
-    ;; how the pop-up buffer is displayed
-    (add-to-list 'display-buffer-alist
-                 '("\\*org-roam\\*"
-                   (display-buffer-in-direction)
-                   (direction . right)
-                   (window-width . 0.33)
-                   (window-height . fit-window-to-buffer)))
+;;     ;; how the pop-up buffer is displayed
+;;     (add-to-list 'display-buffer-alist
+;;                  '("\\*org-roam\\*"
+;;                    (display-buffer-in-direction)
+;;                    (direction . right)
+;;                    (window-width . 0.33)
+;;                    (window-height . fit-window-to-buffer)))
 
-    ;; (add-to-list 'display-buffer-alist
-    ;;              '("\\*org-roam\\*"
-    ;;                (display-buffer-in-side-window)
-    ;;                (side . right)
-    ;;                (slot . 0)
-    ;;                (window-width . 0.33)
-    ;;                (window-parameters . ((no-other-window . t)
-    ;;                                      (no-delete-other-windows . t)))))
+;;     ;; (add-to-list 'display-buffer-alist
+;;     ;;              '("\\*org-roam\\*"
+;;     ;;                (display-buffer-in-side-window)
+;;     ;;                (side . right)
+;;     ;;                (slot . 0)
+;;     ;;                (window-width . 0.33)
+;;     ;;                (window-parameters . ((no-other-window . t)
+;;     ;;                                      (no-delete-other-windows . t)))))
 
-    (when emacs/>=27p
-      (use-package org-roam-ui
-        :init
-        (when (featurep 'xwidget-internal)
-          (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
-        :bind (
-               ("C-c n u". org-roam-ui-open))
-        :config
-        (setq org-roam-ui-sync-theme t
-              org-roam-ui-follow t
-              org-roam-ui-update-on-save t
-              org-roam-ui-open-on-start t)))))
+;;     (when emacs/>=27p
+;;       (use-package org-roam-ui
+;;         :init
+;;         (when (featurep 'xwidget-internal)
+;;           (setq org-roam-ui-browser-function #'xwidget-webkit-browse-url))
+;;         :bind (
+;;                ("C-c n u". org-roam-ui-open))
+;;         :config
+;;         (setq org-roam-ui-sync-theme t
+;;               org-roam-ui-follow t
+;;               org-roam-ui-update-on-save t
+;;               org-roam-ui-open-on-start t)))))
 
 
 (use-package dogears
@@ -1178,50 +1178,51 @@ typical word processor."
                               (when (eq major-mode 'org-mode)
                                 (hsk/update-org-modified-property))))
 
-
+;; ----------------------------------------------
 ;; auto update updated tag in current heading
-(defun yant/getentryhash ()
-  "Get the hash sum of the text in current entry, except :HASH: and :MODIFIED: property texts."
-  (save-excursion
-    (let* ((beg (progn (org-back-to-heading) (point)))
-           (end (progn
-                  (forward-char)
-                  (if (not (re-search-forward "^\*+ " (point-max) t))
-                      (point-max)
-                    (match-beginning 0))))
-           (full-str (buffer-substring beg end))
-           (str-nohash (if (string-match "^ *:HASH:.+\n" full-str)
-                           (replace-match "" nil nil full-str)
-                         full-str))
-           (str-nohash-nomod (if (string-match "^ *:UPDATED:.+\n" str-nohash)
-                                 (replace-match "" nil nil str-nohash)
-                               str-nohash))
-           (str-nohash-nomod-nopropbeg (if (string-match "^ *:PROPERTIES:\n" str-nohash-nomod)
-                                           (replace-match "" nil nil str-nohash-nomod)
-                                         str-nohash-nomod))
-           (str-nohash-nomod-nopropbeg-end (if (string-match "^ *:END:\n" str-nohash-nomod-nopropbeg)
-                                               (replace-match "" nil nil str-nohash-nomod-nopropbeg)
-                                             str-nohash-nomod-nopropbeg)))
-      (sxhash str-nohash-nomod-nopropbeg-end)
-      )))
+;; (defun yant/getentryhash ()
+;;   "Get the hash sum of the text in current entry, except :HASH: and :MODIFIED: property texts."
+;;   (save-excursion
+;;     (let* ((beg (progn (org-back-to-heading) (point)))
+;;            (end (progn
+;;                   (forward-char)
+;;                   (if (not (re-search-forward "^\*+ " (point-max) t))
+;;                       (point-max)
+;;                     (match-beginning 0))))
+;;            (full-str (buffer-substring beg end))
+;;            (str-nohash (if (string-match "^ *:HASH:.+\n" full-str)
+;;                            (replace-match "" nil nil full-str)
+;;                          full-str))
+;;            (str-nohash-nomod (if (string-match "^ *:UPDATED:.+\n" str-nohash)
+;;                                  (replace-match "" nil nil str-nohash)
+;;                                str-nohash))
+;;            (str-nohash-nomod-nopropbeg (if (string-match "^ *:PROPERTIES:\n" str-nohash-nomod)
+;;                                            (replace-match "" nil nil str-nohash-nomod)
+;;                                          str-nohash-nomod))
+;;            (str-nohash-nomod-nopropbeg-end (if (string-match "^ *:END:\n" str-nohash-nomod-nopropbeg)
+;;                                                (replace-match "" nil nil str-nohash-nomod-nopropbeg)
+;;                                              str-nohash-nomod-nopropbeg)))
+;;       (sxhash str-nohash-nomod-nopropbeg-end)
+;;       )))
 
-(defun yant/update-modification-time ()
-  "Set the :UPDATED: property of the current entry to NOW and update :HASH: property."
-  (org-set-property "HASH" (format "%s" (yant/getentryhash)))
-  (org-set-property "UPDATED" (hsk/org-time-stamp-string))
-  ;; (org-set-property "UPDATED" (format-time-string "%Y-%m-%d %H:%M"))
-  )
-(defun yant/skip-nonmodified ()
-  "Skip org entries, which were not modified according to the :HASH: property"
-  (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-    (if (string= (org-entry-get (point) "HASH" nil) (format "%s" (yant/getentryhash)))
-        next-headline
-      nil)))
+;; (defun yant/update-modification-time ()
+;;   "Set the :UPDATED: property of the current entry to NOW and update :HASH: property."
+;;   (org-set-property "HASH" (format "%s" (yant/getentryhash)))
+;;   (org-set-property "UPDATED" (hsk/org-time-stamp-string))
+;;   ;; (org-set-property "UPDATED" (format-time-string "%Y-%m-%d %H:%M"))
+;;   )
+;; (defun yant/skip-nonmodified ()
+;;   "Skip org entries, which were not modified according to the :HASH: property"
+;;   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+;;     (if (string= (org-entry-get (point) "HASH" nil) (format "%s" (yant/getentryhash)))
+;;         next-headline
+;;       nil)))
 
-(add-hook 'before-save-hook (lambda ()
-                              (when (eq major-mode 'org-mode)
-                                (org-map-entries #'yant/update-modification-time nil 'file #'yant/skip-nonmodified))))
+;; (add-hook 'before-save-hook (lambda ()
+;;                               (when (eq major-mode 'org-mode)
+;;                                 (org-map-entries #'yant/update-modification-time nil 'file #'yant/skip-nonmodified))))
 
+;; ----------------------------------------------
 
 ;; org-excalidraw
 (use-package org-excalidraw

@@ -47,9 +47,9 @@
     :config
     (fullframe magit-status magit-mode-quit-window))
 
-  (use-package git-commit
-    :hook (git-commit-mode . goto-address-mode)
-    )
+  ;; (use-package git-commit
+  ;;   :hook (git-commit-mode . goto-address-mode)
+  ;;   )
   (when sys/win32p
     (setenv "GIT_ASKPASS" "git-gui--askpass"))
 

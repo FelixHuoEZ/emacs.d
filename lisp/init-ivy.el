@@ -589,12 +589,12 @@
       (advice-add #'ivy--regex-ignore-order :around #'my-ivy--regex-pinyin))))
 
 ;; Ivy
-(use-package ivy-dired-history
-  :demand t
-  :after (savehist dired)
-  :bind (:map dired-mode-map
-              ("," . dired))
-  :init (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
+;; (use-package ivy-dired-history
+;;   :demand t
+;;   :after (savehist dired)
+;;   :bind (:map dired-mode-map
+;;               ("," . dired))
+;;   :init (add-to-list 'savehist-additional-variables 'ivy-dired-history-variable))
 
 ;; Better experience with icons
 ;; Enable it before`ivy-rich-mode' for better performance
