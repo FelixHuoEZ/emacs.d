@@ -21,7 +21,8 @@
 ;;(load "~/.emacs.d/my_emacs_abbrev")
 (global-set-key (kbd "C-h C-f") 'find-function)
 (setq desktop-restore-frames t)
-(desktop-save-mode nil)
+(unless noninteractive
+  (desktop-save-mode nil))
 (setq-default cursor-type '(bar . 4))
 ;; (set-cursor-color "#ffffff")
 ;; (delete-selection-mode t)
@@ -34,12 +35,13 @@
 (setq auto-save-default nil)
 ;; 每一次当 Emacs 需要与你确认某个命令时需要输入 (yes or no) 比较麻烦，所有我们可以使用下面的代码，设置一个别名将其简化为只输入 (y or n)
 (fset 'yes-or-no-p 'y-or-n-p)
-(setf org-file-apps
-      (remove '("\\.pdf\\'" . default) org-file-apps))
-(add-to-list 'org-file-apps '("\\.pdf\\'" . "xdg-open \"%s\""))
-(add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "xdg-open \"-page %1 %s\""))
-(add-to-list 'org-file-apps '("\\.html\\'" . "xdg-open \"%s\""))
-(add-to-list 'org-file-apps '("\\.htm\\'" . "xdg-open \"%s\""))
+(with-eval-after-load 'org
+  (setf org-file-apps
+        (remove '("\\.pdf\\'" . default) org-file-apps))
+  (add-to-list 'org-file-apps '("\\.pdf\\'" . "xdg-open \"%s\""))
+  (add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "xdg-open \"-page %1 %s\""))
+  (add-to-list 'org-file-apps '("\\.html\\'" . "xdg-open \"%s\""))
+  (add-to-list 'org-file-apps '("\\.htm\\'" . "xdg-open \"%s\"")))
 ;; (add-to-list 'org-file-apps '("\\.pdf\\'" . "sumatrapdf %s"))
 ;; (add-to-list 'org-file-apps '("\.pdf::\(\d+\)\'" . "sumatrapdf -page %1 %s"))
 
@@ -324,7 +326,8 @@
 
 
 (use-package org-attach-screenshot
-  :config
+  :commands (org-attach-screenshot)
+  :init
   ;; (setq org-attach-screenshot-command-line "mycommand -x -y -z %f")
   (setq org-attach-screenshot-dirfunction
         (lambda ()
@@ -369,7 +372,8 @@ same directory as the org-buffer and insert a link to this file."
 (use-package ace-link
   :config
   (ace-link-setup-default)
-  (define-key org-mode-map (kbd "M-o") 'ace-link-org)
+  (with-eval-after-load 'org
+    (define-key org-mode-map (kbd "M-o") 'ace-link-org))
   ;; (define-key gnus-summary-mode-map (kbd "M-o") 'ace-link-gnus)
   ;; (define-key gnus-article-mode-map (kbd "M-o") 'ace-link-gnus)
   ;; (global-set-key (kbd "M-o") 'ace-link-addr)
@@ -751,7 +755,8 @@ directory and insert a link to this file.
       (insert (concat "[[./img/" file-name "]]"))
       (if arg (shell-command (format "picpick \"%s\"" file-fullname))))))
 
-(define-key org-mode-map (kbd "C-c r") 'org-img-capture)
+(with-eval-after-load 'org
+  (define-key org-mode-map (kbd "C-c r") 'org-img-capture))
 
 
 ;; merriam-webster dictionary
@@ -1261,8 +1266,12 @@ directory and insert a link to this file.
         org-latex-prefer-user-labels t))
 
 (use-package org2ctex
+  :if (locate-library "org2ctex")
+  :ensure nil
   ;; :load-path "elpa-24.5/ox-latex-chinese/"
   ;; :disabled t
+  :defer t
+  :commands (org2ctex-toggle)
   :config
   ;; (setq org-latex-create-formula-image-program 'dvipng) ;速度很快，但 *默认* 不支持中文
   (setq org-latex-create-formula-image-program 'imagemagick) ;速度较慢，但支持中文
