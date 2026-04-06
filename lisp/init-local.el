@@ -410,19 +410,16 @@ same directory as the org-buffer and insert a link to this file."
 ;;; ag
 
 (use-package ag
-  :config
+  :if (executable-find "ag")
+  :bind (("M-?" . ag-project))
+  :init
   (setq-default grep-highlight-matches t
                 grep-scroll-output t)
 
   (when *is-a-mac*
     (setq-default locate-command "mdfind"))
-
-  (when (executable-find "ag")
-    (require-package 'ag)
-    (require-package 'wgrep-ag)
-    ;; (setq-default ag-highlight-search t)
-    (global-set-key (kbd "M-?") 'ag-project))
-  )
+  :config
+  (require 'wgrep-ag nil t))
 
 
 ;;; hungry-delete
@@ -435,8 +432,8 @@ same directory as the org-buffer and insert a link to this file."
 
 
 ;;Set nodejs-repl
-(require-package 'nodejs-repl)
-(require 'nodejs-repl)
+(use-package nodejs-repl
+  :defer t)
 
 
 ;;; swiper
@@ -1122,20 +1119,20 @@ directory and insert a link to this file.
 
 ;; hexo.el
 (use-package hexo
-  :config
+  :commands (hexo)
+  :preface
   (defun hexo-hsk-blog ()
     (interactive)
     (hexo "~/blog/")))
 
 ;;; blog-admin
 (use-package blog-admin
-  :config
+  :defer t
+  :init
   (setq blog-admin-backend-path "~/blog")
   (setq blog-admin-backend-type 'hexo)
   (setq blog-admin-backend-new-post-in-drafts t) ;; create new post in drafts by default
-  (setq blog-admin-backend-new-post-with-same-name-dir t) ;; create same-name directory with new post
-  ;; (setq blog-admin-backend-hexo-config-file "my_config.yml") ;; default assumes _config.yml
-  )
+  (setq blog-admin-backend-new-post-with-same-name-dir t)) ;; create same-name directory with new post
 ;; (add-to-list 'load-path "~/.emacs.d/elpa/blog-admin")
 ;; (require 'blog-admin)
 ;; When change home directory, use the following line to make soft link which point to the blog directory in the Dropbox sync directory
@@ -1143,21 +1140,20 @@ directory and insert a link to this file.
 
 ;;; org2issue
 (use-package org2issue
-  :config
-  ;;(require-package 'ox-gfm)
-  ;;(require 'ox-gfm)
+  :defer t
+  :init
   (setq org2issue-user "private-github-user")
   (setq org2issue-blog-repo "org2issue-test")
   (setq org2issue-browse-issue t)
-  (setq org2issue-update-file "~/org2issue-test/README.org")
-  )
+  (setq org2issue-update-file "~/org2issue-test/README.org"))
 
 
 
 
 ;;; esup
 ;;; startup time statistics
-(use-package esup)
+(use-package esup
+  :defer t)
 
 ;;; helm-github-stars
 ;;; go to github starred project
@@ -1174,10 +1170,7 @@ directory and insert a link to this file.
 
 ;;; helm-chrome
 (use-package helm-chrome
-  :config
-  ;; (setq helm-chrome-use-urls t)
-  ;; (helm-chrome-reload-bookmarks)
-  )
+  :defer t)
 
 ;; (use-package helm-google
 ;;   :config
@@ -1199,28 +1192,33 @@ directory and insert a link to this file.
 ;;; org-zotxt-mode
 ;;; zotero connection
 ;;; zotxt is a Zotero extension for supporting utilities that deal with plain text files (e.g., markdown, reStructuredText, latex, etc.)
+(defun hsk/enable-org-zotxt-mode ()
+  "Enable `org-zotxt-mode' when the package is available."
+  (when (require 'org-zotxt nil t)
+    (org-zotxt-mode 1)))
+
 (use-package zotxt
+  :defer t
+  :hook (org-mode . hsk/enable-org-zotxt-mode)
+  :init
+  (setq zotxt-default-bibliography-style "mkbehr-short")
+  (with-eval-after-load 'org
+    ;; Bind something to replace the awkward C-u C-c " i.
+    (define-key org-mode-map
+      (kbd "C-c \" \"")
+      (lambda ()
+        (interactive)
+        (org-zotxt-insert-reference-link '(4)))))
   :config
-  (require 'org-zotxt)
-  ;; Activate org-zotxt-mode in org-mode buffers
-  (add-hook 'org-mode-hook (lambda () (org-zotxt-mode 1)))
   ;; Bind something to replace the awkward C-u C-c " i
-  (define-key org-mode-map
-    (kbd "C-c \" \"") (lambda () (interactive)
-                        (org-zotxt-insert-reference-link '(4))))
-  ;; Change citation format to be less cumbersome in files.
-  ;; You'll need to install mkbehr-short into your style manager first.
-  (eval-after-load "zotxt"
-    '(setq zotxt-default-bibliography-style "mkbehr-short"))
   )
 
 
 
 
 (use-package zotelo
-  :config
-  (add-hook 'TeX-mode-hook 'zotelo-minor-mode)
-  (add-hook 'org-mode-hook 'zotelo-minor-mode))
+  :hook ((TeX-mode . zotelo-minor-mode)
+         (org-mode . zotelo-minor-mode)))
 
 
 ;;; yasnippet
@@ -1508,13 +1506,15 @@ directory and insert a link to this file.
 ;;; uimage - darksun - lujun9972
 
 (use-package uimage
-  :config
+  :defer t
+  :init
   ;; (push `(,(concat "\\(`\\|\\[\\[\\|<\\)?"
   ;; "\\(\\(file:http://\\)" uimage-mode-image-filename-regex "\\)"
   ;; "\\(\\]\\]\\|>\\|'\\)?") . 2)
   ;; uimage-mode-image-regex-alist )
-  (uimage-mode)
-  )
+  (add-hook 'after-init-hook
+            (lambda ()
+              (run-with-idle-timer 2 nil #'uimage-mode))))
 
 
 ;;; mode-icons
@@ -1537,18 +1537,16 @@ directory and insert a link to this file.
 
 ;;; symon
 (use-package symon
-  :config
-  ;; (symon-mode)
-  )
+  :defer t)
 
 
 ;;; figlet
 (use-package figlet
-  :config
+  :defer t
+  :init
   ;; (setq figlet-font-directory "c:/emacs/.emacs.d/win-apps/figlet/fonts")
   (setq figlet-font-directory (expand-file-name "~/.emacs.d/win-apps/figlet/fonts") )
-  (setq figlet-options `("-d",figlet-font-directory))
-  )
+  (setq figlet-options `("-d" ,figlet-font-directory)))
 
 
 ;;; hyperbole
@@ -1587,13 +1585,12 @@ directory and insert a link to this file.
 
 ;;; command-log-mode
 (use-package command-log-mode
-  :config
-  (add-hook 'LaTeX-mode-hook 'command-log-mode)
-  (add-hook 'emacs-lisp-mode-hook 'command-log-mode)
-  )
+  :hook ((LaTeX-mode . command-log-mode)
+         (emacs-lisp-mode . command-log-mode)))
 
 ;;; zhihu-daily
-(use-package helm-zhihu-daily)
+(use-package helm-zhihu-daily
+  :defer t)
 
 
 
@@ -1605,7 +1602,8 @@ directory and insert a link to this file.
   :bind (("<f8>" . neotree-toggle)))
 
 
-(use-package verify-url)
+(use-package verify-url
+  :defer t)
 
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 ;; (use-package semantic-tag-folding
@@ -1703,7 +1701,12 @@ _~_: modified
 
 
 ;; helpful
-(use-package helpful)
+(use-package helpful
+  :commands (helpful-at-point
+             helpful-callable
+             helpful-command
+             helpful-key
+             helpful-variable))
 
 
 (require 'init-window-settings)
@@ -1922,17 +1925,22 @@ _~_: modified
 
 
 ;;; beancount-mode
+(let ((beancount-mode-dir
+       (expand-file-name "straight/build/beancount-mode" user-emacs-directory)))
+  (when (file-directory-p beancount-mode-dir)
+    (add-to-list 'load-path beancount-mode-dir)))
 (use-package beancount-mode
-  :straight (:type git :host github :repo "beancount/beancount-mode")
-  ;; :quelpa (beancount-mode :fetcher github :repo "beancount/beancount-mode" :files ("*"))
+  :if (or (locate-library "beancount")
+          (locate-library "beancount-mode"))
+  :ensure nil
+  :defer t
+  :mode ("\\.beancount\\'" . beancount-mode)
   :config
-  (add-to-list 'auto-mode-alist '("\\.beancount\\'" . beancount-mode))
   (add-hook 'beancount-mode-hook
             (lambda () (setq-local electric-indent-chars nil)))
   (add-hook 'beancount-mode-hook #'outline-minor-mode)
   (define-key beancount-mode-map (kbd "C-c C-n") #'outline-next-visible-heading)
-  (define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading)
-  )
+  (define-key beancount-mode-map (kbd "C-c C-p") #'outline-previous-visible-heading))
 
 
 

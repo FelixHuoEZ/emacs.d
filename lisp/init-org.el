@@ -892,7 +892,8 @@ typical word processor."
 (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
 
 ;; org-edit-latex
-(use-package org-edit-latex)
+(use-package org-edit-latex
+  :defer t)
 
 
 ;;; increasingly renumber the equation in fragment
@@ -1137,9 +1138,13 @@ typical word processor."
 
 ;; query language for Org files
 (use-package org-ql
+  :commands (org-ql-search org-ql-view org-ql-find)
   :config
-  (use-package helm-org-ql))
-(use-package org-sidebar)
+  (use-package helm-org-ql
+    :defer t))
+
+(use-package org-sidebar
+  :defer t)
 
 ;; auto add created property at heading
 (defun hsk/org-time-stamp-string (&optional ts)
@@ -1232,12 +1237,16 @@ typical word processor."
 ;; ----------------------------------------------
 
 ;; org-excalidraw
+(let ((org-excalidraw-dir
+       (expand-file-name "straight/build/org-excalidraw" user-emacs-directory)))
+  (when (file-directory-p org-excalidraw-dir)
+    (add-to-list 'load-path org-excalidraw-dir)))
 (use-package org-excalidraw
-  :straight (:type git :host github :repo "wdavew/org-excalidraw")
-  ;; :quelpa (org-excalidraw :fetcher github :repo "wdavew/org-excalidraw" :files ("*"))
+  :if (locate-library "org-excalidraw")
+  :ensure nil
+  :defer t
   :init
-  (setq org-excalidraw-directory "~/excalidraw_files")
-  )
+  (setq org-excalidraw-directory "~/excalidraw_files"))
 
 ;; org-ai
 (use-package org-ai

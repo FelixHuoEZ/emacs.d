@@ -3,48 +3,47 @@
                 ("SConscript\\'" . python-mode))
               auto-mode-alist))
 
-(use-package pip-requirements)
+(use-package pip-requirements
+  :mode ("requirements\\(?:\\.in\\)?\\'" . pip-requirements-mode))
 
 (use-package py-autopep8
-  :config
-  (add-hook 'elpy-mode-hook 'py-autopep8-enable-on-save)
-  )
+  :hook (elpy-mode . py-autopep8-enable-on-save))
 
 (use-package elpy
-  :config
+  :defer t
+  :hook (python-mode . elpy-enable)
+  :init
   (setq elpy-rpc-python-command "python")
   ;; (setq elpy-rpc-python-command "pythonw")
   ;; use jupyter
   (setq python-shell-interpreter "jupyter"
         python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
+  :config
   ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
   ;;              "jupyter")
   ;; use ipython
   ;; (if (eq system-type 'windows-nt)
   ;;     (setq python-shell-interpreter "ipython"
   ;; python-shell-interpreter-args "-i --simple-prompt"))
-  (elpy-enable)
   ;; (setq python-shell-unbuffered nil)
   ;; (setq python-shell-prompt-detect-failure-warning nil)
   (define-key elpy-mode-map (kbd "C-x C-e") 'elpy-shell-send-statement-and-step))
 
-(use-package jedi)
+(use-package jedi
+  :defer t)
 
 
 (use-package flycheck
+  :after elpy
   :config
   (when (require 'flycheck nil t)
     (setq elpy-modules (delq 'elpy-module-flymake elpy-modules))
-    (add-hook 'elpy-mode-hook 'flycheck-mode))
-  )
+    (add-hook 'elpy-mode-hook 'flycheck-mode)))
 
 
 (use-package ein
-  :config
-  ;; (if (eq system-type 'windows-nt)
-  ;;     (elpy-use-ipython))
-  )
+  :defer t)
 
 (when (maybe-require-package 'anaconda-mode)
   (after-load 'python
