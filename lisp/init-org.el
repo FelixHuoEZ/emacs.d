@@ -153,9 +153,9 @@ prepended to the element after the #+HEADER: tag."
               (centaur-webkit-browse-url (concat "file://" file) t)))
           org-file-apps))
 
-  ;; Add gfm/md backends
-  (use-package ox-gfm)
-  (add-to-list 'org-export-backends 'md)
+  ;; Add markdown export backends lazily.
+  (with-eval-after-load 'ox
+    (add-to-list 'org-export-backends 'md))
 
   (with-eval-after-load 'counsel
     (bind-key [remap org-set-tags-command] #'counsel-org-tag org-mode-map))
@@ -294,7 +294,8 @@ prepended to the element after the #+HEADER: tag."
                 org-tree-slide-skip-outline-level 3))
 
   ;; org-attach
-  (require 'org-attach-git)
+  (with-eval-after-load 'org-attach
+    (require 'org-attach-git nil t))
   (setq org-attach-dir-relative t)
   (setq org-attach-use-inheritance t)
   (setq org-attach-id-dir "attach/")
@@ -330,6 +331,9 @@ prepended to the element after the #+HEADER: tag."
 
   ;; Pomodoro
   (use-package org-pomodoro
+    :if (locate-library "org-pomodoro")
+    :ensure nil
+    :commands (org-pomodoro)
     :custom-face
     (org-pomodoro-mode-line ((t (:inherit warning))))
     (org-pomodoro-mode-line-overtime ((t (:inherit error))))
@@ -535,28 +539,31 @@ typical word processor."
 
 ;;(add-hook 'org-mode-hook 'buffer-face-mode)
 
+(defun org-protocol-find-file-fix-wsl-path (path)
+  "Change Windows-style paths to WSL-style paths if inside WSL."
+  (if (not (string-match-p "-[Mm]icrosoft" operating-system-release))
+      path
+    (save-match-data
+      (if (/= 0 (string-match "^\\([a-zA-Z]\\):\\(/.*\\)" path))
+          path
+        (let ((volume (match-string-no-properties 1 path))
+              (abspath (match-string-no-properties 2 path)))
+          (format "/mnt/%s%s" (downcase volume) abspath))))))
+
+(defun org-protocol-find-file (fname)
+  "Process org-protocol://find-file?path= style URL."
+  (let ((f (plist-get (org-protocol-parse-parameters fname nil '(:path)) :path)))
+    (find-file (org-protocol-find-file-fix-wsl-path f))
+    (raise-frame)
+    (select-frame-set-input-focus (selected-frame))))
+
 (use-package org-protocol
   :ensure nil
-  :config
+  :commands (org-protocol-check-filename-for-protocol)
+  :init
+  (with-eval-after-load 'org-protocol
   (add-to-list 'org-protocol-protocol-alist
-               '("org-find-file" :protocol "find-file" :function org-protocol-find-file :kill-client nil))
-  (defun org-protocol-find-file-fix-wsl-path (path)
-    "Change Windows-style paths to WSL-style paths if inside WSL."
-    (if (not (string-match-p "-[Mm]icrosoft" operating-system-release))
-        path
-      (save-match-data
-        (if (/= 0 (string-match "^\\([a-zA-Z]\\):\\(/.*\\)" path))
-            path
-          (let ((volume (match-string-no-properties 1 path))
-                (abspath (match-string-no-properties 2 path)))
-            (format "/mnt/%s%s" (downcase volume) abspath))))))
-
-  (defun org-protocol-find-file (fname)
-    "Process org-protocol://find-file?path= style URL."
-    (let ((f (plist-get (org-protocol-parse-parameters fname nil '(:path)) :path)))
-      (find-file (org-protocol-find-file-fix-wsl-path f))
-      (raise-frame)
-      (select-frame-set-input-focus (selected-frame)))))
+               '("org-find-file" :protocol "find-file" :function org-protocol-find-file :kill-client nil))))
 
 
 
@@ -810,7 +817,6 @@ typical word processor."
 
 
 
-(require-package 'org-pomodoro)
 (setq org-pomodoro-keep-killed-pomodoro-time t)
 (after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "P") 'org-pomodoro))
@@ -893,7 +899,9 @@ typical word processor."
 
 ;; org-edit-latex
 (use-package org-edit-latex
-  :defer t)
+  :if (locate-library "org-edit-latex")
+  :ensure nil
+  :commands (org-edit-latex-mode))
 
 
 ;;; increasingly renumber the equation in fragment
@@ -943,6 +951,10 @@ typical word processor."
 ;;; org-ref and bibtex
 ;; (require 'org-ref-ivy)
 (use-package org-ref
+  :if (locate-library "org-ref")
+  :ensure nil
+  :defer t
+  :commands (org-ref-insert-link)
   ;; :disabled t
   :bind
   (:map org-mode-map
@@ -1128,6 +1140,11 @@ typical word processor."
 
 
 (use-package dogears
+  :commands (dogears-go
+             dogears-back
+             dogears-forward
+             dogears-list
+             dogears-sidebar)
   ;; These bindings are optional, of course:
   :bind (:map global-map
               ("M-g d" . dogears-go)
@@ -1244,18 +1261,18 @@ typical word processor."
 (use-package org-excalidraw
   :if (locate-library "org-excalidraw")
   :ensure nil
-  :defer t
+  :commands (org-excalidraw-create-drawing org-excalidraw-open)
   :init
   (setq org-excalidraw-directory "~/excalidraw_files"))
 
 ;; org-ai
 (use-package org-ai
-  :ensure
+  :if (locate-library "org-ai")
+  :ensure nil
   :commands (org-ai-mode)
+  :defer t
   :custom
   (org-ai-openai-api-token "<ENTER YOUR API TOKEN HERE>")
-  :init
-  (add-hook 'org-mode-hook #'org-ai-mode)
   :config
   ;; if you are on the gpt-4 beta:
   (setq org-ai-default-chat-model "gpt-4")

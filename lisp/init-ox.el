@@ -45,6 +45,16 @@
 ;;Don't display validate in the bottom of html when export
 (setq org-html-validation-link nil)
 
+(use-package ox-gfm
+  :if (locate-library "ox-gfm")
+  :ensure nil
+  :commands (org-gfm-export-as-markdown
+             org-gfm-export-to-markdown
+             org-gfm-export-to-buffer)
+  :init
+  (with-eval-after-load 'ox
+    (add-to-list 'org-export-backends 'gfm)))
+
 
 ;; support for MathJax 3.x
 ;; 还是不支持 SIunitx

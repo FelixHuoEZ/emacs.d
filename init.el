@@ -138,7 +138,15 @@
 (require 'init-ox)
 ;; (require 'init-ox-latex)
 ;;(require 'init-ox-beamer)
-(require 'init-org-query)
+(defvar hsk/init-org-query-loaded nil)
+
+(defun hsk/load-init-org-query-once (&rest _)
+  "Load `init-org-query' the first time agenda commands are used."
+  (unless hsk/init-org-query-loaded
+    (setq hsk/init-org-query-loaded t)
+    (require 'init-org-query)))
+
+(advice-add #'org-agenda :before #'hsk/load-init-org-query-once)
 ;; (require 'init-nxml)
 ;; (require 'init-html)
 (require 'init-css)
