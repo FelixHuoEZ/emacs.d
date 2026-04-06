@@ -1186,7 +1186,8 @@ typical word processor."
   "Turn off heading creation date property"
   (interactive)
   (remove-hook 'org-insert-heading-hook #'hsk/set-creation-date-heading-property))
-(hsk/org-mode-date-heading-on)
+;; Disabled by default. Re-enable with `M-x hsk/org-mode-date-heading-on`.
+;; (hsk/org-mode-date-heading-on)
 
 ;; auto update updated tag in current file
 (defun hsk/update-org-modified-property ()
