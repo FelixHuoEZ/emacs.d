@@ -297,6 +297,34 @@ Emacs is still fully alive."
     (ignore-errors
       (rime-lib-finalize))))
 
+(defun hsk/rime--ascii-token-before-point ()
+  "Return the ASCII token before point as (START END TEXT), or nil."
+  (save-excursion
+    (let ((end (point)))
+      (skip-chars-backward "A-Za-z'-")
+      (when (< (point) end)
+        (list (point)
+              end
+              (buffer-substring-no-properties (point) end))))))
+
+(defun hsk/rime-force-enable-or-convert ()
+  "Force-enable Rime, or convert the ASCII token before point into Rime input.
+
+If point is after an ASCII token, remove it and feed it back through
+Rime so it becomes the current preedit string. Otherwise, fall back to
+`rime-force-enable'."
+  (interactive)
+  (unless (equal current-input-method "rime")
+    (activate-input-method "rime"))
+  (pcase (hsk/rime--ascii-token-before-point)
+    (`(,start ,end ,text)
+     (delete-region start end)
+     (rime-force-enable)
+     (setq unread-command-events
+           (append (string-to-list text) unread-command-events)))
+    (_
+     (rime-force-enable))))
+
 (defun hsk/rime-toggle-input-method ()
   "Toggle input method, always preferring Rime when enabling."
   (interactive)
@@ -350,7 +378,7 @@ Emacs is still fully alive."
   :bind
   (("C-\\" . hsk/rime-toggle-input-method)
    ("C-c ;" . hsk/rime-toggle-input-method)
-   ("M-j" . rime-force-enable)))
+   ("M-j" . hsk/rime-force-enable-or-convert)))
 
 (provide 'init-rime)
 
