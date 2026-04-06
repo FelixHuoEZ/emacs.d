@@ -334,7 +334,9 @@ Emacs is still fully alive."
   (rime-emacs-module-header-root hsk/rime-emacs-module-header-root)
   (rime-share-data-dir hsk/rime-share-data-dir)
   (rime-user-data-dir hsk/rime-user-data-dir)
-  (rime-show-candidate 'minibuffer)
+  (rime-show-candidate 'posframe)
+  (rime-show-preedit 'inline)
+  (rime-posframe-style 'vertical)
   (rime-disable-predicates
    '(rime-predicate-ace-window-p
      rime-predicate-after-alphabet-char-p
