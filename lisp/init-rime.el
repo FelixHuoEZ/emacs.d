@@ -297,6 +297,14 @@ Emacs is still fully alive."
     (ignore-errors
       (rime-lib-finalize))))
 
+(defun hsk/rime-toggle-input-method ()
+  "Toggle input method, always preferring Rime when enabling."
+  (interactive)
+  (setq default-input-method "rime")
+  (setq input-method-history
+        (cons "rime" (delete "rime" input-method-history)))
+  (toggle-input-method))
+
 (defun hsk/rime-ready-p ()
   "Return non-nil when the local machine is ready to load emacs-rime."
   (and (eq system-type 'darwin)
@@ -314,10 +322,14 @@ Emacs is still fully alive."
            (not (hsk/rime-ready-p)))
   (message "Rime is not ready. Install librime and sync config with M-x hsk/rime-sync-config."))
 
+(when (hsk/rime-ready-p)
+  (setq default-input-method "rime")
+  (setq input-method-history
+        (cons "rime" (delete "rime" input-method-history))))
+
 (use-package rime
   :if (hsk/rime-ready-p)
   :custom
-  (default-input-method "rime")
   (rime-librime-root hsk/rime-librime-root)
   (rime-emacs-module-header-root hsk/rime-emacs-module-header-root)
   (rime-share-data-dir hsk/rime-share-data-dir)
@@ -334,7 +346,9 @@ Emacs is still fully alive."
   :config
   (add-hook 'kill-emacs-hook #'hsk/rime-finalize-before-exit)
   :bind
-  (("M-j" . rime-force-enable)))
+  (("C-\\" . hsk/rime-toggle-input-method)
+   ("C-c ;" . hsk/rime-toggle-input-method)
+   ("M-j" . rime-force-enable)))
 
 (provide 'init-rime)
 
