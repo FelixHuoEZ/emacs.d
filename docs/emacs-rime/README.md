@@ -113,3 +113,28 @@ M-x hsk/rime-bootstrap-user-data
 - 配置同步由用户显式触发，启动时只提醒差异
 
 这样比“完全共享 `~/Library/Rime`”更稳，也比“完全独立且不复制配置”更省维护。
+
+## 路线选择
+
+当前选择的方向是：
+
+- 继续使用 `emacs-rime`
+- 在 Emacs Lisp 层把交互逐步向 `pyim` 的 UX 靠近
+
+没有选择 `pyim + pyim-liberime` 的原因主要是：
+
+- 不希望接手 `liberime` 这一层的长期维护责任。
+- `pyim-liberime` 的技术路线虽然成立，但中间链路更长：`pyim -> pyim-liberime -> liberime -> librime`，出现问题时定位和修复成本更高。
+- `liberime` 相比 `emacs-rime` 明显不够活跃，未来遇到 Emacs / macOS / `librime` 版本变化时，兼容性风险更大。
+- 当前这套 `emacs-rime` 已经能稳定复用现有的 Rime 用户目录、schema、Lua 配置和 `sync_dir`，没有必要为了获得 `pyim` 的交互手感而整体切换技术栈。
+
+因此，当前的策略不是“替换成 `pyim` 技术栈”，而是：
+
+- 保留 `emacs-rime` 作为 Rime 前端
+- 优先通过本地兼容层补齐 `pyim` 风格的体验
+  - 更顺手的 toggle
+  - 更接近 `pyim` 的 `M-j`
+  - 更贴近 `pyim` 的自动中英切换规则
+  - 更接近 `pyim` 的候选框显示体验
+
+只有在 Emacs Lisp 层已经无法满足需求时，才考虑对 `emacs-rime` 做小范围 fork；并且优先修改 Lisp 前端，而不是动态模块或 `librime` 相关代码。
