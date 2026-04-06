@@ -1,5 +1,7 @@
 ;; (maybe-require-package 'org-fstree)
 
+(require 'cl-lib)
+
 (use-package org
   :ensure nil
   :commands (org-dynamic-block-define)
@@ -500,7 +502,9 @@ prepended to the element after the #+HEADER: tag."
 This enables or modifies a number of settings so that the
 experience of editing prose is a little more like that of a
 typical word processor."
-  nil " Prose" nil
+  :init-value nil
+  :lighter " Prose"
+  :keymap nil
   (if prose-mode
       (progn
         (when (fboundp 'writeroom-mode)
@@ -562,7 +566,7 @@ typical word processor."
 (defun transform-square-brackets-to-round-ones(string-to-transform)
   "Transforms [ into ( and ] into ), other chars left unchanged."
   (concat
-   (mapcar #'(lambda (c) (if (equal c ?[) ?\( (if (equal c ?]) ?\) c))) string-to-transform))
+   (mapcar #'(lambda (c) (if (equal c ?\[) ?\( (if (equal c ?\]) ?\) c))) string-to-transform))
   )
 
 (setq org-capture-templates
@@ -613,9 +617,12 @@ typical word processor."
 (after-load 'org-agenda
   (add-to-list 'org-agenda-after-show-hook 'org-show-entry))
 
-(defadvice org-refile (after sanityinc/save-all-after-refile activate)
+(defun sanityinc/save-all-after-refile (&rest _args)
   "Save all org buffers after each refile operation."
   (org-save-all-org-buffers))
+
+(after-load 'org
+  (advice-add 'org-refile :after #'sanityinc/save-all-after-refile))
 
 ;; Exclude DONE state tasks from refile targets
 (defun sanityinc/verify-refile-target ()
@@ -894,32 +901,32 @@ typical word processor."
         (counter -1)
         (numberp))
 
-    (setq results (loop for (begin .  env) in
-                        (org-element-map (org-element-parse-buffer) 'latex-environment
-                          (lambda (env)
-                            (cons
-                             (org-element-property :begin env)
-                             (org-element-property :value env))))
-                        collect
-                        (cond
-                         ((and (string-match "\\\\begin{equation}" env)
-                               (not (string-match "\\\\tag{" env)))
-                          (incf counter)
-                          (cons begin counter))
-                         ((string-match "\\\\begin{align}" env)
-                          (prog2
-                              (incf counter)
-                              (cons begin counter)
-                            (with-temp-buffer
-                              (insert env)
-                              (goto-char (point-min))
-                              ;; \\ is used for a new line. Each one leads to a number
-                              (incf counter (count-matches "\\\\$"))
-                              ;; unless there are nonumbers.
-                              (goto-char (point-min))
-                              (decf counter (count-matches "\\nonumber")))))
-                         (t
-                          (cons begin nil)))))
+    (setq results (cl-loop for (begin . env) in
+                           (org-element-map (org-element-parse-buffer) 'latex-environment
+                             (lambda (env)
+                               (cons
+                                (org-element-property :begin env)
+                                (org-element-property :value env))))
+                           collect
+                           (cond
+                            ((and (string-match "\\\\begin{equation}" env)
+                                  (not (string-match "\\\\tag{" env)))
+                             (cl-incf counter)
+                             (cons begin counter))
+                            ((string-match "\\\\begin{align}" env)
+                             (prog2
+                                 (cl-incf counter)
+                                 (cons begin counter)
+                               (with-temp-buffer
+                                 (insert env)
+                                 (goto-char (point-min))
+                                 ;; \\ is used for a new line. Each one leads to a number
+                                 (cl-incf counter (count-matches "\\\\$"))
+                                 ;; unless there are nonumbers.
+                                 (goto-char (point-min))
+                                 (cl-decf counter (count-matches "\\nonumber")))))
+                            (t
+                             (cons begin nil)))))
 
     (when (setq numberp (cdr (assoc (point) results)))
       (setf (car args)

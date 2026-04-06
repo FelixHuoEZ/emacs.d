@@ -1,10 +1,11 @@
+(require 'cl-lib)
+
 (defun qiang-font-existsp (font)
   (if (null (x-list-fonts font))
       nil t))
-	  
+		  
 (defvar font-list '("Microsoft Yahei" "文泉驿等宽微米黑" "黑体" "新宋体" "宋体"))
-(require 'cl) ;; find-if is in common list package
-(find-if #'qiang-font-existsp font-list)
+(cl-find-if #'qiang-font-existsp font-list)
 
 (defun qiang-make-font-string (font-name font-size)
   (if (and (stringp font-size) 
@@ -18,11 +19,10 @@
                        &optional chinese-font-size)
   "english-font-size could be set to \":pixelsize=18\" or a integer.
 If set/leave chinese-font-size to nil, it will follow english-font-size"
-  (require 'cl)                         ; for find if
   (let ((en-font (qiang-make-font-string
-                  (find-if #'qiang-font-existsp english-fonts)
+                  (cl-find-if #'qiang-font-existsp english-fonts)
                   english-font-size))
-        (zh-font (font-spec :family (find-if #'qiang-font-existsp chinese-fonts)
+        (zh-font (font-spec :family (cl-find-if #'qiang-font-existsp chinese-fonts)
                             :size chinese-font-size)))
  
     ;; Set the default English font

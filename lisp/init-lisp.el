@@ -26,11 +26,13 @@
   (add-hook 'after-init-hook 'ipretty-mode))
 
 
-(defadvice pp-display-expression (after sanityinc/make-read-only (expression out-buffer-name) activate)
-  "Enable `view-mode' in the output buffer - if any - so it can be closed with `\"q\"."
+(defun sanityinc/make-read-only (_expression out-buffer-name)
+  "Enable `view-mode' in the output buffer so it can be closed with `q'."
   (when (get-buffer out-buffer-name)
     (with-current-buffer out-buffer-name
       (view-mode 1))))
+
+(advice-add 'pp-display-expression :after #'sanityinc/make-read-only)
 
 
 
@@ -195,7 +197,7 @@
 (defvar sanityinc/vc-reverting nil
   "Whether or not VC or Magit is currently reverting buffers.")
 
-(defadvice revert-buffer (after sanityinc/maybe-remove-elc activate)
+(defun sanityinc/maybe-remove-elc (&rest _)
   "If reverting from VC, delete any .elc file that will now be out of sync."
   (when sanityinc/vc-reverting
     (when (and (eq 'emacs-lisp-mode major-mode)
@@ -206,12 +208,17 @@
           (message "Removing out-of-sync elc file %s" (file-name-nondirectory elc))
           (delete-file elc))))))
 
-(defadvice magit-revert-buffers (around sanityinc/reverting activate)
+(advice-add 'revert-buffer :after #'sanityinc/maybe-remove-elc)
+
+(defun sanityinc/reverting (orig &rest args)
+  "Bind `sanityinc/vc-reverting' while calling ORIG with ARGS."
   (let ((sanityinc/vc-reverting t))
-    ad-do-it))
-(defadvice vc-revert-buffer-internal (around sanityinc/reverting activate)
-  (let ((sanityinc/vc-reverting t))
-    ad-do-it))
+    (apply orig args)))
+
+(with-eval-after-load 'magit
+  (advice-add 'magit-revert-buffers :around #'sanityinc/reverting))
+(with-eval-after-load 'vc
+  (advice-add 'vc-revert-buffer-internal :around #'sanityinc/reverting))
 
 
 

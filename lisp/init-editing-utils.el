@@ -250,18 +250,21 @@
 (defun suspend-mode-during-cua-rect-selection (mode-name)
   "Add an advice to suspend `MODE-NAME' while selecting a CUA rectangle."
   (let ((flagvar (intern (format "%s-was-active-before-cua-rectangle" mode-name)))
-        (advice-name (intern (format "suspend-%s" mode-name))))
+        (activate-advice (intern (format "%s--suspend-during-cua-rectangle" mode-name)))
+        (deactivate-advice (intern (format "%s--restore-after-cua-rectangle" mode-name))))
     (eval-after-load 'cua-rect
       `(progn
          (defvar ,flagvar nil)
          (make-variable-buffer-local ',flagvar)
-         (defadvice cua--activate-rectangle (after ,advice-name activate)
+         (defun ,activate-advice (&rest _)
            (setq ,flagvar (and (boundp ',mode-name) ,mode-name))
            (when ,flagvar
              (,mode-name 0)))
-         (defadvice cua--deactivate-rectangle (after ,advice-name activate)
+         (defun ,deactivate-advice (&rest _)
            (when ,flagvar
-             (,mode-name 1)))))))
+             (,mode-name 1)))
+         (advice-add 'cua--activate-rectangle :after #',activate-advice)
+         (advice-add 'cua--deactivate-rectangle :after #',deactivate-advice)))))
 
 (suspend-mode-during-cua-rect-selection 'whole-line-or-region-mode)
 

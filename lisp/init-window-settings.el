@@ -5,7 +5,7 @@
 ;; You can read the diagram.
 ;; Time-stamp: <2014-01-28 22:58:53 Tuesday by Hua Liang>
 
-(eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (winner-mode 1)
 
@@ -24,7 +24,7 @@
         (set-window-buffer (selected-window) next-win)
         (set-window-buffer (funcall selector) this-win)
         (select-window (funcall selector)))
-      (setq arg (if (plusp arg) (1- arg) (1+ arg))))))
+      (setq arg (if (> arg 0) (1- arg) (1+ arg))))))
 
 (global-set-key (kbd "C-c t") 'transpose-buffers)
 ;; -------------------- Transposing Two Buffers --------------------

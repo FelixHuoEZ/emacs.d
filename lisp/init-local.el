@@ -1,6 +1,8 @@
 ;;------------------User Defined-----------------------------------------------
 ;;-----------------------------------------------------------------------------
 ;;-----------------------------------------------------------------------------
+(require 'cl-lib)
+
 (add-hook 'org-mode-hook
           (lambda ()
             (set (make-local-variable 'system-time-locale) "C")))
@@ -326,7 +328,7 @@
   ;; (setq org-attach-screenshot-command-line "mycommand -x -y -z %f")
   (setq org-attach-screenshot-dirfunction
         (lambda ()
-          (progn (assert (buffer-file-name))
+          (progn (cl-assert (buffer-file-name))
                  (concat (file-name-sans-extension (buffer-file-name))
                          "_att"))))
   (setq org-attach-screenshot-relative-links t))
@@ -1070,32 +1072,26 @@ directory and insert a link to this file.
 
 ;;; add gitman
 
-(cond
- ((eq system-type 'windows-nt)
-  (defadvice Info-follow-nearest-node (around gitman activate)
-    "When encountering a cross reference to the `gitman' info
-manual, then instead of following that cross reference show
-the actual manpage using the function `woman'."
-    (let ((node (Info-get-token
-                 (point) "\\*note[ \n\t]+"
-                 "\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
-      (if (and node (string-match "^(gitman)\\(.+\\)" node))
-          (progn (require 'woman)
-                 (woman (match-string 1 node)))
-        ad-do-it))))
+(defun hsk/info-follow-gitman (orig &rest args)
+  "Follow `gitman' references with a platform-appropriate man viewer."
+  (let ((node (Info-get-token
+               (point) "\\*note[ \n\t]+"
+               "\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?"))))
+    (if (and node (string-match "^(gitman)\\(.+\\)" node))
+        (let ((manual (match-string 1 node)))
+          (cond
+           ((eq system-type 'windows-nt)
+            (require 'woman)
+            (woman manual))
+           ((eq system-type 'gnu/linux)
+            (require 'man)
+            (man manual))
+           (t
+            (apply orig args))))
+      (apply orig args)))
 
- ((eq system-type 'gnu/linux)
-  (defadvice Info-follow-nearest-node (around gitman activate)
-    "When encountering a cross reference to the `gitman' info
-manual, then instead of following that cross reference show
-the actual manpage using the function `man'."
-    (let ((node (Info-get-token
-                 (point) "\\*note[ \n\t]+"
-                 "\\*note[ \n\t]+\\([^:]*\\):\\(:\\|[ \n\t]*(\\)?")))
-      (if (and node (string-match "^(gitman)\\(.+\\)" node))
-          (progn (require 'man)
-                 (man (match-string 1 node)))
-        ad-do-it)))))
+(with-eval-after-load 'info
+  (advice-add 'Info-follow-nearest-node :around #'hsk/info-follow-gitman))
 
 
 ;; TODO: twittering-mode
@@ -1237,11 +1233,11 @@ the actual manpage using the function `man'."
   (setq yas-snippet-dirs '("~/.emacs.d/snippets/"
                            "~/yasnippet-snippets/"))
   (defun yas/insert-by-name (name)
-    (flet ((dummy-prompt
-            (prompt choices &optional display-fn)
-            (declare (ignore prompt))
-            (or (find name choices :key display-fn :test #'string=)
-                (throw 'notfound nil))))
+    (cl-flet ((dummy-prompt
+               (prompt choices &optional display-fn)
+               (declare (ignore prompt))
+               (or (cl-find name choices :key display-fn :test #'string=)
+                   (throw 'notfound nil))))
       (let ((yas/prompt-functions '(dummy-prompt)))
         (catch 'notfound
           (yas/insert-snippet t)))))
