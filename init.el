@@ -40,7 +40,7 @@
 ;;----------------------------------------------------------------------------
 ;; Allow users to provide an optional "init-preload-local.el"
 ;;----------------------------------------------------------------------------
-;; (require 'init-preload-local nil t)
+(require 'init-preload-local nil t)
 
 ;;----------------------------------------------------------------------------
 ;; Load configs for specific features and modes
@@ -142,10 +142,6 @@
 ;; (require 'init-erlang)
 (require 'init-javascript)
 (require 'init-php)
-(setq org-roam-directory "/mnt/d/Dropbox/logseq/roam/")
-(setq dropbox-org-directory "/mnt/d/Dropbox/orgfile/")
-(setq dropbox-org-roam-directory "/mnt/d/Dropbox/orgfile/roam/")
-(setq logseq-assets-directory-prefix "assets")
 (require 'init-org)
 (require 'init-ox)
 ;; (require 'init-ox-latex)
@@ -201,8 +197,6 @@
 ;;----------------------------------------------------------------------------
 (require 'server)
 (unless (server-running-p)
-(setq server-auth-dir "~/.emacs.d/server/")
-(setq server-name "emacs-server-file")
 (server-start))
 ;; use "setsid emacsclient --socket-name emacs-server-file xxx.txt" to start emacsclient
 
