@@ -9,6 +9,7 @@
 /session.*
 /custom.el
 /lisp/init-preload-local.el
+/places
 /auto-save-list
 /frame-restore-parameters
 /.tutor/
