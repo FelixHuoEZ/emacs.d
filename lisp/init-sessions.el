@@ -3,24 +3,30 @@
       desktop-auto-save-timeout 600)
 (desktop-save-mode 1)
 
-(defadvice desktop-read (around time-restore activate)
-    (let ((start-time (current-time)))
-      (prog1
-          ad-do-it
-        (message "Desktop restored in %.2fms"
-                 (sanityinc/time-subtract-millis (current-time)
-                                                 start-time)))))
-
-(defadvice desktop-create-buffer (around time-create activate)
-  (let ((start-time (current-time))
-        (filename (ad-get-arg 1)))
+(defun sanityinc/desktop-read-timer (orig-fun &rest args)
+  (let ((start-time (current-time)))
     (prog1
-        ad-do-it
+        (apply orig-fun args)
+      (message "Desktop restored in %.2fms"
+               (sanityinc/time-subtract-millis (current-time)
+                                               start-time)))))
+
+(advice-add #'desktop-read :around #'sanityinc/desktop-read-timer)
+
+(defun sanityinc/desktop-create-buffer-timer (orig-fun &rest args)
+  (let ((start-time (current-time))
+        (filename (nth 1 args)))
+    (prog1
+        (apply orig-fun args)
       (message "Desktop: %.2fms to restore %s"
                (sanityinc/time-subtract-millis (current-time)
                                                start-time)
                (when filename
                  (abbreviate-file-name filename))))))
+
+(advice-add #'desktop-create-buffer
+            :around
+            #'sanityinc/desktop-create-buffer-timer)
 
 ;;----------------------------------------------------------------------------
 ;; Restore histories and registers after saving
