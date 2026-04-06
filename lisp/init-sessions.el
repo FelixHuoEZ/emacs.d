@@ -7,6 +7,16 @@
 (unless noninteractive
   (desktop-save-mode 1))
 
+(with-eval-after-load 'desktop
+  ;; Keep using `tabbar`, but do not let desktop restore Emacs's built-in tab bar.
+  (setq frameset-filter-alist (copy-tree frameset-filter-alist))
+  (dolist (parameter '(tab-bar-lines tabs))
+    (setf (alist-get parameter frameset-filter-alist) :never))
+  (add-hook 'desktop-after-read-hook
+            (lambda ()
+              (when (fboundp 'tab-bar-mode)
+                (tab-bar-mode -1)))))
+
 (defun sanityinc/desktop-read-timer (orig-fun &rest args)
   (let ((start-time (current-time)))
     (prog1
