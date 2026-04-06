@@ -645,7 +645,8 @@ same directory as the org-buffer and insert a link to this file."
 ;;(require 'init-tabbar)
 (use-package tabbar
   :config
-  (tab-bar-mode t)
+  ;; Keep only `tabbar`; do not also enable the built-in `tab-bar-mode`.
+  ;; (tab-bar-mode t)
   ;;Speed up by not using images
   ;;(setq tabbar-use-images nil)
   :bind
