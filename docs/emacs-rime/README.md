@@ -6,13 +6,13 @@
 
 1. macOS 原生前端 `Squirrel` 继续使用 `~/Library/Rime`。
 2. `emacs-rime` 使用独立的本地用户数据目录，避免和 `Squirrel` 共享 `*.userdb/` 与 `build/` 造成锁冲突。
-3. `emacs-rime` 的配置尽量与本机 `primary-rime` 上的 `Squirrel` 保持一致。
+3. `emacs-rime` 的配置尽量与当前机器上的主 `Squirrel` 配置保持一致。
 4. `emacs-rime` 与 `Squirrel` 仍然通过同一个 `sync_dir` 互通词频和用户词典快照。
-5. `emacs-rime` 在同步层面应被视为一个独立安装实例，而不是 `primary-rime` 的镜像。
+5. `emacs-rime` 在同步层面应被视为一个独立安装实例，而不是主 `Squirrel` 配置的镜像。
 
 ## 当前实现
 
-当前实现位于 [lisp/init-rime.el](../../lisp/init-rime.el)。
+当前实现位于 [`lisp/init-rime.el`](../../lisp/init-rime.el)。
 
 ### 目录职责
 
@@ -55,8 +55,8 @@
 
 ### installation_id 与 sync_dir
 
-- `Squirrel`: `installation_id: primary-rime`
-- `emacs-rime`: `installation_id: emacs-rime`
+- `Squirrel`: 保留主安装实例已有的 `installation_id`
+- `emacs-rime`: 在主安装实例的 `installation_id` 后追加 `-emacs`；如果主安装实例没有该值，则回退为 `emacs-rime`
 - 两者共用同一个 `sync_dir`
 
 这样 Rime 会把它们当成两个安装实例处理，词频通过同步目录互通，但本地用户数据不会直接共用。
