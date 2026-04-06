@@ -2,6 +2,7 @@
 ;;-----------------------------------------------------------------------------
 ;;-----------------------------------------------------------------------------
 (require 'cl-lib)
+(require 'init-local-private nil t)
 
 (add-hook 'org-mode-hook
           (lambda ()
@@ -158,24 +159,15 @@
 
 
 (use-package web-mode
-  :config
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-
+  :mode ("\\.html?\\'" "\\.phtml\\'" "\\.tpl\\.php\\'" "\\.[agj]sp\\'"
+         "\\.as[cp]x\\'" "\\.erb\\'" "\\.mustache\\'" "\\.djhtml\\'")
+  :hook (web-mode . my-web-mode-hook)
+  :init
   (defun my-web-mode-hook ()
     "Hooks for Web mode."
     (setq web-mode-markup-indent-offset 2)
     (setq web-mode-css-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    )
-  (add-hook 'web-mode-hook 'my-web-mode-hook)
-  )
+    (setq web-mode-code-indent-offset 2)))
 
 
 ;;; fix youdao-dictionary invalid date error
@@ -211,7 +203,8 @@
 
 
 ;; try
-(use-package try)
+(use-package try
+  :commands (try try-and-refresh))
 
 
 ;; smartparens-mode
@@ -380,15 +373,8 @@ same directory as the org-buffer and insert a link to this file."
   )
 
 
-(use-package habitica
-  :config
-  (setq habitica-uid "REDACTED-HABITICA-UID")
-  (setq habitica-token "REDACTED-HABITICA-TOKEN")
-  ;; If you want to try highlighting tasks based on their value, This is very experimental.
-  ;; (setq habitica-turn-on-highlighting t)
-  ;; If you want the streak count to appear as a tag for your daily tasks
-  (setq habitica-show-streak t)
-  )
+(when (bound-and-true-p hsk-enable-habitica)
+  (require 'init-local-habitica nil t))
 
 
 ;; (use-package ox-anki
@@ -398,8 +384,8 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; tiny(abo-abo)
 (use-package tiny
-  :config
-  (tiny-setup-default))
+  :commands (tiny-expand tiny-helper)
+  :bind (("C-;" . tiny-expand)))
 
 
 ;;; popwin
@@ -697,21 +683,22 @@ same directory as the org-buffer and insert a link to this file."
 
 ;;; expand-region
 (use-package expand-region
-  :config
+  :commands (er/expand-region)
+  :bind (("M-m" . er/expand-region))
+  :init
   ;; Don't use expand-region fast keys
   (setq expand-region-fast-keys-enabled nil)
   ;; Show expand-region command used
   (setq er--show-expansion-message t)
-  (global-set-key (kbd "M-m") 'er/expand-region)
   ;;Also enable mark-paragraph and mark-page
-  (defun er/add-text-mode-expansions ()
-    (make-variable-buffer-local 'er/try-expand-list)
-    (setq er/try-expand-list (append
-                              er/try-expand-list
-                              '(mark-paragraph
-                                mark-page))))
-  (add-hook 'text-mode-hook 'er/add-text-mode-expansions)
-  )
+  (with-eval-after-load 'expand-region
+    (defun er/add-text-mode-expansions ()
+      (make-variable-buffer-local 'er/try-expand-list)
+      (setq er/try-expand-list (append
+                                er/try-expand-list
+                                '(mark-paragraph
+                                  mark-page))))
+    (add-hook 'text-mode-hook 'er/add-text-mode-expansions)))
 
 
 ;;; magit
@@ -815,107 +802,24 @@ directory and insert a link to this file.
 
 
 ;;; chinese-pyim
-(use-package pyim
-  ;; :load-path "elpa-24.5/chinese-pyim"
-  ;; :defer nil
-  ;; :demand t ; if set demand, pyim will not automatically switched sometimes especially in org-mode,
-                                        ; if not set, when first use pyim, there will be a delay to load the package
-  ;; :disabled t
-  ;; :init
-  ;; (add-hook 'after-init-hook
-  ;; #'(lambda () (pyim-restart-1 t)))
-  :config
-  ;; 基本快捷键列表
-  ;; C-n/M-n/+ 向下翻页， C-p/M-p/- 向上翻页， C-f 选择下一个备选词，C-b 选择上一个备选词
-  ;; SPC 确定输入，RET/C-m 字母上屏， C-c 取消输入， C-g 取消输入并保留已输入的中文， TAB 模糊音调整
+(defun hsk/ensure-init-local-pyim ()
+  "Load the optional pyim configuration once for the current session."
+  (unless (featurep 'init-local-pyim)
+    (require 'init-local-pyim)))
+
+(defun hsk/pyim-toggle-input-method ()
+  "Toggle pyim without paying its startup cost until first use."
+  (interactive)
+  (hsk/ensure-init-local-pyim)
   (setq default-input-method "pyim")
-  ;; (setq default-input-method nil)
-  (setq pyim-default-scheme 'quanpin)
-  (global-set-key (kbd "C-\\") 'toggle-input-method)
+  (if (equal current-input-method "pyim")
+      (deactivate-input-method)
+    (when current-input-method
+      (deactivate-input-method))
+    (activate-input-method "pyim")))
 
-  ;; (setq pyim-enable-words-predict '(dabbrev pinyin-similar pinyin-znabc))
-  ;; (setq pyim-enable-words-predict nil)
-  (require 'pyim-dregcache)
-  (require 'pyim-cregexp-utils)
-  (require 'pyim-cstring-utils)
-
-  (setq pyim-backends '(dcache-personal dcache-common pinyin-chars pinyin-shortcode pinyin-znabc))
-  ;; (setq pyim-backends '(dcache-personal dcache-common pinyin-chars))
-  ;; (setq pyim-backends '(dcache-common))
-
-  (setq-default pyim-english-input-switch-functions
-                '(pyim-probe-dynamic-english
-                  pyim-probe-isearch-mode
-                  pyim-probe-program-mode
-                  pyim-probe-org-structure-template))
-
-  (setq-default pyim-punctuation-half-width-functions
-                '(pyim-probe-punctuation-line-beginning
-                  pyim-probe-punctuation-after-punctuation))
-
-  (use-package pyim-basedict
-    ;; :disabled t
-    :config
-    (pyim-basedict-enable))
-
-  (setq pyim-dicts
-        '(
-          ;; (:name "bigdict" :file "~/.emacs.d/pyim/dicts/pyim-bigdict.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          ;; (:name "guessdict" :file "~/.emacs.d/pyim/dicts/pyim-guessdict.gpyim" :coding utf-8-unix :dict-type guess-dict)
-          ;; (:name "sogou-dic-utf8" :file "~/.emacs.d/pyim/dicts/sogou-dic-utf8.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          ;; (:name "sogoucell" :file "~/.emacs.d/pyim/dicts/SogouCellWordLib.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          ;; (:name "millions" :file "~/.emacs.d/pyim/dicts/millions.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-
-          (:name "Useful" :file "~/.emacs.d/pyim/dicts/Useful.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          (:name "words" :file "~/.emacs.d/pyim/dicts/words.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          (:name "Daily" :file "~/.emacs.d/pyim/dicts/Daily.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          (:name "Electronics" :file "~/.emacs.d/pyim/dicts/Electronics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          (:name "CS" :file "~/.emacs.d/pyim/dicts/CS.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          (:name "Math-Physics" :file "~/.emacs.d/pyim/dicts/Math-Physics.pyim" :coding utf-8-unix :dict-type pinyin-dict)
-          ))
-
-  ;; Enable searching with pinyin
-  (setq pyim-isearch-enable-pinyin-search t)
-  ;; (setq pyim-guidance-format-function 'pyim-guidance-format-function-one-line)
-  (setq pyim-page-length 9)
-  ;; (setq pyim-page-style 'one-line)
-  (setq pyim-page-tooltip nil)
-  ;; (setq pyim-page-tooltip 'pos-tip)
-  ;; (setq pyim-page-tooltip 'popup)
-  ;; (print pyim-dicts)
-  ;; (add-hook 'emacs-startup-hook
-  ;; #'(lambda () (pyim-restart-1 t)))
-  ;; (pyim-restart-1 t)
-  ;; (pyim-restart-1)
-
-  ;; 词库导出，后续更新版本需要注释掉
-  ;; (defun pyim-personal-dcache-export ()
-  ;; "将 pyim-dcache-icode2word 导出为 pyim 词库文件。"
-  ;; (interactive)
-  ;; (let ((file (read-file-name "将个人缓存中的词条导出到文件：")))
-  ;; (with-temp-buffer
-  ;; (insert ";;; -*- coding: utf-8-unix -*-\n")
-  ;; (maphash
-  ;; #'(lambda (key value)
-  ;; (insert (concat key " " (mapconcat #'identity value " ") "\n")))
-  ;; pyim-dcache-icode2word)
-  ;; (write-file file))))
-
-  (use-package pyim-company
-    :disabled t
-    :ensure nil
-    :config
-    (setq pyim-company-max-length 6))
-
-  :bind
-  (("C-\\" . toggle-input-method)
-   ("M-j" . pyim-convert-string-at-point)
-   ;; ("C-;" . pyim-delete-word-from-personal-buffer)
-   ("C-c h" . pyim-punctuation-translate-at-point)
-   ("C-c C-h" . pyim-punctuation-toggle)
-   ("M-f" . pyim-forward-word)
-   ("M-b" . pyim-backward-word)
-   ))
+(global-set-key (kbd "C-c \\") #'hsk/pyim-toggle-input-method)
+(global-set-key (kbd "C-\\") #'hsk/pyim-toggle-input-method)
 
 
 ;;;pinyin-search
@@ -931,7 +835,9 @@ directory and insert a link to this file.
 ;; )
 
 
-(use-package find-by-pinyin-dired)
+(use-package find-by-pinyin-dired
+  :commands (find-by-pinyin-dired
+             find-by-pinyin-in-project-dired))
 
 
 ;;; Don't delete *scratch* buffer
@@ -1106,14 +1012,12 @@ directory and insert a link to this file.
 
 ;; tldr.el
 (use-package tldr
-  :config
-  ;; (tldr-update-docs)
-  )
+  :commands (tldr helm-tldr tldr-update-docs))
 
 
 ;; kaomoji 颜文字
 (use-package kaomoji
-  :config
+  :commands (kaomoji)
   ;; (setq kaomoji-table
   ;; (append '((("angry" "furious") . "(／‵Д′)／~ ╧╧ ")
   ;; (("angry" "punch") . "#???）?彡☆))?Д?)?∵"))
@@ -1488,7 +1392,8 @@ directory and insert a link to this file.
   (setq org-pretty-entities nil))
 
 
-(use-package evil-tutor)
+(use-package evil-tutor
+  :commands (evil-tutor-start evil-tutor-resume))
 
 
 ;;; cheatsheet
@@ -1854,10 +1759,15 @@ _~_: modified
 ;;   (minions-mode 1))
 
 (use-package powershell
-  :config
-  (use-package ob-powershell
-    :config
-    (cl-pushnew '(powershell . t) load-language-alist)))
+  :mode ("\\.ps1\\'" . powershell-mode)
+  :init
+  (with-eval-after-load 'org
+    (use-package ob-powershell
+      :init
+      (cl-pushnew '(powershell . t) load-language-alist)
+      :config
+      (org-babel-do-load-languages 'org-babel-load-languages
+                                   load-language-alist))))
 
 ;; zsh
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
