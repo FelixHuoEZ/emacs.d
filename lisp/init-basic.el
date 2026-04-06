@@ -109,15 +109,18 @@
 (use-package server
   :ensure nil
   :if centaur-server
+  :unless noninteractive
   :hook (after-init . server-mode))
 
 ;; History
 (use-package saveplace
   :ensure nil
+  :unless noninteractive
   :hook (after-init . save-place-mode))
 
 (use-package recentf
   :ensure nil
+  :unless noninteractive
   :bind (("C-x C-r" . recentf-open-files))
   :hook (after-init . recentf-mode)
   :init (setq recentf-max-saved-items 300
@@ -133,6 +136,7 @@
 
 (use-package savehist
   :ensure nil
+  :unless noninteractive
   :hook (after-init . savehist-mode)
   :init (setq enable-recursive-minibuffers t ; Allow commands in minibuffers
               history-length 1000
