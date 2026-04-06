@@ -8,6 +8,7 @@
 /.session
 /session.*
 /custom.el
+/lisp/emacs_abbrev_private.el
 /lisp/init-preload-local.el
 /lisp/init-local-private.el
 /places

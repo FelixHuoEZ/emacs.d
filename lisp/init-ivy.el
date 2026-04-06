@@ -256,7 +256,7 @@
     ;; put an .ignore file to tell counsel-rg to ignore
 
     ;; see@ [[https://github.com/abo-abo/swiper/issues/2802][Counsel rg base command string to exclude a directory · Issue #2802 · abo-abo/swiper]]
-    ;; (defvar my-rg-excludes '("~/iCloudDrive/logseq/roam/_gsdata_" "~/mnt/d/Dropbox/logseq/roam/_gsdata_")
+    ;; (defvar my-rg-excludes '("~/iCloudDrive/logseq/roam/_gsdata_" "~/Dropbox/logseq/roam/_gsdata_")
     ;;   "List of directories to exclude from `counsel-rg' results.")
 
     ;; (define-advice counsel-rg

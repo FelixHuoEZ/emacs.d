@@ -6,9 +6,8 @@
                                             ("8luv" "♥")
                                             ("8smly" "☺")
 
-                                            ;; email
-                                            ("8meg" "private-email@example.invalid")
-                                            ("8mew" "private-alt-email@example.invalid")
+                                            ;; personal contact abbreviations live in
+                                            ;; `emacs_abbrev_private.el'
 
                                             ;; computing tech
                                             ("8wp" "Wikipedia")
@@ -32,12 +31,6 @@
                                             ("8var" "variable")
                                             ("8ev" "environment variable")
                                             ("8cp" "computer")
-
-                                            ;; signature
-                                            ("8hsk" "Private User")
-
-                                            ;; url
-                                            ("8uxl" "https://example.invalid/")
 
                                             ;; emacs regex
                                             ("8d" "\\([0-9]+?\\)")

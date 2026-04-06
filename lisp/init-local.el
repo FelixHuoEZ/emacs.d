@@ -2,6 +2,80 @@
 ;;-----------------------------------------------------------------------------
 ;;-----------------------------------------------------------------------------
 (require 'cl-lib)
+
+(defvar hsk/private-github-username nil
+  "GitHub username loaded from `init-local-private.el'.")
+
+(defvar hsk/private-sync-directory nil
+  "Absolute directory containing synced private Emacs files.
+When nil, discover it from `EMACS_PRIVATE_SYNC_DIR' and common Dropbox paths.")
+
+(defconst hsk/private-sync-relative-directory "PrivateSync/emacs"
+  "Default Dropbox subdirectory for synced private Emacs files.")
+
+(defconst hsk/private-sync-files
+  '(("init-local-private.el" . "lisp/init-local-private.el")
+    ("emacs_abbrev_private.el" . "lisp/emacs_abbrev_private.el"))
+  "Files to bootstrap from the private sync directory.")
+
+(defun hsk/private-sync--candidate-directories ()
+  (let ((env-dir (getenv "EMACS_PRIVATE_SYNC_DIR")))
+    (cl-delete-duplicates
+     (delq nil
+           (mapcar #'expand-file-name
+                   (append
+                    (when hsk/private-sync-directory
+                      (list hsk/private-sync-directory))
+                    (when env-dir
+                      (list env-dir))
+                    (mapcar (lambda (root)
+                              (expand-file-name
+                               hsk/private-sync-relative-directory root))
+                            '("~/Library/CloudStorage/Dropbox"
+                              "~/Dropbox")))))
+     :test #'string-equal)))
+
+(defun hsk/private-sync--directory ()
+  (cl-find-if #'file-directory-p
+              (hsk/private-sync--candidate-directories)))
+
+(defun hsk/private-sync--same-link-target-p (path source)
+  (and (file-symlink-p path)
+       (condition-case nil
+           (string-equal (file-truename path)
+                         (file-truename source))
+         (error nil))))
+
+(defun hsk/private-sync--ensure-link (source target)
+  (let ((existing-link (file-symlink-p target)))
+    (cond
+     ((not (file-exists-p source))
+      nil)
+     ((hsk/private-sync--same-link-target-p target source)
+      nil)
+     ((and (file-exists-p target) (not existing-link))
+      (message "Keeping existing local file %s" target))
+     (t
+      (make-directory (file-name-directory target) t)
+      (when existing-link
+        (delete-file target))
+      (condition-case err
+          (progn
+            (make-symbolic-link source target t)
+            (message "Linked %s -> %s" target source))
+        (error
+         (message "Failed to link %s -> %s: %s"
+                  target source (error-message-string err))))))))
+
+(defun hsk/private-sync-bootstrap ()
+  "Link private files from Dropbox into this Emacs directory."
+  (when-let ((sync-dir (hsk/private-sync--directory)))
+    (dolist (entry hsk/private-sync-files)
+      (hsk/private-sync--ensure-link
+       (expand-file-name (car entry) sync-dir)
+       (expand-file-name (cdr entry) user-emacs-directory)))))
+
+(hsk/private-sync-bootstrap)
 (require 'init-local-private nil t)
 
 (add-hook 'org-mode-hook
@@ -19,7 +93,8 @@
 (setq debug-on-error t)
 ;;Turn on abbrev mode
 (load (expand-file-name "lisp/emacs_abbrev.el" user-emacs-directory))
-;;(load "~/.emacs.d/my_emacs_abbrev")
+(load (expand-file-name "lisp/emacs_abbrev_private.el" user-emacs-directory)
+      t 'nomessage)
 (global-set-key (kbd "C-h C-f") 'find-function)
 (setq desktop-restore-frames t)
 (unless noninteractive
@@ -1051,7 +1126,8 @@ directory and insert a link to this file.
 (use-package org2issue
   :defer t
   :init
-  (setq org2issue-user "private-github-user")
+  (when hsk/private-github-username
+    (setq org2issue-user hsk/private-github-username))
   (setq org2issue-blog-repo "org2issue-test")
   (setq org2issue-browse-issue t)
   (setq org2issue-update-file "~/org2issue-test/README.org"))
@@ -1068,7 +1144,8 @@ directory and insert a link to this file.
 ;;; go to github starred project
 (use-package helm-github-stars
   :config
-  (setq helm-github-stars-username "private-github-user")
+  (when hsk/private-github-username
+    (setq helm-github-stars-username hsk/private-github-username))
   ;; (setq helm-github-stars-cache-file "/cache/path")
 ;;;; refresh cache: M-x helm-github-stars-fetch
   (setq helm-github-stars-refetch-time 0.5)

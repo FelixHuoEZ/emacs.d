@@ -875,7 +875,26 @@ typical word processor."
 
 
 
-;;; Private User Misc Settings
+;;; Local Misc Settings
+
+(defvar hsk/bibtex-completion-bibliography nil
+  "Private bibliography file loaded from `init-local-private.el'.")
+
+(defvar hsk/bibtex-completion-library-path nil
+  "Private bibliography library path loaded from `init-local-private.el'.")
+
+(defvar hsk/bibtex-completion-notes-path nil
+  "Private bibliography notes path loaded from `init-local-private.el'.")
+
+(defvar hsk/org-ref-bibliography-notes nil
+  "Private `org-ref-bibliography-notes' value loaded from `init-local-private.el'.")
+
+(defvar hsk/org-ref-default-bibliography nil
+  "Private `org-ref-default-bibliography' value loaded from `init-local-private.el'.")
+
+(defvar hsk/org-ref-pdf-directory nil
+  "Private `org-ref-pdf-directory' value loaded from `init-local-private.el'.")
+
 (defun org-open-exported-pdf ()
   (interactive)
   (let* ((file (concat (file-name-sans-extension (buffer-file-name)) ".pdf")))
@@ -990,13 +1009,17 @@ typical word processor."
   (setq bibtex-completion-pdf-symbol "⌘")
   (setq bibtex-completion-notes-symbol "✎")
 
-  ;; see org-ref for use of these variables
-  ;; (setq org-ref-bibliography-notes "D:/MyDocuments/My Knowledge/Data/private-email@example.invalid/Academic/Projects/S 波段双圆极化天线/S波段双圆极化天线文档/双圆极化天线论文笔记.org_Attachments/note-of-dual-circular-polarized-antenna-papers.org"
-  ;;       org-ref-default-bibliography '("E:/Zotero/autobib/zoteroexport.bib")
-  ;;       org-ref-pdf-directory "E:/Zotero/storage/")
-  (setq bibtex-completion-bibliography "E:/Zotero/autobib/zoteroexport.bib"
-        bibtex-completion-library-path "E:/Zotero/storage"
-        bibtex-completion-notes-path "E:/Zotero/storage"
+  ;; Put personal bibliography paths in `init-local-private.el'.
+  (when hsk/org-ref-bibliography-notes
+    (setq org-ref-bibliography-notes hsk/org-ref-bibliography-notes))
+  (when hsk/org-ref-default-bibliography
+    (setq org-ref-default-bibliography hsk/org-ref-default-bibliography))
+  (when hsk/org-ref-pdf-directory
+    (setq org-ref-pdf-directory hsk/org-ref-pdf-directory))
+
+  (setq bibtex-completion-bibliography
+        (or hsk/bibtex-completion-bibliography
+            (expand-file-name "zoterobib.bib" user-emacs-directory))
         bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
 
         bibtex-completion-additional-search-fields '(keywords)
@@ -1009,6 +1032,10 @@ typical word processor."
         bibtex-completion-pdf-open-function
         (lambda (fpath)
           (call-process "open" nil 0 nil fpath)))
+  (when hsk/bibtex-completion-library-path
+    (setq bibtex-completion-library-path hsk/bibtex-completion-library-path))
+  (when hsk/bibtex-completion-notes-path
+    (setq bibtex-completion-notes-path hsk/bibtex-completion-notes-path))
 
   ;; open pdf with system pdf viewer (works on mac)
   ;; (setq bibtex-completion-pdf-open-function
@@ -1280,6 +1307,6 @@ typical word processor."
   ;; if you are using yasnippet and want `ai` snippets
   (org-ai-install-yasnippets))
 
-;;; Private User Misc Settings Ends
+;;; Local Misc Settings Ends
 
 (provide 'init-org)
