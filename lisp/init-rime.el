@@ -82,6 +82,24 @@
 (defvar hsk/rime--exit-finalized nil
   "Non-nil once librime has been explicitly finalized during shutdown.")
 
+(defconst hsk/rime-use-macos-word-navigation
+  (eq system-type 'darwin)
+  "Whether to use a macOS tokenizer helper for Chinese-aware word motion.")
+
+(defconst hsk/rime-word-segment-swift-source
+  (expand-file-name "scripts/rime-word-segment.swift" user-emacs-directory)
+  "Swift source file used for macOS word segmentation.")
+
+(defconst hsk/rime-word-segment-binary
+  (expand-file-name "var/rime-word-segment" user-emacs-directory)
+  "Compiled helper binary used for macOS word segmentation.")
+
+(defvar hsk/rime--word-segment-cache (make-hash-table :test #'equal)
+  "Cache for macOS word segmentation results keyed by input string.")
+
+(defvar hsk/rime--word-segmenter-unavailable nil
+  "Non-nil when the macOS word segmentation helper cannot be used.")
+
 (defun hsk/rime--rsync-args (source-dir target-dir &optional dry-run)
   "Build rsync args from SOURCE-DIR to TARGET-DIR.
 When DRY-RUN is non-nil, include diff-style preview flags."
@@ -333,6 +351,124 @@ Rime so it becomes the current preedit string. Otherwise, fall back to
         (cons "rime" (delete "rime" input-method-history)))
   (toggle-input-method))
 
+(defun hsk/rime--string-has-multibyte-p (string)
+  "Return non-nil when STRING contains non-ASCII characters."
+  (and (stringp string)
+       (string-match-p "[^[:ascii:]]" string)))
+
+(defun hsk/rime--ensure-word-segmenter ()
+  "Return the macOS word segmenter binary path, compiling it if needed."
+  (when (and hsk/rime-use-macos-word-navigation
+             (eq system-type 'darwin)
+             (not hsk/rime--word-segmenter-unavailable)
+             (file-exists-p hsk/rime-word-segment-swift-source))
+    (condition-case err
+        (progn
+          (when (or (not (file-executable-p hsk/rime-word-segment-binary))
+                    (file-newer-than-file-p hsk/rime-word-segment-swift-source
+                                            hsk/rime-word-segment-binary))
+            (make-directory (file-name-directory hsk/rime-word-segment-binary) t)
+            (with-temp-buffer
+              (let ((status (call-process "xcrun" nil t nil
+                                          "swiftc"
+                                          hsk/rime-word-segment-swift-source
+                                          "-o"
+                                          hsk/rime-word-segment-binary)))
+                (unless (zerop status)
+                  (setq hsk/rime--word-segmenter-unavailable t)
+                  (message "Rime word segmenter compile failed: %s"
+                           (string-trim (buffer-string)))))))
+          (when (file-executable-p hsk/rime-word-segment-binary)
+            hsk/rime-word-segment-binary))
+      (error
+       (setq hsk/rime--word-segmenter-unavailable t)
+       (message "Rime word segmenter unavailable: %s"
+                (error-message-string err))
+       nil))))
+
+(defun hsk/rime--segment-string-with-macos (string)
+  "Return token ranges for STRING using the macOS word segmenter."
+  (when (and (hsk/rime--string-has-multibyte-p string)
+             (hsk/rime--ensure-word-segmenter))
+    (or (gethash string hsk/rime--word-segment-cache)
+        (let ((rows nil))
+          (with-temp-buffer
+            (if (zerop (call-process hsk/rime-word-segment-binary
+                                     nil (current-buffer) nil string))
+                (progn
+                  (goto-char (point-min))
+                  (while (not (eobp))
+                    (let* ((line (string-trim
+                                  (buffer-substring-no-properties
+                                   (line-beginning-position)
+                                   (line-end-position))))
+                           (parts (split-string line "\t")))
+                      (when (= (length parts) 3)
+                        (push (list (string-to-number (nth 0 parts))
+                                    (string-to-number (nth 1 parts))
+                                    (nth 2 parts))
+                              rows)))
+                    (forward-line 1))
+                  (setq rows (nreverse rows)))
+              (setq rows nil)))
+          (puthash string rows hsk/rime--word-segment-cache)))))
+
+(defun hsk/rime--line-segment-move (direction)
+  "Move point by one segmented token on the current line.
+
+DIRECTION should be the symbol `forward' or `backward'. Return non-nil when a
+segmented move succeeds."
+  (let* ((line-beg (line-beginning-position))
+         (line-end (line-end-position))
+         (line (buffer-substring-no-properties line-beg line-end))
+         (offset (- (point) line-beg))
+         (tokens (hsk/rime--segment-string-with-macos line))
+         target)
+    (when tokens
+      (pcase direction
+        ('forward
+         (dolist (token tokens)
+           (let ((end (nth 1 token)))
+             (when (and (> end offset)
+                        (or (null target) (< end target)))
+               (setq target end)))))
+        ('backward
+         (dolist (token tokens)
+           (let ((start (nth 0 token)))
+             (when (< start offset)
+               (setq target start))))))
+      (when target
+        (goto-char (+ line-beg target))
+        t))))
+
+(defun hsk/rime-forward-word (&optional arg)
+  "Move forward across a Chinese or English word."
+  (interactive "p")
+  (let ((count (or arg 1)))
+    (dotimes (_ count)
+      (unless (or (hsk/rime--line-segment-move 'forward)
+                  (and (require 'pyim-cstring-utils nil t)
+                       (ignore-errors
+                         (call-interactively #'pyim-forward-word)
+                         t))
+                  (progn
+                    (forward-word 1)
+                    t))))))
+
+(defun hsk/rime-backward-word (&optional arg)
+  "Move backward across a Chinese or English word."
+  (interactive "p")
+  (let ((count (or arg 1)))
+    (dotimes (_ count)
+      (unless (or (hsk/rime--line-segment-move 'backward)
+                  (and (require 'pyim-cstring-utils nil t)
+                       (ignore-errors
+                         (call-interactively #'pyim-backward-word)
+                         t))
+                  (progn
+                    (backward-word 1)
+                    t))))))
+
 (defun hsk/rime-ready-p ()
   "Return non-nil when the local machine is ready to load emacs-rime."
   (and (eq system-type 'darwin)
@@ -378,7 +514,9 @@ Rime so it becomes the current preedit string. Otherwise, fall back to
   :bind
   (("C-\\" . hsk/rime-toggle-input-method)
    ("C-c ;" . hsk/rime-toggle-input-method)
-   ("M-j" . hsk/rime-force-enable-or-convert)))
+   ("M-j" . hsk/rime-force-enable-or-convert)
+   ("M-f" . hsk/rime-forward-word)
+   ("M-b" . hsk/rime-backward-word)))
 
 (provide 'init-rime)
 
